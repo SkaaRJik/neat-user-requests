@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("trainer")
+@RequestMapping("api/trainer")
 public class TargetIndicatorsTrainingController {
 
     @GetMapping("/default-config")

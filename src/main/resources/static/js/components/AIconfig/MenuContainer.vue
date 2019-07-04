@@ -1,4 +1,4 @@
-<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+<template>
 
             <v-list class="pa-1">
 
@@ -427,7 +427,7 @@
         },
         methods:{
             getDefaultConfig(){
-                this.$resource("/trainer/default-config").get().then(res => {
+                this.$resource("api/trainer/default-config").get().then(res => {
                     if(res.ok){
                         res.json().then(data => {
                             this.defaultConfig = data
@@ -580,6 +580,6 @@
     }
 </script>
 
-<style scoped>
+<style>
 
 </style>
