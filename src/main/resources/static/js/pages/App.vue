@@ -10,7 +10,8 @@
                 </v-btn>
             </template>
             <template v-else>
-                <v-avatar tile="false">
+                <v-avatar v-bind:tile="false"
+                color="primary">
                     <img v-bind:src="'data:image/jpeg;base64,'+profile.avatar" alt="avatar">
                 </v-avatar>
             </template>
