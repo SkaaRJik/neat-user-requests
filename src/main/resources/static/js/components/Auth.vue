@@ -2,6 +2,7 @@
 
     <v-layout row justify-center>
         <v-dialog v-model="dialog" persistent max-width="600px">
+
             <v-tabs
                     v-model="model"
                     centered
@@ -18,21 +19,34 @@
                     Регистрация
                 </v-tab>
             </v-tabs>
-
+            <v-alert
+                    v-model="showErrorSignIn"
+                    type="error"
+                    transition="scale-transition"
+                    dense
+            >
+                {{signInError}}
+            </v-alert>
             <v-tabs-items v-model="model">
                 <v-tab-item
                         value="sign-in"
                 >
+
                     <v-card>
                         <v-card-text>
                             <v-container grid-list-md>
                                 <v-layout wrap>
 
                                     <v-flex xs12>
-                                        <v-text-field label="Email" v-model="signInDetails.email" required></v-text-field>
+                                        <v-text-field
+                                                label="Email"
+                                                type="email"
+                                                v-model="signInDetails.email"
+                                                v-on:focusout="checkEmail"
+                                                required></v-text-field>
                                     </v-flex>
                                     <v-flex xs12>
-                                        <v-text-field label="Пароль*"
+                                        <v-text-field label="Пароль"
                                                       type="password"
                                                       v-model="signInDetails.password"
                                                       required>
@@ -115,10 +129,14 @@
 
         data() {
             return {
+                reg: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/,
+
                 model: 'sign-in',
                 emailError: null,
                 passwordError: null,
                 signInError: null,
+                showErrorSignIn: false,
+
                 signInDetails:{
                     email: null,
                     password: null,
@@ -139,21 +157,54 @@
         },
         methods: {
             ...mapActions(['showHideDialog', 'setProfile']),
-            async signIn(){
-                const result = await authApi.signIn(this.signInDetails)
-                if(result.ok){
-                    this.$store.dispatch('setProfile', await result.json())
+           async signIn(){
+                try{
+                    const result = await authApi.signIn(this.signInDetails)
+                    const data = await result.json()
+                    this.showErrorSignIn = false
+                    this.$store.dispatch('setProfile', data)
                     this.$store.dispatch('showHideDialog')
+                } catch (error) {
+                    this.signInError = 'Неверный логин или пароль'
+                    this.showErrorSignIn = true
                 }
             },
             async signUp() {
-                  const result = await authApi.signUp(this.userDetails)
-                if(result.ok){
+                try {
+                    const result = await authApi.signUp(this.userDetails)
                     this.model = 'sign-in'
                     this.signInDetails.email = this.userDetails.email
-                    //this.signInDetails = null;
+                } catch (e) {
+                    const error = await e.json()
+                    console.log(error)
                 }
             },
+            isEmailValid( email ) {
+
+                return (email == "") ? false : (this.reg.test(email));
+
+            },
+            async checkEmail() {
+                if(this.isEmailValid(this.signInDetails.email) )
+                try {
+                    this.showErrorSignIn = false
+                    const result = await authApi.checkEmail(this.signInDetails.email)
+                    const data = await result.json()
+                    if(data == false) {
+                        this.signInError = 'Пользователя с таким email не существует'
+                        this.showErrorSignIn = true
+                    } else {
+                        this.showErrorSignIn = false
+                    }
+                } catch (e) {
+
+                }
+                else {
+                    this.signInError = 'email не валиден'
+                    this.showErrorSignIn = true
+                }
+            },
+
         },
         watch: {
 

@@ -5,8 +5,9 @@ import Vue from 'vue'
 
 
 export default {
-    signIn: signInDetails => Vue.resource('/api/auth/signin').save({}, signInDetails),
-    signUp: signUpDetails => Vue.resource('/api/auth/signup').save({}, signUpDetails),
+    signIn: signInDetails => {return Vue.resource('/api/auth/signin').save({}, signInDetails)},
+    signUp: signUpDetails => {return Vue.resource('/api/auth/signup').save({}, signUpDetails)},
+    checkEmail: email => {return Vue.resource('/api/auth/check-email').get({email: email})},
 
 }
 
