@@ -28,6 +28,15 @@
                 temporary
                 absolute
         >
+
+            <v-list>
+                <v-list-group>
+
+                </v-list-group>
+            </v-list>
+            <!--<v-list>
+
+
             <v-list-item>
                 <v-list-item-avatar>
                     <v-avatar :tile="false">
@@ -42,7 +51,7 @@
 
             <v-divider></v-divider>
 
-            <v-list dense>
+
 
                 <v-list-item
                         v-for="item in items"
@@ -57,7 +66,7 @@
                         <v-list-item-title>{{ item.name }}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-            </v-list>
+            </v-list>-->
         </v-navigation-drawer>
         <!--<v-navigation-drawer
                 v-model="drawer"
