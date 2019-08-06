@@ -79,6 +79,9 @@
         </v-app-bar>
 
         <v-content>
+            <v-btn @click="test">
+
+            </v-btn>
            <!-- <v-container
                     fluid
                     fill-height
@@ -134,6 +137,8 @@
     import Auth from "components/Auth.vue";
     import {mapActions, mapState} from 'vuex'
 
+    import authAPI from 'api/auth'
+
     export default {
         props: {
             source: String,
@@ -157,8 +162,14 @@
         computed:
             mapState(['profile']),
 
-        methods:
-            mapActions(['showHideDialog']),
+        methods: {
+            ...mapActions(['showHideDialog']),
+            async test(){
+                const res = await authAPI.test(this.$store.state.profile.token)
+                const data = await res.json
+                console.log(data)
+            }
+        }
 
     }
 </script>

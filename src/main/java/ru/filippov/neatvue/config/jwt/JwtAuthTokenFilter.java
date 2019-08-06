@@ -27,11 +27,9 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    @Value("${app.jwt.Prefix}")
-    private String jwtPrefix;
 
-    @Value("${app.jwt.Header}")
-    private String jwtHeader;
+
+
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthTokenFilter.class);
 
@@ -42,8 +40,8 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     										throws ServletException, IOException {
         try {
         	
-            String jwt = getJwt(request);
-            if (jwt!=null && tokenProvider.validateJwtToken(jwt)) {
+            String jwt = tokenProvider.getJwt(request);
+            if (jwt!=null) {
                 String username = tokenProvider.getUserNameFromJwtToken(jwt);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -60,13 +58,5 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String getJwt(HttpServletRequest request) {
-        String authHeader = request.getHeader(jwtHeader);
-        	
-        if (authHeader != null && authHeader.startsWith(jwtPrefix+":")) {
-        	return authHeader.replace(jwtPrefix+":","");
-        }
 
-        return null;
-    }
 }

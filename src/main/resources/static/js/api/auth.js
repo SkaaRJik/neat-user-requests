@@ -8,6 +8,13 @@ export default {
     signIn: signInDetails => {return Vue.resource('/api/auth/signin').save({}, signInDetails)},
     signUp: signUpDetails => {return Vue.resource('/api/auth/signup').save({}, signUpDetails)},
     checkEmail: email => {return Vue.resource('/api/auth/check-email').get({email: email})},
+    test: token => {
+        return Vue.http.get('/api/trainer/default-config', {
+            headers: {
+                'Authorization': token
+            }
+        })
+    }
 
 }
 

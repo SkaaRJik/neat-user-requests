@@ -33,7 +33,7 @@
                 transition="scale-transition"
                 dense
                 border="bottom"
-                colored-border
+
                 elevation="2"
                 class="mb-0"
         >
