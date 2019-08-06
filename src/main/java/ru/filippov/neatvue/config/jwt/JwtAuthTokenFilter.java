@@ -22,7 +22,7 @@ import ru.filippov.neatvue.service.user.UserDetailsServiceImpl;
 public class JwtAuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtProvider tokenProvider;
+    private TokenProvider tokenProvider;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;

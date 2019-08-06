@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import ru.filippov.neatvue.config.jwt.JwtProvider;
+import ru.filippov.neatvue.config.jwt.TokenProvider;
 import ru.filippov.neatvue.domain.Role;
 import ru.filippov.neatvue.domain.User;
 import ru.filippov.neatvue.dto.ProfileDto;
@@ -42,7 +43,7 @@ public class AuthRestAPI {
     PasswordEncoder encoder;
 
     @Autowired
-    JwtProvider jwtProvider;
+    TokenProvider jwtProvider;
 
     @Value("${app.default.avatar}")
     private String defaultAvatar;

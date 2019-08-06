@@ -19,7 +19,7 @@ import java.util.Date;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 @Component
-public class JwtProvider {
+public class JwtProvider implements TokenProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
 
@@ -35,6 +35,7 @@ public class JwtProvider {
     @Value("${app.jwt.Header}")
     private String JWT_HEADER;
 
+    @Override
     public String generateJwtToken(Authentication authentication) {
 
         UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
@@ -57,7 +58,8 @@ public class JwtProvider {
 		                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
 		                .compact();*/
     }
-    
+
+    @Override
     public boolean validateJwtToken(String authToken) {
        /* try {
             Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(authToken);
@@ -76,7 +78,8 @@ public class JwtProvider {
         
         return false;
     }
-    
+
+    @Override
     public String getUserNameFromJwtToken(String token) throws JWTVerificationException {
         /*return Jwts.parser()
 			                .setSigningKey(JWT_SECRET)
@@ -89,6 +92,7 @@ public class JwtProvider {
                 .getSubject();
     }
 
+    @Override
     public String getJwt(HttpServletRequest request) {
         String authHeader = request.getHeader(JWT_HEADER);
 
