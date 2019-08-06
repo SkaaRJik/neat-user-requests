@@ -44,7 +44,7 @@ public class JwtProvider {
                 .withExpiresAt(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
                 .sign(HMAC512(JWT_SECRET.getBytes()));
 
-        logger.debug(token);
+        logger.info(token);
 
         return token;
 
@@ -85,7 +85,7 @@ public class JwtProvider {
 
         return JWT.require(HMAC512(JWT_SECRET.getBytes()))
                 .build()
-                .verify(token.substring(JWT_PREFIX.length()))
+                .verify(token)
                 .getSubject();
     }
 
