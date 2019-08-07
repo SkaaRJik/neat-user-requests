@@ -1,17 +1,13 @@
 package ru.filippov.neatvue.config.jwt;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import io.jsonwebtoken.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-import ru.filippov.neatvue.domain.User;
 import ru.filippov.neatvue.service.user.UserPrinciple;
-
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -19,9 +15,10 @@ import java.util.Date;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 @Component
+@Slf4j
 public class JwtProvider implements TokenProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
+
 
     @Value("${app.jwt.Secret}")
     private String JWT_SECRET;
@@ -42,10 +39,16 @@ public class JwtProvider implements TokenProvider {
 
         String token = JWT_PREFIX + JWT.create()
                 .withSubject(userPrincipal.getEmail())
+                .withArrayClaim("role", authentication
+                        .getAuthorities()
+                        .stream().
+                        map(GrantedAuthority::getAuthority)
+                        .toArray(String[]::new)
+                )
                 .withExpiresAt(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
                 .sign(HMAC512(JWT_SECRET.getBytes()));
 
-        logger.info(token);
+        log.info(token);
 
         return token;
 
@@ -93,7 +96,7 @@ public class JwtProvider implements TokenProvider {
     }
 
     @Override
-    public String getJwt(HttpServletRequest request) {
+    public String getRefreshToken(HttpServletRequest request) {
         String authHeader = request.getHeader(JWT_HEADER);
 
         if (authHeader != null && authHeader.startsWith(JWT_PREFIX)) {

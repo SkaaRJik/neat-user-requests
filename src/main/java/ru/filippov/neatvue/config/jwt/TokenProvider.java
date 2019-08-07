@@ -12,5 +12,5 @@ public interface TokenProvider {
 
     String getUserNameFromJwtToken(String token) throws JWTVerificationException;
 
-    String getJwt(HttpServletRequest request);
+    String getRefreshToken(HttpServletRequest request);
 }

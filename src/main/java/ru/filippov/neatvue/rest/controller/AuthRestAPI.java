@@ -1,9 +1,6 @@
 package ru.filippov.neatvue.rest.controller;
 
-import java.util.HashSet;
-
-import javax.validation.Valid;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -14,22 +11,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-
-import ru.filippov.neatvue.config.jwt.JwtProvider;
 import ru.filippov.neatvue.config.jwt.TokenProvider;
 import ru.filippov.neatvue.domain.Role;
 import ru.filippov.neatvue.domain.User;
-import ru.filippov.neatvue.dto.ProfileDto;
 import ru.filippov.neatvue.dto.LoginDto;
+import ru.filippov.neatvue.dto.ProfileDto;
 import ru.filippov.neatvue.dto.SignUpDto;
-import ru.filippov.neatvue.dto.TokenDto;
 import ru.filippov.neatvue.repository.UserRepository;
-import ru.filippov.utils.UtilBase64Image;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.HashSet;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
+@Slf4j
 public class AuthRestAPI {
 
     @Autowired
@@ -50,7 +47,15 @@ public class AuthRestAPI {
 
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginDto loginRequest) {
+    public ResponseEntity<?> authenticateUser(HttpServletRequest request, @Valid @RequestBody LoginDto loginRequest) {
+
+
+        String remoteAddr = request.getHeader("X-FORWARDED-FOR");
+        if (remoteAddr == null || "".equals(remoteAddr)) {
+            remoteAddr = request.getRemoteAddr();
+        }
+
+        log.info(remoteAddr);
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -62,6 +67,7 @@ public class AuthRestAPI {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         ProfileDto profile = ProfileDto.build(jwtProvider ,authentication);
+
 
 
         return ResponseEntity.ok(profile);
@@ -110,16 +116,15 @@ public class AuthRestAPI {
 	        		roles.add(userRole);        			
         	}
         });*/
-
-        User user = new User(
-                signUpRequest.getEmail(),
-                signUpRequest.getFirstName(),
-                signUpRequest.getLastName(),
-                encoder.encode(signUpRequest.getPassword()),
-                        true,
-                new HashSet<Role>(1) {{add(Role.USER);}},
-                this.defaultAvatar
-        );
+        User user = User.builder()
+                .email(signUpRequest.getEmail())
+                .firstName(signUpRequest.getFirstName())
+                .lastName(signUpRequest.getLastName())
+                .active(true)
+                .password(encoder.encode(signUpRequest.getPassword()))
+                .roles( new HashSet<Role>(1) {{add(Role.USER);}})
+                .avatar( this.defaultAvatar)
+                .build();
 
         userRepository.save(user);
 

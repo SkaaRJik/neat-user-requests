@@ -1,6 +1,7 @@
 package ru.filippov.neatvue.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
                 "email"
@@ -49,13 +51,4 @@ public class User {
     @Column
     private String avatar;
 
-    public User(@NotBlank String email, @NotBlank String firstName, @NotBlank String lastName, @NotBlank String password, boolean active, Set<Role> roles, String avatar) {
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-        this.active = active;
-        this.roles = roles;
-        this.avatar = avatar;
-    }
 }

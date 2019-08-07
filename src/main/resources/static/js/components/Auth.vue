@@ -55,20 +55,17 @@
                                             type="email"
                                             v-model="signInDetails.email"
                                             v-on:focusout="checkEmail"
+                                            v-on:input="clearSignInError"
                                             required></v-text-field>
                                 </v-flex>
                                 <v-flex xs12>
                                     <v-text-field label="Пароль"
                                                   type="password"
+                                                  v-on:input="clearSignInError"
                                                   v-model="signInDetails.password"
                                                   required>
 
                                     </v-text-field>
-                                </v-flex>
-                                <v-flex xs12>
-                                    <template v-if="signInError != null" >
-                                        {{signInError}}
-                                    </template>
                                 </v-flex>
                             </v-layout>
                         </v-container>
@@ -203,6 +200,9 @@
 
                 return (email == "") ? false : (this.reg.test(email));
 
+            },
+            async clearSignInError(){
+                this.showErrorSignIn = false
             },
             async checkEmail() {
                 if(this.isEmailValid(this.signInDetails.email) )
