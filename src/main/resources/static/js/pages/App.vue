@@ -165,7 +165,7 @@
         methods: {
             ...mapActions(['showHideDialog']),
             async test(){
-                const res = await authAPI.test(this.$store.state.profile.token)
+                const res = await authAPI.test(this.$store.state.profile.token.accessToken)
                 const data = await res.json
                 console.log(data)
             }

@@ -11,21 +11,20 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder(toBuilder = true)
-@Table(name = "authority")
+@Table(name = "auth")
 public class Auth {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "user_id")
-    @NotBlank
-    private Long userId;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
 
     @Column(name = "refresh_token")
-    @NotBlank
     private String refreshToken;
 
     @Column
@@ -34,7 +33,13 @@ public class Auth {
 
     @Column
     @NotBlank
-    private String device;
+    private String os;
+
+    @Column
+    @NotBlank
+    private String browser;
+
+
 
 
 

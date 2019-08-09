@@ -1,19 +1,26 @@
 package ru.filippov.neatvue.service.user;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.filippov.neatvue.domain.Role;
 import ru.filippov.neatvue.domain.User;
 
+import javax.persistence.Column;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
+@Builder(toBuilder = true)
 public class UserPrinciple implements UserDetails {
 	private static final long serialVersionUID = 1L;
 
@@ -25,8 +32,6 @@ public class UserPrinciple implements UserDetails {
 
     private String username;
 
-    private String email;
-
     private String avatar;
 
     @JsonIgnore
@@ -34,31 +39,26 @@ public class UserPrinciple implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrinciple(Long id, String email, String password, String firstname, String lastname, String avatar,
-			    		Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.avatar = avatar;
-    }
+    private LocalDateTime creationDate;
 
-    public static UserPrinciple build(User user) {
+    private LocalDateTime lastPasswordUpdate;
+
+    public static UserPrinciple toUserPrinciple(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
                 new SimpleGrantedAuthority(role.name())
         ).collect(Collectors.toList());
 
-        return new UserPrinciple(
-                user.getId(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getAvatar(),
-                authorities
-        );
+        return UserPrinciple.builder()
+                .id(user.getId())
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .firstname(user.getFirstName())
+                .lastname(user.getLastName())
+                .avatar(user.getAvatar())
+                .authorities(authorities)
+                .creationDate(user.getCreationDate())
+                .lastPasswordUpdate(user.getLastPasswordUpdate())
+                .build();
     }
 
     @Override
@@ -104,4 +104,25 @@ public class UserPrinciple implements UserDetails {
         UserPrinciple user = (UserPrinciple) o;
         return Objects.equals(id, user.id);
     }
+
+    public User toUser(){
+
+        Set<Role> roles = this.authorities
+                .stream().map(authority -> Role.valueOf(authority.getAuthority()))
+                .collect(Collectors.toSet());
+
+        return User.builder()
+                .id(this.id)
+                .email(this.username)
+                .password(this.password)
+                .firstName(this.firstname)
+                .lastName(this.lastname)
+                .avatar(this.avatar)
+                .roles(roles)
+                .creationDate(this.creationDate)
+                .lastPasswordUpdate(this.lastPasswordUpdate)
+                .build();
+    }
+
+
 }

@@ -23,8 +23,11 @@ public class JwtProvider implements TokenProvider {
     @Value("${app.jwt.Secret}")
     private String JWT_SECRET;
 
-    @Value("${app.jwt.Expiration}")
-    private int JWT_EXPIRATION;
+    @Value("${app.jwt.Access_Expiration}")
+    private int JWT_ACCESS_EXPIRATION;
+
+    @Value("${app.jwt.Refresh_Expiration}")
+    private int JWT_REFRESH_EXPIRATION;
 
     @Value("${app.jwt.Prefix}")
     private String JWT_PREFIX;
@@ -33,62 +36,69 @@ public class JwtProvider implements TokenProvider {
     private String JWT_HEADER;
 
     @Override
-    public String generateJwtToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
+        return generateAccessToken(authentication, this.JWT_ACCESS_EXPIRATION);
+    }
+
+    @Override
+    public String generateAccessToken(Authentication authentication, int expirationTime) {
 
         UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
 
         String token = JWT_PREFIX + JWT.create()
-                .withSubject(userPrincipal.getEmail())
+                .withSubject(userPrincipal.getUsername())
                 .withArrayClaim("role", authentication
                         .getAuthorities()
                         .stream().
-                        map(GrantedAuthority::getAuthority)
+                                map(GrantedAuthority::getAuthority)
                         .toArray(String[]::new)
                 )
-                .withExpiresAt(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
+                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
                 .sign(HMAC512(JWT_SECRET.getBytes()));
 
-        log.info(token);
-
         return token;
-
-
-
-        /*return Jwts.builder()
-		                .setSubject((userPrincipal.getUsername()))
-		                .setIssuedAt(new Date())
-		                .setExpiration(new Date((new Date()).getTime() + JWT_EXPIRATION *1000))
-		                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
-		                .compact();*/
     }
 
     @Override
-    public boolean validateJwtToken(String authToken) {
-       /* try {
-            Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(authToken);
+    public String generateRefreshToken(Authentication authentication) {
+        return generateRefreshToken(authentication, this.JWT_ACCESS_EXPIRATION);
+
+    }
+
+    @Override
+    public String generateRefreshToken(Authentication authentication, int expirationTime) {
+
+        UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
+
+        String token = JWT_PREFIX + JWT.create()
+                .withSubject(userPrincipal.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
+                .sign(HMAC512(JWT_SECRET.getBytes()));
+
+        return token;
+    }
+
+
+
+    @Override
+    public boolean validateJwtToken(String token) {
+
+
+        try{
+            JWT.require(HMAC512(JWT_SECRET.getBytes()))
+                    .build()
+                    .verify(token);
             return true;
-        } catch (SignatureException e) {
-            logger.error("Invalid JWT signature -> Message: {} ", e);
-        } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token -> Message: {}", e);
-        } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT token -> Message: {}", e);
-        } catch (UnsupportedJwtException e) {
-            logger.error("Unsupported JWT token -> Message: {}", e);
-        } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty -> Message: {}", e);
-        }*/
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         
         return false;
     }
 
     @Override
     public String getUserNameFromJwtToken(String token) throws JWTVerificationException {
-        /*return Jwts.parser()
-			                .setSigningKey(JWT_SECRET)
-			                .parseClaimsJws(token)
-			                .getBody().getSubject();*/
-
         return JWT.require(HMAC512(JWT_SECRET.getBytes()))
                 .build()
                 .verify(token)
@@ -96,7 +106,7 @@ public class JwtProvider implements TokenProvider {
     }
 
     @Override
-    public String getRefreshToken(HttpServletRequest request) {
+    public String getToken(HttpServletRequest request) {
         String authHeader = request.getHeader(JWT_HEADER);
 
         if (authHeader != null && authHeader.startsWith(JWT_PREFIX)) {
@@ -104,5 +114,15 @@ public class JwtProvider implements TokenProvider {
         }
 
         return null;
+    }
+
+    @Override
+    public int getAccessTokenExpiration() {
+        return this.JWT_ACCESS_EXPIRATION;
+    }
+
+    @Override
+    public int getRefreshTokenExpiration() {
+        return this.JWT_REFRESH_EXPIRATION;
     }
 }

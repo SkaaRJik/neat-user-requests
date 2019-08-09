@@ -32,8 +32,8 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     										throws ServletException, IOException {
         try {
         	
-            String actionToken = tokenProvider.getRefreshToken(request);
-            String refreshToken = tokenProvider.getRefreshToken(request);
+            String actionToken = tokenProvider.getToken(request);
+            String refreshToken = tokenProvider.getToken(request);
             if (refreshToken !=null) {
                 String username = tokenProvider.getUserNameFromJwtToken(refreshToken);
 

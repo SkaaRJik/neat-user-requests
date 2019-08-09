@@ -19,7 +19,8 @@ spring:
 app:
   jwt:
     Secret: SECRET
-    Expiration: 86400
+    Access_Expiration: 86400
+    Refresh_Expiration: 864000
     Prefix: Bearer_
     Header: Authorization
   default:

@@ -14,8 +14,8 @@ export default new Vuex.Store({
         },
         setProfileMutation(state, profile){
             state.profile = profile
-            state.profile.avatar=state.profile.avatar.data
-            state.profile.token=state.profile.token.token
+            state.profile.avatar = profile.avatar.data
+            state.profile.token = profile.token
         }
     },
     actions:{

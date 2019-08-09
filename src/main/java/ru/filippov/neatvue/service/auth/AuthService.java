@@ -2,30 +2,30 @@ package ru.filippov.neatvue.service.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.filippov.neatvue.domain.Auth;
+import ru.filippov.neatvue.domain.User;
 import ru.filippov.neatvue.repository.AuthRepository;
 
-import java.util.Optional;
-
 @Slf4j
+@Service
 public class AuthService {
 
     @Autowired
     AuthRepository authRepository;
 
     @Transactional
-    public Optional<Auth> loadAuthById(Long id){
-
+    public void addToken(User user, String token, String clientIp, String browser, String os){
+        Auth auth = Auth.builder()
+                .user(user)
+                .refreshToken(token)
+                .ip(clientIp)
+                .browser(browser)
+                .os(os)
+                .build();
+        authRepository.save(auth);
     }
-
-    @Transactional
-    public Optional<Auth> loadAuthByIp(String ip){
-
-    }
-
-    @Transactional
-    public Optional<Auth> loadAuthByRefreshToken(String token)
 
 
 

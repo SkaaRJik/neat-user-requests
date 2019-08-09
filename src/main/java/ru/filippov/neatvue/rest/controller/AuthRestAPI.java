@@ -1,6 +1,7 @@
 package ru.filippov.neatvue.rest.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -14,10 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import ru.filippov.neatvue.config.jwt.TokenProvider;
 import ru.filippov.neatvue.domain.Role;
 import ru.filippov.neatvue.domain.User;
-import ru.filippov.neatvue.dto.LoginDto;
 import ru.filippov.neatvue.dto.ProfileDto;
+import ru.filippov.neatvue.dto.SignInDto;
 import ru.filippov.neatvue.dto.SignUpDto;
-import ru.filippov.neatvue.repository.UserRepository;
+import ru.filippov.neatvue.dto.TokenDto;
+import ru.filippov.neatvue.service.auth.AuthService;
+import ru.filippov.neatvue.service.user.UserDetailsServiceImpl;
+import ru.filippov.neatvue.service.user.UserPrinciple;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -33,29 +37,25 @@ public class AuthRestAPI {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
-
+    UserDetailsServiceImpl userService;
 
     @Autowired
-    PasswordEncoder encoder;
+    AuthService authService;
 
     @Autowired
     TokenProvider jwtProvider;
 
-    @Value("${app.default.avatar}")
-    private String defaultAvatar;
-
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(HttpServletRequest request, @Valid @RequestBody LoginDto loginRequest) {
+    public ResponseEntity<?> authenticateUser(HttpServletRequest request, @Valid @RequestBody SignInDto loginRequest) {
 
 
-        String remoteAddr = request.getHeader("X-FORWARDED-FOR");
-        if (remoteAddr == null || "".equals(remoteAddr)) {
-            remoteAddr = request.getRemoteAddr();
+        String clientIp = request.getHeader("X-FORWARDED-FOR");
+        if (clientIp == null || "".equals(clientIp)) {
+            clientIp = request.getRemoteAddr();
         }
 
-        log.info(remoteAddr);
+
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -66,7 +66,21 @@ public class AuthRestAPI {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        ProfileDto profile = ProfileDto.build(jwtProvider ,authentication);
+        User user = ((UserPrinciple) userService.loadUserByUsername(loginRequest.getEmail())).toUser();
+
+
+        String refreshToken = jwtProvider.generateRefreshToken(authentication);
+        authService.addToken(user,
+                refreshToken,
+                clientIp,
+                loginRequest.getDeviceInfo().get("browser"),
+                loginRequest.getDeviceInfo().get("os"));
+
+        String accessToken = jwtProvider.generateAccessToken(authentication);
+
+        ProfileDto profile = ProfileDto.build(new TokenDto(
+                accessToken, refreshToken, jwtProvider.getAccessTokenExpiration(), jwtProvider.getRefreshTokenExpiration()
+        ),authentication);
 
 
 
@@ -76,7 +90,7 @@ public class AuthRestAPI {
     @GetMapping("/check-email")
     public ResponseEntity<Boolean> isEmailExist(@RequestParam String email){
 
-            return new ResponseEntity<Boolean>(userRepository.existsByEmail(email),
+            return new ResponseEntity<Boolean>(userService.existsByEmail(email),
                     HttpStatus.OK);
 
     }
@@ -84,50 +98,17 @@ public class AuthRestAPI {
 
     @PostMapping("/signup")
     public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpDto signUpRequest) {
-        if(userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return new ResponseEntity<String>("Fail -> Email is already used!",
+        if(userService.existsByEmail(signUpRequest.getEmail())) {
+            return new ResponseEntity<String>("Ошибка. Такой e-mail уже зарегистрирован в системе",
                     HttpStatus.BAD_REQUEST);
         }
 
-        // Creating user's account
-        /*User user = new User(signUpRequest.getEmail(), signUpRequest.getUsername(),
-                signUpRequest.getEmail(), encoder.encode(signUpRequest.getPassword()));
+        try {
+            userService.registrate(signUpRequest);
+        } catch (PSQLException e) {
+            e.printStackTrace();
+        }
 
-        Set<String> strRoles = signUpRequest.getRole();
-        Set<Role> roles = new HashSet<>();*/
-
-        /*strRoles.forEach(role -> {
-        	switch(role) {
-	    		case "admin":
-	    			Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
-	                .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-	    			roles.add(adminRole);
-	    			
-	    			break;
-	    		case "pm":
-	            	Role pmRole = roleRepository.findByName(RoleName.ROLE_PM)
-	                .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-	            	roles.add(pmRole);
-	            	
-	    			break;
-	    		default:
-	        		Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-	                .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-	        		roles.add(userRole);        			
-        	}
-        });*/
-        User user = User.builder()
-                .email(signUpRequest.getEmail())
-                .firstName(signUpRequest.getFirstName())
-                .lastName(signUpRequest.getLastName())
-                .active(true)
-                .password(encoder.encode(signUpRequest.getPassword()))
-                .roles( new HashSet<Role>(1) {{add(Role.USER);}})
-                .avatar( this.defaultAvatar)
-                .build();
-
-        userRepository.save(user);
-
-        return ResponseEntity.ok().body("User registered successfully!");
+        return ResponseEntity.ok().body("Ползователь зарегистрирован успешно. На ваш e-mail отправлено письмо с подтверждением регистрации.");
     }
 }

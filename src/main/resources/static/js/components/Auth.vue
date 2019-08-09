@@ -28,7 +28,19 @@
             </v-tab>
         </v-tabs>
         <v-alert
-                v-model="showErrorSignIn"
+                v-model="showSuccessInfo"
+                type="success"
+                transition="scale-transition"
+                dense
+                border="bottom"
+
+                elevation="2"
+                class="mb-0"
+        >
+            {{successInfo}}
+        </v-alert>
+        <v-alert
+                v-model="showAlert"
                 type="error"
                 transition="scale-transition"
                 dense
@@ -37,7 +49,7 @@
                 elevation="2"
                 class="mb-0"
         >
-            {{signInError}}
+            {{alertInfo}}
         </v-alert>
         <v-tabs-items v-model="model">
             <v-tab-item
@@ -140,6 +152,7 @@
 <script>
     import {mapActions, mapState} from 'vuex'
     import authApi from 'api/auth.js'
+    import browserDetector from 'libraries/device'
 
 
     export default {
@@ -151,12 +164,19 @@
                 model: 'sign-in',
                 emailError: null,
                 passwordError: null,
-                signInError: null,
-                showErrorSignIn: false,
 
+                alertInfo: null,
+                showAlert: false,
+
+                successInfo: null,
+                showSuccessInfo: false,
                 signInDetails:{
                     email: null,
                     password: null,
+                    deviceInfo: {
+                        browser: null,
+                        os: null
+                    }
                 },
                 userDetails:{
                     email: null,
@@ -176,24 +196,32 @@
             ...mapActions(['setProfile']),
            async signIn(){
                 try{
+                    var user = browserDetector.parse(navigator.userAgent);
+                    this.signInDetails.deviceInfo.browser = user.browser.family + ' v.' + user.browser.version
+                    this.signInDetails.deviceInfo.os = user.os.name
                     const result = await authApi.signIn(this.signInDetails)
                     const data = await result.json()
-                    this.showErrorSignIn = false
+                    this.showAlert = false
                     this.$store.dispatch('setProfile', data)
                     this.dialog=false
                 } catch (error) {
-                    this.signInError = 'Неверный логин или пароль'
-                    this.showErrorSignIn = true
+                    const info = await error.json()
+                    this.alertInfo = info
+                    this.showAlert = true
                 }
             },
             async signUp() {
                 try {
-                    const result = await authApi.signUp(this.userDetails)
+                    const res = await authApi.signUp(this.userDetails)
+                    const data = await res.json
+                    this.showSuccessInfo = true
+                    this.successInfo = data.bodyText
                     this.model = 'sign-in'
                     this.signInDetails.email = this.userDetails.email
-                } catch (e) {
-                    const error = await e.json()
-                    console.log(error)
+                } catch (error) {
+                    const info = await error.bodyText
+                    this.alertInfo = info
+                    this.showAlert = true
                 }
             },
             isEmailValid( email ) {
@@ -202,26 +230,26 @@
 
             },
             async clearSignInError(){
-                this.showErrorSignIn = false
+                this.showAlert = false
             },
             async checkEmail() {
                 if(this.isEmailValid(this.signInDetails.email) )
                 try {
-                    this.showErrorSignIn = false
+                    this.showAlert = false
                     const result = await authApi.checkEmail(this.signInDetails.email)
                     const data = await result.json()
                     if(data == false) {
-                        this.signInError = 'Пользователя с таким email не существует'
-                        this.showErrorSignIn = true
+                        this.alertInfo = 'Пользователя с таким email не существует'
+                        this.showAlert = true
                     } else {
-                        this.showErrorSignIn = false
+                        this.showAlert = false
                     }
                 } catch (e) {
 
                 }
                 else {
-                    this.signInError = 'email не валиден'
-                    this.showErrorSignIn = true
+                    this.alertInfo = 'email не валиден'
+                    this.showAlert = true
                 }
             },
 
@@ -229,14 +257,16 @@
         watch: {
 
             repeatPassword: function () {
-                console.log(this.repeatPassword)
-                console.log(this.emailError)
                 if(this.repeatPassword !== this.userDetails.password){
                     this.passwordError = 'Пароли не совпадают!'
                 } else {
                     this.passwordError = null
                 }
             },
+            model: function () {
+                this.showAlert = false
+
+            }
         }
 
     }

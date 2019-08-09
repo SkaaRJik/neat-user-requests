@@ -6,11 +6,12 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.HashMap;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginDto {
+public class SignInDto {
     @NotBlank
     @Size(min=3, max = 60)
     private String email;
@@ -18,6 +19,8 @@ public class LoginDto {
     @NotBlank
     @Size(min = 3, max = 40)
     private String password;
+
+    private HashMap<String, String> deviceInfo;
 
 
 }
