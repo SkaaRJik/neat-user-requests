@@ -1,9 +1,5 @@
 import Vue from 'vue'
 
-
-
-
-
 export default {
     signIn: signInDetails => {return Vue.resource('/api/auth/signin').save({}, signInDetails)},
     signUp: signUpDetails => {return Vue.resource('/api/auth/signup').save({}, signUpDetails)},

@@ -1,19 +1,15 @@
 import Vue from 'vue'
 
 import store from 'vue-modules/vuex-store'
-import router from 'vue-modules/vue-router'
+import router from 'vue-modules/vue-router.js'
 import vuetify from 'vue-modules/vuetify'
 
 import '@babel/polyfill'
-import 'api/resource'
-
-import App from 'pages/App.vue'
-
+import App from 'App.vue'
+// import 'frontend/src/api/resource'
 
 
-
-
-var app = new Vue({
+const app = new Vue({
     el: '#app',
     store,
     router,
