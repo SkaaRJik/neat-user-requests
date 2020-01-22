@@ -6,17 +6,9 @@ import Vuetify from 'vuetify/lib'
 import vuetify from './plugins/vuetify';
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@mdi/font/css/materialdesignicons.css'
-import Axios from 'axios'
+import '../settings/axios'
 
-
-Vue.config.productionTip = false
-Vue.prototype.$http = Axios;
-
-const token = localStorage.getItem('token')
-if (token) {
-    Vue.prototype.$http.defaults.headers.common['Authorization'] = token
-}
-
+console.log('[Main].() Vue.prototype.$http:', Vue.prototype.$http)
 
 Vue.use(Vuetify)
 

@@ -6,22 +6,20 @@
             clipped
     >
       <v-list dense>
-        <v-list-item link>
-          <v-list-item-action>
-            <v-icon>mdi-view-dashboard</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Dashboard</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link>
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Settings</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+          <v-list-item
+                  v-for="item in items"
+                  :key="item.name"
+                  link
+          >
+              <v-list-item-icon>
+                  <v-icon v-text="item.logo"></v-icon>
+              </v-list-item-icon>
+
+              <v-list-item-content>
+                  <v-list-item-title>{{ item.name }}</v-list-item-title>
+              </v-list-item-content>
+          </v-list-item>
+
       </v-list>
     </v-navigation-drawer>
 
@@ -49,7 +47,14 @@
       source: String,
     },
     data: () => ({
-      drawer: null,
+        drawer: null,
+        items: [
+            {
+                logo: "mdi-account",
+                name: "Профиль",
+                link: null,
+            }
+        ]
     }),
     created() {
 
