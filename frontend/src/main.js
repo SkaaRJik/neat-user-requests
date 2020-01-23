@@ -8,8 +8,6 @@ import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@mdi/font/css/materialdesignicons.css'
 import '../settings/axios'
 
-console.log('[Main].() Vue.prototype.$http:', Vue.prototype.$http)
-
 Vue.use(Vuetify)
 
 new Vue({

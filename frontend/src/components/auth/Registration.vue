@@ -21,6 +21,7 @@
                         <v-text-field label="Email*"
                                       v-model="userDetails.email"
                                       :hint="tooltip.emailError"
+                                      v-on:focusout="checkEmail"
                                       persistent-hint
                                       required>
 
@@ -59,6 +60,7 @@
 
 <script>
     import AuthApi from "../../methods/api/AuthAPI";
+    import {checkEmailExist, isEmailValid} from "../../methods/utils/validators";
 
     export default {
         name: "Registration",
@@ -90,6 +92,11 @@
         methods: {
             async signUp() {
                 try {
+                    const err = this.validateFields()
+                    if (err) {
+                        console.log('[Registration].signUp() validation error:', err)
+                        return
+                    }
                     let res = AuthApi.signUp(this.userDetails);
                     console.log('[Registration].signUp() res:', res)
                 } catch (e) {
@@ -99,18 +106,39 @@
                 }
             },
             async checkEmail() {
-
-            }
-        },
-
-        watch: {
-            repeatPassword: function () {
-                if (this.repeatPassword !== this.userDetails.password) {
-                    this.tooltip.passwordError = 'Пароли не совпадают!'
+                if (isEmailValid(this.userDetails.email)) {
+                    const emailExists = await checkEmailExist(this.userDetails.email)
+                    if (emailExists) {
+                        this.tooltip.emailError = 'Пользователь с таким e-mail уже зарегистрирован!'
+                    } else {
+                        this.tooltip.emailError = null
+                    }
                 } else {
-                    this.tooltip.passwordError = null
+                    this.tooltip.emailError = 'Ваш e-mail не валиден!'
                 }
             },
+            validateFields() {
+                if (!this.userDetails.email) return 'Заполните поле "Email"'
+                if (this.tooltip.emailError) return this.tooltip.emailError
+                if (!this.userDetails.password) return 'Заполните поле "Пароль"'
+                if (!this.repeatPassword) return 'Заполните поле "Повторите пароль"'
+                if (this.tooltip.passwordError) return this.tooltip.passwordError
+                if (!this.userDetails.firstName) return 'Заполните поле "Имя"'
+                if (!this.userDetails.lastName) return 'Заполните поле "Фамилия"'
+
+
+                return null
+            }
+        },
+        computed: {
+            tooltip: function () {
+                const message = this.repeatPassword !== this.userDetails.password ? 'Пароли не совпадают!' : null
+                return {
+                    ...this.tooltip,
+                    passwordError: message
+
+                }
+            }
         }
 
 

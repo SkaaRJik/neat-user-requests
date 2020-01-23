@@ -83,9 +83,10 @@ public class AuthRestAPI {
 
     @GetMapping("/email-exist")
     public ResponseEntity<Boolean> isEmailExist(@RequestParam String email){
+        Boolean existsByEmail = userService.existsByEmail(email);
 
-            return new ResponseEntity<Boolean>(userService.existsByEmail(email),
-                    HttpStatus.OK);
+        return new ResponseEntity<Boolean>(existsByEmail,
+                HttpStatus.OK);
 
     }
 

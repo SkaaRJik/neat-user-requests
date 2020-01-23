@@ -1,19 +1,19 @@
 import Vue from 'vue'
 
-
+const controllerPath = ''
 export default {
     signIn: signInDetails => {
-        return Vue.prototype.$http.post('/login', {
+        return Vue.prototype.$http.post(`${controllerPath}/login`, {
             signInDetails
         })
     },
     signUp: signUpDetails => {
-        return Vue.prototype.$http.post('/signup', {
+        return Vue.prototype.$http.post(`${controllerPath}/signup`, {
             signUpDetails
         })
     },
     checkEmail: email => {
-        return Vue.prototype.$http.get('/email-exist'), {params: {email}}
+        return Vue.prototype.$http.get(`${controllerPath}/email-exist?email=${email}`)
     },
     test: token => {
         return Vue.http.get('/api/trainer/default-config', {
