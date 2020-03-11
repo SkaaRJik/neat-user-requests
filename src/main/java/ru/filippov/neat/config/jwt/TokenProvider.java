@@ -9,11 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 public interface TokenProvider {
     String generateAccessToken(Authentication authentication);
 
-    String generateAccessToken(Authentication authentication, int expirationTime);
+    String generateAccessToken(Authentication authentication, long expirationTime);
 
     String generateRefreshToken(Authentication authentication);
 
-    String generateRefreshToken(Authentication authentication, int expirationTime);
+    String generateRefreshToken(Authentication authentication, long expirationTime);
 
 
     boolean validateJwtToken(String authToken);
@@ -22,6 +22,6 @@ public interface TokenProvider {
 
     String getToken(HttpServletRequest request);
 
-    int getAccessTokenExpiration();
-    int getRefreshTokenExpiration();
+    long getAccessTokenExpiration();
+    long getRefreshTokenExpiration();
 }

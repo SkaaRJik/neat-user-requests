@@ -24,10 +24,10 @@ public class JwtProvider implements TokenProvider {
     private String JWT_SECRET;
 
     @Value("${app.jwt.Access_Expiration}")
-    private int JWT_ACCESS_EXPIRATION;
+    private long JWT_ACCESS_EXPIRATION;
 
     @Value("${app.jwt.Refresh_Expiration}")
-    private int JWT_REFRESH_EXPIRATION;
+    private long JWT_REFRESH_EXPIRATION;
 
     @Value("${app.jwt.Prefix}")
     private String JWT_PREFIX;
@@ -41,7 +41,7 @@ public class JwtProvider implements TokenProvider {
     }
 
     @Override
-    public String generateAccessToken(Authentication authentication, int expirationTime) {
+    public String generateAccessToken(Authentication authentication, long expirationTime) {
 
         UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
 
@@ -66,7 +66,7 @@ public class JwtProvider implements TokenProvider {
     }
 
     @Override
-    public String generateRefreshToken(Authentication authentication, int expirationTime) {
+    public String generateRefreshToken(Authentication authentication, long expirationTime) {
 
         UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
 
@@ -117,12 +117,12 @@ public class JwtProvider implements TokenProvider {
     }
 
     @Override
-    public int getAccessTokenExpiration() {
+    public long getAccessTokenExpiration() {
         return this.JWT_ACCESS_EXPIRATION;
     }
 
     @Override
-    public int getRefreshTokenExpiration() {
+    public long getRefreshTokenExpiration() {
         return this.JWT_REFRESH_EXPIRATION;
     }
 }

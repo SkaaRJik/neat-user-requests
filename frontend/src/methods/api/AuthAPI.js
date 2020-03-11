@@ -9,7 +9,7 @@ export default {
     },
     signUp: signUpDetails => {
         return Vue.prototype.$http.post(`${controllerPath}/signup`, {
-            signUpDetails
+            ...signUpDetails
         })
     },
     checkEmail: email => {

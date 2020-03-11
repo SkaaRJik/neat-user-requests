@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.HashMap;
 
 @Data
@@ -19,8 +20,5 @@ public class SignInDto {
     @NotBlank
     @Size(min = 3, max = 40)
     private String password;
-
-    private HashMap<String, String> deviceInfo;
-
 
 }

@@ -1,5 +1,6 @@
 package ru.filippov.neat.service.user;
 
+import lombok.extern.log4j.Log4j2;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 
 @Service
+@Log4j2
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
@@ -44,7 +46,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public Boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+        Boolean isUserExists = userRepository.existsByEmail(email);
+        log.info("isUserExists: " + isUserExists);
+        return isUserExists;
     }
 
     public void registrate(SignUpDto signUpRequest) throws PSQLException {

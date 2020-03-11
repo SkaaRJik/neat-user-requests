@@ -8,6 +8,8 @@ import ru.filippov.neat.domain.Auth;
 import ru.filippov.neat.domain.User;
 import ru.filippov.neat.repository.AuthRepository;
 
+import java.util.Date;
+
 @Slf4j
 @Service
 public class AuthService {
@@ -16,13 +18,11 @@ public class AuthService {
     AuthRepository authRepository;
 
     @Transactional
-    public void addToken(User user, String token, String clientIp, String browser, String os){
+    public void addToken(User user, String token, Date expirationDate){
         Auth auth = Auth.builder()
                 .user(user)
                 .refreshToken(token)
-                .ip(clientIp)
-                .browser(browser)
-                .os(os)
+                .expirationDate(expirationDate)
                 .build();
         authRepository.save(auth);
     }

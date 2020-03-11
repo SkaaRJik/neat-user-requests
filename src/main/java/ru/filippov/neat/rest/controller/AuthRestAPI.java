@@ -22,35 +22,32 @@ import ru.filippov.neat.service.user.UserPrinciple;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Date;
 
 @RestController
 @Slf4j
+@CrossOrigin
 public class AuthRestAPI {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+    final private AuthenticationManager authenticationManager;
 
-    @Autowired
-    UserDetailsServiceImpl userService;
+    final private UserDetailsServiceImpl userService;
 
-    @Autowired
-    AuthService authService;
+    final private AuthService authService;
 
-    @Autowired
-    TokenProvider jwtProvider;
+    final private TokenProvider jwtProvider;
+
+    public AuthRestAPI(AuthenticationManager authenticationManager, UserDetailsServiceImpl userService, AuthService authService, TokenProvider jwtProvider) {
+        this.authenticationManager = authenticationManager;
+        this.userService = userService;
+        this.authService = authService;
+        this.jwtProvider = jwtProvider;
+    }
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(HttpServletRequest request, @Valid @RequestBody SignInDto loginRequest) {
-
-
-        String clientIp = request.getHeader("X-FORWARDED-FOR");
-        if (clientIp == null || "".equals(clientIp)) {
-            clientIp = request.getRemoteAddr();
-        }
-
-
-
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SignInDto loginRequest) {
+        
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -60,15 +57,15 @@ public class AuthRestAPI {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = ((UserPrinciple) userService.loadUserByUsername(loginRequest.getEmail())).toUser();
+
 
 
         String refreshToken = jwtProvider.generateRefreshToken(authentication);
+
+        User user = ((UserPrinciple) userService.loadUserByUsername(loginRequest.getEmail())).toUser();
+
         authService.addToken(user,
-                refreshToken,
-                clientIp,
-                loginRequest.getDeviceInfo().get("browser"),
-                loginRequest.getDeviceInfo().get("os"));
+                refreshToken, new Date(new Date().getTime() + jwtProvider.getRefreshTokenExpiration()));
 
         String accessToken = jwtProvider.generateAccessToken(authentication);
 

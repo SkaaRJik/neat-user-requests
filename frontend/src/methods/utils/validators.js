@@ -9,7 +9,7 @@ export function isEmailValid(email) {
 export async function checkEmailExist(email) {
     try {
         const result = await AuthApi.checkEmail(email)
-        console.log('[Validators].checkEmail() result:', result)
+        console.log('[Validators].checkEmail() result:', result.data)
         return result
 
     } catch (e) {

@@ -34,7 +34,7 @@
                     <v-flex xs12>
                         <v-text-field label="Повторите пароль*"
                                       type="password"
-                                      v-model="userDetails.repeatPassword"
+                                      v-model="repeatPassword"
                                       :hint="tooltip.passwordError"
                                       persistent-hint
                                       required>
@@ -52,7 +52,7 @@
         </v-card-text>
         <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="cancel">Отмена</v-btn>
+            <v-btn color="blue darken-1" text @click="()=> this.$emit('cancel')">Отмена</v-btn>
             <v-btn color="blue darken-1" text @click="signUp">Зарегистрироваться</v-btn>
         </v-card-actions>
     </v-card>
@@ -72,10 +72,10 @@
                     message: '',
                 },
                 userDetails: {
-                    email: null,
-                    password: null,
-                    firstName: null,
-                    lastName: null,
+                    email: '',
+                    password: '',
+                    firstName: '',
+                    lastName: '',
 
                 },
                 tooltip: {
@@ -87,28 +87,35 @@
             }
         },
         props: {
-            cancel: Function
+            cancel: Function,
+            switchTab: Function,
         },
         methods: {
             async signUp() {
                 try {
+                    this.alert.message = ''
                     const err = this.validateFields()
                     if (err) {
                         console.log('[Registration].signUp() validation error:', err)
+                        this.alert.type = 'error'
+                        this.alert.message = err
                         return
                     }
-                    let res = AuthApi.signUp(this.userDetails);
-                    console.log('[Registration].signUp() res:', res)
+                    console.debug('[Registration].signUp() userDetails:', this.userDetails)
+                    let res = await AuthApi.signUp(this.userDetails)
+                    console.debug('[Registration].signUp() res:', res)
+                    this.$emit('fillDataToLogin', this.userDetails.email, this.userDetails.password, res)
+                    this.$emit('switchTab', 'sign-in')
                 } catch (e) {
                     console.log('[Registration].signUp() error:', e)
                     this.alert.type = 'error'
-                    this.alert.message = e.response
+                    this.alert.message = e.response ? e.response : e.message
                 }
             },
             async checkEmail() {
                 if (isEmailValid(this.userDetails.email)) {
                     const emailExists = await checkEmailExist(this.userDetails.email)
-                    if (emailExists) {
+                    if (emailExists === true) {
                         this.tooltip.emailError = 'Пользователь с таким e-mail уже зарегистрирован!'
                     } else {
                         this.tooltip.emailError = null
@@ -125,8 +132,6 @@
                 if (this.tooltip.passwordError) return this.tooltip.passwordError
                 if (!this.userDetails.firstName) return 'Заполните поле "Имя"'
                 if (!this.userDetails.lastName) return 'Заполните поле "Фамилия"'
-
-
                 return null
             }
         },

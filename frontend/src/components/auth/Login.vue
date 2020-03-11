@@ -2,16 +2,16 @@
     <v-card>
         <v-card-title>
             <v-alert
-                    v-model="showSuccessInfo"
-                    type="success"
+                    v-model="alert.message !== ''"
+                    :type="alert.type"
                     transition="scale-transition"
                     dense
                     border="bottom"
-
                     elevation="2"
                     class="mb-0"
+                    style="width: 100%"
             >
-                {{successInfo}}
+                {{alert.message}}
             </v-alert>
         </v-card-title>
         <v-card-text>
@@ -24,13 +24,13 @@
                                 type="email"
                                 v-model="signInDetails.email"
                                 v-on:focusout="checkEmail"
-                                v-on:input="clearSignInError"
+                                v-on:focusin="()=>{this.alert.message = ''}"
                                 required/>
                     </v-flex>
                     <v-flex xs12>
                         <v-text-field label="Пароль"
                                       type="password"
-                                      v-on:input="clearSignInError"
+                                      v-on:focusin="()=>{this.alert.message = ''}"
                                       v-model="signInDetails.password"
                                       required/>
                     </v-flex>
@@ -39,9 +39,8 @@
         </v-card-text>
         <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="">
-                <Отме></Отме>
-                на
+            <v-btn color="blue darken-1" text @click="()=> this.$emit('cancel')">
+                Отмена
             </v-btn>
             <v-btn color="blue darken-1" text @click="signIn">Войти</v-btn>
         </v-card-actions>
@@ -49,24 +48,48 @@
 </template>
 
 <script>
+
+    import AuthApi from "../../methods/api/AuthAPI";
+    import {checkEmailExist, isEmailValid} from "../../methods/utils/validators";
+
     export default {
         name: "Login",
+        data() {
+            return {
+                signInDetails: {
+                    email: '',
+                    password: ''
+                },
+                alert: {
+                    type: 'error',
+                    message: '',
+                },
+            }
+        },
 
         methods: {
             async signIn() {
                 try {
-                    var user = browserDetector.parse(navigator.userAgent);
-                    this.signInDetails.deviceInfo.browser = user.browser.family + ' v.' + user.browser.version
-                    this.signInDetails.deviceInfo.os = user.os.name
-                    const result = await authApi.signIn(this.signInDetails)
-                    const data = await result.json()
-                    this.showAlert = false
-                    this.$store.dispatch('setProfile', data)
-                    this.dialog = false
-                } catch (error) {
-                    const info = await error.json()
-                    this.alertInfo = info
-                    this.showAlert = true
+                    const result = await AuthApi.signIn(this.signInDetails)
+                    this.$store.dispatch('setProfile', result)
+                } catch (e) {
+                    this.alert.type = 'error'
+                    this.alert.message = e.response ? e.response : e.message
+                }
+            },
+            async checkEmail() {
+                if (isEmailValid(this.signInDetails.email)) {
+                    const emailExists = (await checkEmailExist(this.signInDetails.email)).data
+                    console.log('[Login].checkEmail :',emailExists)
+                    if (emailExists === false) {
+                        this.alert.type = 'info'
+                        this.alert.message  = 'Пользователя с таким e-mail не существует!'
+                    } else {
+                        this.alert.message = ''
+                    }
+                } else {
+                    this.alert.type = 'error'
+                    this.alert.message = 'Ваш e-mail не валиден!'
                 }
             },
         }
