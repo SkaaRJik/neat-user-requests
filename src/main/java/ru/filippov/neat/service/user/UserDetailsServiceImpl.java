@@ -34,20 +34,33 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String email)
+    public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User Not Found with email : " + email)
-                );
+        User user = null;
+        if(username.indexOf('@') != -1){
+            user = userRepository.findByEmail(username)
+                    .orElseThrow(() ->
+                            new UsernameNotFoundException("User Not Found with email : " + username)
+                    );
+        } else {
+            user = userRepository.findByUsername(username)
+                    .orElseThrow(() ->
+                            new UsernameNotFoundException("User Not Found with username : " + username)
+                    );
+        }
 
         return UserPrinciple.toUserPrinciple(user);
     }
 
     public Boolean existsByEmail(String email) {
         Boolean isUserExists = userRepository.existsByEmail(email);
-        log.info("isUserExists: " + isUserExists);
+        log.debug(String.format("User %s exists: %b", email, isUserExists));
+        return isUserExists;
+    }
+
+    public Boolean existsByUsername(String username) {
+        Boolean isUserExists = userRepository.existsByEmail(username);
+        log.debug(String.format("User %s exists: %b", username, isUserExists));
         return isUserExists;
     }
 

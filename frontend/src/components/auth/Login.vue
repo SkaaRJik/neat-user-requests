@@ -30,7 +30,7 @@
                     <v-flex xs12>
                         <v-text-field label="Пароль"
                                       type="password"
-                                      v-on:focusin="()=>{this.alert.message = ''}"
+                                      v-on:focusin="()=>{checkEmail}"
                                       v-model="signInDetails.password"
                                       required/>
                     </v-flex>
@@ -71,7 +71,8 @@
             async signIn() {
                 try {
                     const result = await AuthApi.signIn(this.signInDetails)
-                    this.$store.dispatch('setProfile', result)
+                    console.log('[Login].signIn result:',result.data)
+                    //this.$store.dispatch('setProfile', result)
                 } catch (e) {
                     this.alert.type = 'error'
                     this.alert.message = e.response ? e.response : e.message
@@ -79,9 +80,9 @@
             },
             async checkEmail() {
                 if (isEmailValid(this.signInDetails.email)) {
-                    const emailExists = (await checkEmailExist(this.signInDetails.email)).data
+                    const emailExists = await checkEmailExist(this.signInDetails.email)
                     console.log('[Login].checkEmail :',emailExists)
-                    if (emailExists === false) {
+                    if (emailExists.data === false) {
                         this.alert.type = 'info'
                         this.alert.message  = 'Пользователя с таким e-mail не существует!'
                     } else {

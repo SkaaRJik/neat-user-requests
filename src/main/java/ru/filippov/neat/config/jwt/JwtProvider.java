@@ -2,15 +2,18 @@ package ru.filippov.neat.config.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import ru.filippov.neat.domain.Role;
 import ru.filippov.neat.service.user.UserPrinciple;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
+import java.util.*;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
@@ -20,39 +23,33 @@ public class JwtProvider implements TokenProvider {
 
 
 
-    @Value("${app.jwt.Secret}")
+    @Value("${app.jwt.secret}")
     private String JWT_SECRET;
 
-    @Value("${app.jwt.Access_Expiration}")
+    @Value("${app.jwt.access.expiration}")
     private long JWT_ACCESS_EXPIRATION;
 
-    @Value("${app.jwt.Refresh_Expiration}")
-    private long JWT_REFRESH_EXPIRATION;
-
-    @Value("${app.jwt.Prefix}")
+    @Value("${app.jwt.access.prefix}")
     private String JWT_PREFIX;
 
-    @Value("${app.jwt.Header}")
+    @Value("${app.jwt.access.header}")
     private String JWT_HEADER;
 
+    @Value("${app.jwt.refresh.expiration}")
+    private long JWT_REFRESH_EXPIRATION;
+
     @Override
-    public String generateAccessToken(Authentication authentication) {
-        return generateAccessToken(authentication, this.JWT_ACCESS_EXPIRATION);
+    public String generateAccessToken(String username, String[] roles) {
+        return generateAccessToken(username, roles,this.JWT_ACCESS_EXPIRATION);
     }
 
     @Override
-    public String generateAccessToken(Authentication authentication, long expirationTime) {
+    public String generateAccessToken(String username, String[] roles, long expirationTime) {
 
-        UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
 
         String token = JWT_PREFIX + JWT.create()
-                .withSubject(userPrincipal.getUsername())
-                .withArrayClaim("role", authentication
-                        .getAuthorities()
-                        .stream().
-                                map(GrantedAuthority::getAuthority)
-                        .toArray(String[]::new)
-                )
+                .withSubject(username)
+                .withArrayClaim("roles", roles)
                 .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
                 .sign(HMAC512(JWT_SECRET.getBytes()));
 
@@ -60,18 +57,18 @@ public class JwtProvider implements TokenProvider {
     }
 
     @Override
-    public String generateRefreshToken(Authentication authentication) {
-        return generateRefreshToken(authentication, this.JWT_ACCESS_EXPIRATION);
+    public String generateRefreshToken(String username) {
+        return generateRefreshToken(username, this.JWT_REFRESH_EXPIRATION);
 
     }
 
     @Override
-    public String generateRefreshToken(Authentication authentication, long expirationTime) {
+    public String generateRefreshToken(String username, long expirationTime) {
 
-        UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
 
-        String token = JWT_PREFIX + JWT.create()
-                .withSubject(userPrincipal.getUsername())
+
+        String token = JWT.create()
+                .withSubject(username)
                 .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
                 .sign(HMAC512(JWT_SECRET.getBytes()));
 
@@ -81,20 +78,13 @@ public class JwtProvider implements TokenProvider {
 
 
     @Override
-    public boolean validateJwtToken(String token) {
+    public boolean validateJwtToken(String token) throws JWTVerificationException {
 
+        JWT.require(HMAC512(JWT_SECRET.getBytes()))
+                .build()
+                .verify(token);
 
-        try{
-            JWT.require(HMAC512(JWT_SECRET.getBytes()))
-                    .build()
-                    .verify(token);
-            return true;
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        
-        return false;
+        return true;
     }
 
     @Override
@@ -124,5 +114,19 @@ public class JwtProvider implements TokenProvider {
     @Override
     public long getRefreshTokenExpiration() {
         return this.JWT_REFRESH_EXPIRATION;
+    }
+
+    @Override
+    public List<GrantedAuthority> getAuthoritiesFromJwtToken(String actionToken) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        Arrays.stream(JWT.require(HMAC512(JWT_SECRET.getBytes()))
+                .build()
+                .verify(actionToken)
+                .getClaim("roles").asArray(String.class)).forEach(role -> {
+            authorities.add(new SimpleGrantedAuthority(role));
+        });
+
+        return authorities;
     }
 }

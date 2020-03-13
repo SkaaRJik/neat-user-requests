@@ -2,18 +2,20 @@ package ru.filippov.neat.config.jwt;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 public interface TokenProvider {
-    String generateAccessToken(Authentication authentication);
+    String generateAccessToken(String username, String[] roles);
 
-    String generateAccessToken(Authentication authentication, long expirationTime);
+    String generateAccessToken(String username, String[] roles, long expirationTime);
 
-    String generateRefreshToken(Authentication authentication);
+    String generateRefreshToken(String username);
 
-    String generateRefreshToken(Authentication authentication, long expirationTime);
+    String generateRefreshToken(String username, long expirationTime);
 
 
     boolean validateJwtToken(String authToken);
@@ -24,4 +26,6 @@ public interface TokenProvider {
 
     long getAccessTokenExpiration();
     long getRefreshTokenExpiration();
+
+    List<GrantedAuthority> getAuthoritiesFromJwtToken(String actionToken);
 }

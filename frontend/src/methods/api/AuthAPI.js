@@ -4,7 +4,7 @@ const controllerPath = ''
 export default {
     signIn: signInDetails => {
         return Vue.prototype.$http.post(`${controllerPath}/login`, {
-            signInDetails
+            ...signInDetails
         })
     },
     signUp: signUpDetails => {

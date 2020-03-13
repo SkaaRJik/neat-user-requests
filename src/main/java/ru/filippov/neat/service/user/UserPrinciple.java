@@ -30,6 +30,8 @@ public class UserPrinciple implements UserDetails {
 
     private String username;
 
+    private String email;
+
     private String avatar;
 
     @JsonIgnore
@@ -48,7 +50,8 @@ public class UserPrinciple implements UserDetails {
 
         return UserPrinciple.builder()
                 .id(user.getId())
-                .username(user.getEmail())
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .password(user.getPassword())
                 .firstname(user.getFirstName())
                 .lastname(user.getLastName())
@@ -57,6 +60,10 @@ public class UserPrinciple implements UserDetails {
                 .creationDate(user.getCreationDate())
                 .lastPasswordUpdate(user.getLastPasswordUpdate())
                 .build();
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     @Override

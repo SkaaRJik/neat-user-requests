@@ -24,16 +24,23 @@ public class Auth {
     private Long id;
 
 
-
+    @NotBlank
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
 
+    @NotBlank
     @Column(name = "refresh_token")
     private String refreshToken;
 
+    @Column(name = "previous_refresh_token")
+    private String previousToken;
+
+    @NotBlank
     @Column(name = "expiration_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private Date expirationDate;
+
+
 
 }

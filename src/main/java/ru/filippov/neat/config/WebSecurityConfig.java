@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.filippov.neat.config.jwt.JwtAuthEntryPoint;
 import ru.filippov.neat.config.jwt.JwtAuthTokenFilter;
+import ru.filippov.neat.domain.Role;
 import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 
 @Configuration
@@ -57,7 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .cors().and().csrf().disable().
                 authorizeRequests()
-                .antMatchers("/login", "/signup", "/email-exist").permitAll()
+                .antMatchers("/login", "/signup", "/email-exist", "/refresh-tokens").permitAll()
+                .antMatchers("/api/trainer/default-config").hasRole(Role.USER.name())
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)

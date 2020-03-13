@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class SignInDto {
     @NotBlank
     @Size(min=3, max = 60)
-    private String email;
+    private String username;
 
     @NotBlank
     @Size(min = 3, max = 40)

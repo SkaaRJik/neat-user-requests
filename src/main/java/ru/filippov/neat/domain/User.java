@@ -30,6 +30,10 @@ public class User {
     @NotBlank
     private String email;
 
+    @Column
+    @NotBlank
+    private String username;
+
     @Column(name = "first_name")
     @NotBlank
     private String firstName;

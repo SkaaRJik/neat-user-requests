@@ -18,11 +18,13 @@ spring:
 # App Properties
 app:
   jwt:
-    Secret: SECRET
-    Access_Expiration: 86400
-    Refresh_Expiration: 2592000000
-    Prefix: Bearer_
-    Header: Authorization
+    secret: SECRET
+    access:
+      expiration: 864000
+      header: Authorization
+      prefix: Bearer_
+    refresh:
+      expiration: 2592000000
   default:
     avatar: I:\Java Programs\IdeaProjects\neatvue\src\main\resources\static\assets\img\default-avatar.png
 

@@ -13,6 +13,11 @@ public class SignUpDto {
 
 
     @NotBlank
+    @Size(min = 2, max = 60)
+    @Email
+    private String username;
+
+    @NotBlank
     @Size(max = 60)
     @Email
     private String email;

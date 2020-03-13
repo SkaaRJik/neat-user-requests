@@ -6,13 +6,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.filippov.neat.domain.Auth;
 import ru.filippov.neat.domain.User;
+import ru.filippov.neat.exceptions.RefreshTokenNotExists;
 import ru.filippov.neat.repository.AuthRepository;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Slf4j
 @Service
-public class AuthService {
+public class AuthServiceImpl {
 
     @Autowired
     AuthRepository authRepository;
@@ -27,6 +29,21 @@ public class AuthService {
         authRepository.save(auth);
     }
 
+    public Auth findRefreshToken(String refreshToken) throws RefreshTokenNotExists{
+        Optional<Auth> refreshTokenFromBase = authRepository.findByRefreshToken(refreshToken);
+        return refreshTokenFromBase.orElseThrow(RefreshTokenNotExists::new);
+    }
+
+    public void updateAuth(Auth auth) {
+            authRepository.save(auth);
+    };
+
+    public void deleteToken(Auth refreshTokenFromBase) {
+        authRepository.delete(refreshTokenFromBase);
+    }
 
 
+    public Auth findPreviousRefreshToken(String refreshToken) {
+        return authRepository.findByPreviousToken(refreshToken).get();
+    }
 }
