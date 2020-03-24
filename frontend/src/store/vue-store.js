@@ -1,28 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import {auth} from "./modules/auth.module";
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
 
-    state: {
-        profile: null,
-        dialogShow: false,
-
-    },
-    mutations: {
-        setProfileMutation(state, profile) {
-            state.profile = profile
-            state.profile.avatar = profile.avatar.data
-            state.profile.token = profile.token
-        }
-    },
-    actions: {
-        setProfile({commit, state}, profile) {
-            if (profile != null) {
-                commit('setProfileMutation', profile)
-            }
-        }
-    },
-    modules: {}
+    modules: {
+        auth
+    }
 })

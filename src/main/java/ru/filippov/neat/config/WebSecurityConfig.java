@@ -13,10 +13,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import ru.filippov.neat.config.jwt.JwtAuthEntryPoint;
 import ru.filippov.neat.config.jwt.JwtAuthTokenFilter;
 import ru.filippov.neat.domain.Role;
 import ru.filippov.neat.service.user.UserDetailsServiceImpl;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -39,6 +44,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://192.168.0.3:8080");
+        config.setAllowedMethods(Arrays.asList("POST", "OPTIONS", "GET", "DELETE", "PUT"));
+        config.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -56,10 +73,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .cors().and().csrf().disable().
-                authorizeRequests()
-                .antMatchers("/login", "/signup", "/email-exist", "/refresh-tokens").permitAll()
-                .antMatchers("/api/trainer/default-config").hasRole(Role.USER.name())
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/login", "/signup", "/email-exist", "/username-exist", "/refresh-tokens").permitAll()
+                .antMatchers("/api/trainer/default-config").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
@@ -67,5 +84,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(this.corsFilter(), CorsFilter.class);
     }
 }

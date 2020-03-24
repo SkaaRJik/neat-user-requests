@@ -59,7 +59,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public Boolean existsByUsername(String username) {
-        Boolean isUserExists = userRepository.existsByEmail(username);
+        Boolean isUserExists = userRepository.existsByUsername(username);
         log.debug(String.format("User %s exists: %b", username, isUserExists));
         return isUserExists;
     }
@@ -67,6 +67,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public void registrate(SignUpDto signUpRequest) throws PSQLException {
 
         User user = User.builder()
+                .username(signUpRequest.getUsername())
                 .email(signUpRequest.getEmail())
                 .firstName(signUpRequest.getFirstName())
                 .lastName(signUpRequest.getLastName())

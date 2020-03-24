@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -24,7 +25,7 @@ public class Auth {
     private Long id;
 
 
-    @NotBlank
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
@@ -36,7 +37,7 @@ public class Auth {
     @Column(name = "previous_refresh_token")
     private String previousToken;
 
-    @NotBlank
+    @NotNull
     @Column(name = "expiration_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private Date expirationDate;

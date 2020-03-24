@@ -44,6 +44,6 @@ public class AuthServiceImpl {
 
 
     public Auth findPreviousRefreshToken(String refreshToken) {
-        return authRepository.findByPreviousToken(refreshToken).get();
+        return authRepository.findByPreviousToken(refreshToken).orElse(null);
     }
 }

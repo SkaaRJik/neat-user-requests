@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import axiosInstance from "../../../settings/axios";
 
 const controllerPath = ''
 export default {
@@ -15,14 +16,17 @@ export default {
     checkEmail: email => {
         return Vue.prototype.$http.get(`${controllerPath}/email-exist?email=${email}`)
     },
-    test: token => {
-        return Vue.http.get('/api/trainer/default-config', {
-            headers: {
-                'Authorization': token
-            }
-        })
-    }
+    checkUsername: username => {
+        return Vue.prototype.$http.get(`${controllerPath}/username-exist?username=${username}`)
+    },
+    test: () => {
+        console.log('[AuthApi].test headers:',Vue.prototype.$http.defaults.headers['Authorization'])
+        return axiosInstance.get('/api/trainer/default-config')
+    },
 
+    refreshTokens(refreshToken) {
+        return Vue.prototype.$http.get(`${controllerPath}/refresh-tokens?refreshToken=${refreshToken}`)
+    }
 }
 
 /*export default {

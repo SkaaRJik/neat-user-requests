@@ -118,7 +118,8 @@ public class UserPrinciple implements UserDetails {
 
         return User.builder()
                 .id(this.id)
-                .email(this.username)
+                .username(this.username)
+                .email(this.email)
                 .password(this.password)
                 .firstName(this.firstname)
                 .lastName(this.lastname)

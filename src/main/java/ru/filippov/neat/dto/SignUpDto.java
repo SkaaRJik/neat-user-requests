@@ -14,7 +14,6 @@ public class SignUpDto {
 
     @NotBlank
     @Size(min = 2, max = 60)
-    @Email
     private String username;
 
     @NotBlank
@@ -34,7 +33,8 @@ public class SignUpDto {
     @Size(min = 3, max = 50)
     private String lastName;
 
-    public SignUpDto(@NotBlank @Size(max = 60) @Email String email, @NotBlank @Size(min = 6, max = 40) String password, @NotBlank @Size(min = 3, max = 50) String firstName, @NotBlank @Size(min = 3, max = 50) String lastName) {
+    public SignUpDto(@NotBlank @Size(min = 2, max = 60) String username, @NotBlank @Size(max = 60) @Email String email, @NotBlank @Size(min = 3, max = 40) String password, @NotBlank @Size(min = 3, max = 50) String firstName, @NotBlank @Size(min = 3, max = 50) String lastName) {
+        this.username = username;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -71,5 +71,13 @@ public class SignUpDto {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

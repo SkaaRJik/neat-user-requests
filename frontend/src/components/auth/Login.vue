@@ -2,8 +2,8 @@
     <v-card>
         <v-card-title>
             <v-alert
-                    v-model="alert.message !== ''"
-                    :type="alert.type"
+                    v-model="dataToLogin.message !== ''"
+                    :type="alertType"
                     transition="scale-transition"
                     dense
                     border="bottom"
@@ -11,7 +11,7 @@
                     class="mb-0"
                     style="width: 100%"
             >
-                {{alert.message}}
+                {{dataToLogin.message}}
             </v-alert>
         </v-card-title>
         <v-card-text>
@@ -20,18 +20,18 @@
 
                     <v-flex xs12>
                         <v-text-field
-                                label="Email"
+                                label="Логин / Email"
                                 type="email"
-                                v-model="signInDetails.email"
-                                v-on:focusout="checkEmail"
-                                v-on:focusin="()=>{this.alert.message = ''}"
+                                v-model="dataToLogin.username"
+                                v-on:focusout="checkUsername"
+                                v-on:focusin="()=>{this.dataToLogin.message = ''}"
                                 required/>
                     </v-flex>
                     <v-flex xs12>
                         <v-text-field label="Пароль"
                                       type="password"
-                                      v-on:focusin="()=>{checkEmail}"
-                                      v-model="signInDetails.password"
+                                      v-on:focusin="()=>{checkUsername}"
+                                      v-model="dataToLogin.password"
                                       required/>
                     </v-flex>
                 </v-layout>
@@ -39,60 +39,99 @@
         </v-card-text>
         <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="()=> this.$emit('cancel')">
-                Отмена
-            </v-btn>
-            <v-btn color="blue darken-1" text @click="signIn">Войти</v-btn>
+            <v-btn color="blue darken-1" :disabled="isLoading" text @click="signIn">
+                    <v-progress-circular v-show="isLoading"
+                            indeterminate
+                            color="amber"
+                    ></v-progress-circular>
+                <div v-show="!isLoading">Войти</div></v-btn>
         </v-card-actions>
     </v-card>
 </template>
 
 <script>
 
-    import AuthApi from "../../methods/api/AuthAPI";
-    import {checkEmailExist, isEmailValid} from "../../methods/utils/validators";
+    import AuthApi from "../../services/api/AuthAPI";
+    import {checkEmailExist, checkUsernameExist, isEmailValid, isUsernameValid} from "../../services/utils/validators";
+    import AuthService from "../../services/AuthService";
 
     export default {
         name: "Login",
+
+        props:{
+            dataToLogin: Object,
+        },
+
         data() {
             return {
-                signInDetails: {
-                    email: '',
-                    password: ''
-                },
-                alert: {
-                    type: 'error',
-                    message: '',
-                },
+                isLoading: false,
+                alertType: 'error',
+                alert_timer: null,
             }
         },
 
         methods: {
             async signIn() {
-                try {
-                    const result = await AuthApi.signIn(this.signInDetails)
-                    console.log('[Login].signIn result:',result.data)
-                    //this.$store.dispatch('setProfile', result)
-                } catch (e) {
-                    this.alert.type = 'error'
-                    this.alert.message = e.response ? e.response : e.message
-                }
-            },
-            async checkEmail() {
-                if (isEmailValid(this.signInDetails.email)) {
-                    const emailExists = await checkEmailExist(this.signInDetails.email)
-                    console.log('[Login].checkEmail :',emailExists)
-                    if (emailExists.data === false) {
-                        this.alert.type = 'info'
-                        this.alert.message  = 'Пользователя с таким e-mail не существует!'
-                    } else {
-                        this.alert.message = ''
-                    }
+                const error = this.validateFields()
+                if(error){
+                    this.alertType = 'error'
+                    this.dataToLogin.message = error
                 } else {
-                    this.alert.type = 'error'
-                    this.alert.message = 'Ваш e-mail не валиден!'
+                    try {
+                        const result = await this.$store.dispatch('auth/login', this.dataToLogin)
+                        console.log('[Login].signIn result:',result)
+                        console.log('[Login].signIn store.userData:',this.$store.getters['auth/userData'])
+                        await this.$router.push({name:'about'})
+                    } catch (e) {
+                        this.alertType = 'error'
+
+                        if(e.response) {
+                            if (e.response.status === 401) {
+                                this.dataToLogin.message =  'Неверный логин или пароль'
+                            } else {
+                                this.dataToLogin.message =  e.response.data.message
+                            }
+                        } else {
+                            this.dataToLogin.message =  e.message
+                        }
+                    }
+                }
+
+            },
+            async checkUsername() {
+
+                if(isUsernameValid(this.dataToLogin.username)){
+                    const usernameExist = await checkUsernameExist(this.dataToLogin.username)
+                    console.log('[Login].checkUsername :',usernameExist)
+                    if (usernameExist.data === false) {
+                        this.alertType = 'info'
+                        this.dataToLogin.message  = 'Пользователя с таким Логином не существует!'
+                    } else {
+                        this.dataToLogin.message = ''
+                    }
+
+                } else {
+                    if (isEmailValid(this.dataToLogin.username)) {
+                        const emailExists = await checkEmailExist(this.dataToLogin.username)
+                        console.log('[Login].checkUsername :',emailExists)
+                        if (emailExists.data === false) {
+                            this.alertType = 'info'
+                            this.dataToLogin.message  = 'Пользователя с таким e-mail не существует!'
+                        } else {
+                            this.dataToLogin.message = ''
+                        }
+                    } else {
+                        this.alertType = 'error'
+                        this.dataToLogin.message = 'Ваш e-mail не валиден!'
+                    }
                 }
             },
+            validateFields() {
+                if (!this.dataToLogin.username) return 'Заполните поле "Логин/Email"'
+                if (this.dataToLogin.message) return this.dataToLogin.message
+                if (!this.dataToLogin.password) return 'Заполните поле "Пароль"'
+                return null
+            }
         }
     }
 </script>

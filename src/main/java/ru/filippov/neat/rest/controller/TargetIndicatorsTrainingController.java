@@ -7,7 +7,7 @@ import ru.filippov.utils.AIConfig;
 import ru.filippov.utils.NEATConfig;
 
 @RestController
-@RequestMapping("api/trainer")
+@RequestMapping(value = "api/trainer")
 public class TargetIndicatorsTrainingController {
 
     @GetMapping("/default-config")

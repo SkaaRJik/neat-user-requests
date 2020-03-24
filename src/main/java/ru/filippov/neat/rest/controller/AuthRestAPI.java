@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.filippov.neat.config.jwt.TokenProvider;
 import ru.filippov.neat.domain.Auth;
 import ru.filippov.neat.domain.User;
-import ru.filippov.neat.dto.UserAuthDetailsDto;
+import ru.filippov.neat.dto.UserAuthDetailsResponse;
 import ru.filippov.neat.dto.SignInDto;
 import ru.filippov.neat.dto.SignUpDto;
 import ru.filippov.neat.dto.TokenDto;
@@ -28,7 +28,6 @@ import java.util.Date;
 
 @RestController
 @Slf4j
-@CrossOrigin
 public class AuthRestAPI {
 
     final private AuthenticationManager authenticationManager;
@@ -49,7 +48,20 @@ public class AuthRestAPI {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SignInDto loginRequest) {
-        
+
+        boolean userExists = false;
+
+        if(loginRequest.getUsername().indexOf('@')!= -1) {
+            userExists = userService.existsByEmail(loginRequest.getUsername());
+        } else {
+            userExists = userService.existsByUsername(loginRequest.getUsername());
+        }
+
+        if(!userExists){
+            return new ResponseEntity<String>("Пользователя с таким Логином / Email не существует",
+                    HttpStatus.BAD_REQUEST);
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -74,7 +86,7 @@ public class AuthRestAPI {
 
         String accessToken = jwtProvider.generateAccessToken(user.getUsername(), roles);
 
-        UserAuthDetailsDto profile = UserAuthDetailsDto.build(new TokenDto(
+        UserAuthDetailsResponse profile = UserAuthDetailsResponse.build(new TokenDto(
                 accessToken, refreshToken, jwtProvider.getAccessTokenExpiration(), jwtProvider.getRefreshTokenExpiration()
         ),(UserPrinciple) authentication.getPrincipal());
 
@@ -88,6 +100,15 @@ public class AuthRestAPI {
         Boolean existsByEmail = userService.existsByEmail(email);
 
         return new ResponseEntity<Boolean>(existsByEmail,
+                HttpStatus.OK);
+
+    }
+
+    @GetMapping("/username-exist")
+    public ResponseEntity<Boolean> isUsernameExist(@RequestParam String username){
+        Boolean existsByUsername = userService.existsByUsername(username);
+
+        return new ResponseEntity<Boolean>(existsByUsername,
                 HttpStatus.OK);
 
     }
@@ -114,6 +135,8 @@ public class AuthRestAPI {
         try {
 
 
+
+
             boolean shouldDeleteTokenFromBase = false;
             try{
                 jwtProvider.getUserNameFromJwtToken(refreshToken);
@@ -123,7 +146,7 @@ public class AuthRestAPI {
 
 
             Auth previousRefreshToken = authService.findPreviousRefreshToken(refreshToken);
-            if(previousRefreshToken!=null){
+            if(previousRefreshToken != null){
                 authService.deleteToken(previousRefreshToken);
                 log.error("Old refresh token was used by user", previousRefreshToken.getUser().getUsername());
                 return ResponseEntity.status(HttpStatus.RESET_CONTENT).body("Кто-то воспользовался вашими старыми данными аутентификации");
@@ -149,12 +172,11 @@ public class AuthRestAPI {
 
             String[] roles = user.getRoles().stream().map(role -> role.name()).toArray(String[]::new);
             String accessToken = jwtProvider.generateAccessToken(user.getUsername(), roles);
-            UserPrinciple userPrinciple = UserPrinciple.toUserPrinciple(user);
 
-            UserAuthDetailsDto profile = UserAuthDetailsDto.build(new TokenDto(
+            TokenDto tokens = new TokenDto(
                     accessToken, newRefreshToken, jwtProvider.getAccessTokenExpiration(), jwtProvider.getRefreshTokenExpiration()
-            ),userPrinciple);
-            return ResponseEntity.ok(profile);
+            );
+            return ResponseEntity.ok(tokens);
         } catch (RefreshTokenNotExists e) {
             log.warn(e.getMessage());
             return ResponseEntity.badRequest().body("Токена не существует в базе");
