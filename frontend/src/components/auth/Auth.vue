@@ -68,15 +68,9 @@
                 return this.$store.state.auth.status.loggedIn;
             }
         },
-        created() {
-            if (this.loggedIn) {
-                this.$router.push('/about');
-            }
-        },
         methods: {
             closeDialog() {
-                console.log('[Auth].closeDialog() CLOSED!!!:',)
-                this.dialog = false
+                this.$emit("close")
             },
             readData(email, password, message){
 

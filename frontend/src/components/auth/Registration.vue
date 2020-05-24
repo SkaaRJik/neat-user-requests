@@ -17,7 +17,7 @@
         <v-card-text>
             <v-container grid-list-md>
                 <v-layout wrap>
-                    <v-flex xs12 sm6>
+                    <v-flex xs12>
                         <v-text-field label="Email*"
                                       v-model="userDetails.email"
                                       :hint="emailError"
@@ -27,7 +27,7 @@
 
                         </v-text-field>
                     </v-flex>
-                    <v-flex xs12 sm6>
+                    <v-flex xs12>
                         <v-text-field label="Логин*"
                                       v-model="userDetails.username"
                                       :hint="usernameError"
@@ -37,11 +37,11 @@
 
                         </v-text-field>
                     </v-flex>
-                    <v-flex xs12>
+                    <v-flex xs12 sm6>
                         <v-text-field label="Пароль*" type="password" v-model="userDetails.password"
                                       required></v-text-field>
                     </v-flex>
-                    <v-flex xs12>
+                    <v-flex xs12 sm6>
                         <v-text-field label="Повторите пароль*"
                                       type="password"
                                       v-model="repeatPassword"
