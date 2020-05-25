@@ -42,7 +42,7 @@
                         </v-list-item-icon>
 
                         <v-list-item-content>
-                            <v-list-item-title @click="handleClick(item.text)" v-text="item.text"></v-list-item-title>
+                            <v-list-item-title @click="handleClick(item.text)" v-text="$t(item.text)"></v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                 </v-list-item-group>
@@ -102,18 +102,15 @@
                 this.dialog = false;
             }
         },
-        created: () => {
-            this.items[5].onClick = this.logout()
-        },
         data: () => ({
             dialog: false,
             items: [
-                { text: 'Мои проекты', icon: 'mdi-folder', onClick: this.methods.logout()},
+                { text: 'My_Projects', icon: 'mdi-folder'},
                 { text: 'Доступные мне', icon: 'mdi-account-multiple' },
                 { text: 'Starred', icon: 'mdi-star' },
                 { text: 'Recent', icon: 'mdi-history' },
                 { text: 'Uploads', icon: 'mdi-upload' },
-                { text: 'Выйти', icon: 'mdi-logout' },
+                { text: 'Logout', icon: 'mdi-logout' },
             ],
         }),
         computed: {
