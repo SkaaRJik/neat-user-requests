@@ -27,11 +27,11 @@ app:
       prefix: Bearer_
     refresh:
       expiration: 2592000000
-  default:
-    avatar: I:\Java Programs\IdeaProjects\neatvue\src\main\resources\static\assets\img\default-avatar.png
-  upload:
-    path: /home/victor/IdeaProjects/neatvue/public
 
 loger:
   level:
     root: DEBUG
+
+
+folders:
+  avatar: ./public/avatar

@@ -7,7 +7,6 @@ import vuetify from './plugins/vuetify';
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@mdi/font/css/materialdesignicons.css'
 import '../settings/axios'
-import axiosInstance from "../settings/axios";
 
 Vue.use(Vuetify)
 
@@ -19,16 +18,3 @@ const vue = new Vue({
     render: h => h(App)
 }).$mount('#app')
 
-
-
-
-
-
-
-
-
-
-
-
-
-export default vue;

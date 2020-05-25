@@ -28,10 +28,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     PasswordEncoder encoder;
 
-    @Value("${app.default.avatar}")
-    private String DEFAULT_AVATAR;
-
-
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username)
@@ -74,7 +70,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .active(true)
                 .password(encoder.encode(signUpRequest.getPassword()))
                 .roles( new HashSet<Role>(1) {{add(Role.USER);}})
-                .avatar( this.DEFAULT_AVATAR)
+                .avatar( null )
                 .creationDate(LocalDateTime.now())
                 .lastPasswordUpdate(LocalDateTime.now())
                 .build();

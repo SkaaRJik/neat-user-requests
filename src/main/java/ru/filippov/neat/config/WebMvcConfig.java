@@ -14,8 +14,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @Log4j2
 public class WebMvcConfig implements WebMvcConfigurer {
-    @Value("${app.upload.path}")
-    private String uploadPath;
 
     @Bean
     public WebServerFactoryCustomizer<ConfigurableWebServerFactory> webServerFactoryCustomizer(){

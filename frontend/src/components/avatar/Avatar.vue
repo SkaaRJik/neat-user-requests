@@ -12,15 +12,41 @@
         </template>
 
         <v-list>
-            <v-list-item>
-                <v-list-item-title>Профиль</v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-                <v-list-item-title><v-divider></v-divider></v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-                <v-list-item-title @click="logout">Выйти</v-list-item-title>
-            </v-list-item>
+            <v-list>
+                <v-list-item>
+
+                    <v-list-item-avatar>
+                        <v-avatar color="red">
+                            <span class="white--text headline">{{shortUsername}}</span>
+                        </v-avatar>
+                    </v-list-item-avatar>
+
+                    <v-list-item-content>
+                        <v-list-item-title class="title">{{userInfo.username}}</v-list-item-title>
+                        <v-list-item-subtitle>john@vuetifyjs.com</v-list-item-subtitle>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
+            <v-divider></v-divider>
+            <v-list
+                    nav
+                    dense
+            >
+                <v-list-item-group color="primary">
+                    <v-list-item
+                            v-for="(item, i) in items"
+                            :key="i"
+                    >
+                        <v-list-item-icon>
+                            <v-icon v-text="item.icon"></v-icon>
+                        </v-list-item-icon>
+
+                        <v-list-item-content>
+                            <v-list-item-title @click="handleClick(item.text)" v-text="item.text"></v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list-item-group>
+            </v-list>
         </v-list>
     </v-menu>
 
@@ -46,6 +72,7 @@
 
     import Auth from "../auth/Auth";
     import {getShortNameForAvatar} from "../../services/utils/AvatarUtil";
+    import store from "../../store/vue-store";
 
     export default {
         name: "avatar",
@@ -53,11 +80,17 @@
         components:{
             Auth
         },
-
-        data: () => ({
-            dialog: false,
-        }),
         methods:{
+            handleClick(type){
+                switch (type) {
+                    case 'My_Projects':
+
+                        break;
+                    case 'Logout':
+                        this.logout();
+                        break;
+                }
+            },
             logout(){
                 this.$store.dispatch('auth/logout')
                 if (!this.loggedIn) {
@@ -69,9 +102,26 @@
                 this.dialog = false;
             }
         },
+        created: () => {
+            this.items[5].onClick = this.logout()
+        },
+        data: () => ({
+            dialog: false,
+            items: [
+                { text: 'Мои проекты', icon: 'mdi-folder', onClick: this.methods.logout()},
+                { text: 'Доступные мне', icon: 'mdi-account-multiple' },
+                { text: 'Starred', icon: 'mdi-star' },
+                { text: 'Recent', icon: 'mdi-history' },
+                { text: 'Uploads', icon: 'mdi-upload' },
+                { text: 'Выйти', icon: 'mdi-logout' },
+            ],
+        }),
         computed: {
             loggedIn() {
                 return this.$store.state.auth.status.loggedIn;
+            },
+            userInfo(){
+                return this.$store.getters['auth/userData']
             },
             shortUsername() {
                 return getShortNameForAvatar()

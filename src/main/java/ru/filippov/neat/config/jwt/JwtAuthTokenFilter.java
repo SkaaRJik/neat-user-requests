@@ -1,8 +1,7 @@
 package ru.filippov.neat.config.jwt;
 
 import com.auth0.jwt.exceptions.SignatureVerificationException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.SignatureException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,7 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -45,12 +43,11 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
             }
         } catch (IllegalArgumentException e) {
             logger.error("an error occured during getting username from token", e);
-        } catch (ExpiredJwtException e) {
+        } catch (TokenExpiredException e) {
             logger.warn("the token is expired and not valid anymore", e);
         } catch(SignatureVerificationException e){
             logger.error("Someone change the token!.");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Can NOT set user authentication -> Message: {}", e);
         }
 

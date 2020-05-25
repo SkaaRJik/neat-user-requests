@@ -1,6 +1,6 @@
 package ru.filippov.neat.rest.controller;
 
-import io.jsonwebtoken.ExpiredJwtException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpStatus;
@@ -140,7 +140,7 @@ public class AuthRestAPI {
             boolean shouldDeleteTokenFromBase = false;
             try{
                 jwtProvider.getUserNameFromJwtToken(refreshToken);
-            } catch (ExpiredJwtException e) {
+            } catch (TokenExpiredException e) {
                 shouldDeleteTokenFromBase = true;
             }
 
