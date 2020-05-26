@@ -1,51 +1,187 @@
 <template>
-    <v-container>
-        <v-row>
-            <v-col
-                    sm="4"
-            >
-                <v-card>
-                    <v-card-text>
-                            <v-list
-                                    nav
-                                    dense
-                            >
-                                <v-list-item-group v-model="item" color="primary">
-                                    <v-list-item
-                                            v-for="(item, i) in items"
-                                            :key="i"
-                                    >
-                                        <v-list-item-icon>
-                                            <v-icon v-text="item.icon"></v-icon>
-                                        </v-list-item-icon>
+    <div>
+        <!-- Full screen template       -->
+        <div class="d-none d-lg-block">
+            <v-container >
+                <v-row md lg xl>
+                    <v-col
+                            sm="12"
+                    >
+                        <v-card>
+                            <v-card-title>
+                                Nutrition
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                        v-model="search"
+                                        append-icon="mdi-magnify"
+                                        label="Search"
+                                        single-line
+                                        hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                        :value="itemsPerPage"
+                                        label="Items per page"
+                                        type="number"
+                                        min="5"
+                                        max="50"
+                                        single-line
+                                        hide-details
+                                        @input="itemsPerPage = parseInt($event, 10)"
+                                ></v-text-field>
+                            </v-card-title>
+                            <v-data-table
+                                    :headers="headers"
+                                    :items="desserts"
+                                    :page.sync="page"
+                                    :items-per-page="itemsPerPage"
+                                    hide-default-footer
+                                    class="elevation-1"
+                                    @page-count="pageCount = $event"
+                            ></v-data-table>
+                            <div class="text-center pt-2">
+                                <v-pagination v-model="page" :length="pageCount"></v-pagination>
 
-                                        <v-list-item-content>
-                                            <v-list-item-title v-text="item.text"></v-list-item-title>
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                </v-list-item-group>
-                            </v-list>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-            <v-col>
-                <v-card>
-                    <v-card-title>Детали проекта</v-card-title>
+                            </div>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </div>
+        <!-- Mobile version  -->
+        <div class="d-md-none">
+            <v-container >
+                <v-row md lg xl>
+                    <v-col
+                            sm="12"
+                    >
+                        <v-card>
+                            <v-card-title>
+                                Nutrition
+                                <v-spacer></v-spacer>
+                                Its mobile
+                            </v-card-title>
 
-                </v-card>
-            </v-col>
-        </v-row>
-    </v-container>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </div>
+    </div>
 </template>
 
 <script>
     export default {
         name: "Projects",
+        methods: {
+            clicked(value) {
+                console.log('[Projects].clicked() value:',value)
+            }
+        },
         data () {
             return {
-                item: 0,
-
-                right: null,
+                search: '',
+                page: 1,
+                pageCount: 0,
+                itemsPerPage: 10,
+                headers: [
+                    {
+                        text: 'Dessert (100g serving)',
+                        align: 'start',
+                        sortable: false,
+                        value: 'name',
+                    },
+                    { text: 'Calories', value: 'calories' },
+                    { text: 'Fat (g)', value: 'fat' },
+                    { text: 'Carbs (g)', value: 'carbs' },
+                    { text: 'Protein (g)', value: 'protein' },
+                    { text: 'Iron (%)', value: 'iron' },
+                ],
+                options: {
+                    multiSort: false
+                },
+                desserts: [
+                    {
+                        name: 'Frozen Yogurt',
+                        calories: 159,
+                        fat: 6.0,
+                        carbs: 24,
+                        protein: 4.0,
+                        iron: '1%',
+                    },
+                    {
+                        name: 'Ice cream sandwich',
+                        calories: 237,
+                        fat: 9.0,
+                        carbs: 37,
+                        protein: 4.3,
+                        iron: '1%',
+                    },
+                    {
+                        name: 'Eclair',
+                        calories: 262,
+                        fat: 16.0,
+                        carbs: 23,
+                        protein: 6.0,
+                        iron: '7%',
+                    },
+                    {
+                        name: 'Cupcake',
+                        calories: 305,
+                        fat: 3.7,
+                        carbs: 67,
+                        protein: 4.3,
+                        iron: '8%',
+                    },
+                    {
+                        name: 'Gingerbread',
+                        calories: 356,
+                        fat: 16.0,
+                        carbs: 49,
+                        protein: 3.9,
+                        iron: '16%',
+                    },
+                    {
+                        name: 'Jelly bean',
+                        calories: 375,
+                        fat: 0.0,
+                        carbs: 94,
+                        protein: 0.0,
+                        iron: '0%',
+                    },
+                    {
+                        name: 'Lollipop',
+                        calories: 392,
+                        fat: 0.2,
+                        carbs: 98,
+                        protein: 0,
+                        iron: '2%',
+                    },
+                    {
+                        name: 'Honeycomb',
+                        calories: 408,
+                        fat: 3.2,
+                        carbs: 87,
+                        protein: 6.5,
+                        iron: '45%',
+                    },
+                    {
+                        name: 'Donut',
+                        calories: 452,
+                        fat: 25.0,
+                        carbs: 51,
+                        protein: 4.9,
+                        iron: '22%',
+                    },
+                    {
+                        name: 'KitKat',
+                        calories: 518,
+                        fat: 26.0,
+                        carbs: 65,
+                        protein: 7,
+                        iron: '6%',
+                    },
+                ],
             }
         },
     }
