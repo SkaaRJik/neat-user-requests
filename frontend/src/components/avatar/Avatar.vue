@@ -22,31 +22,38 @@
                     </v-list-item-avatar>
 
                     <v-list-item-content>
-                        <v-list-item-title class="title">{{userInfo.username}}</v-list-item-title>
-                        <v-list-item-subtitle>john@vuetifyjs.com</v-list-item-subtitle>
+                        <v-list-item-title class="title">{{userInfo.firstname}} {{userInfo.lastname}}</v-list-item-title>
+                        <v-list-item-subtitle>{{userInfo.username}}</v-list-item-subtitle>
                     </v-list-item-content>
                 </v-list-item>
             </v-list>
-            <v-divider></v-divider>
-            <v-list
-                    nav
-                    dense
-            >
-                <v-list-item-group color="primary">
-                    <v-list-item
-                            v-for="(item, i) in items"
-                            :key="i"
-                    >
-                        <v-list-item-icon>
-                            <v-icon v-text="item.icon"></v-icon>
-                        </v-list-item-icon>
+            <template v-for="(item, i) in items">
+                <v-divider></v-divider>
+                <v-list
+                        nav
+                        dense
+                >
+                    <v-list-item-group color="primary">
+                        <v-list-item
+                                v-for="(section, j) in item"
+                                :key="section.text"
+                        >
 
-                        <v-list-item-content>
-                            <v-list-item-title @click="handleClick(item.text)" v-text="$t(item.text)"></v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list-item-group>
-            </v-list>
+
+
+
+
+                            <v-list-item-icon>
+                                <v-icon v-text="section.icon"></v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title @click="handleClick(section.text)" v-text="$t(section.text)"></v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
+            </template>
         </v-list>
     </v-menu>
 
@@ -105,12 +112,8 @@
         data: () => ({
             dialog: false,
             items: [
-                { text: 'My_Projects', icon: 'mdi-folder'},
-                { text: 'Доступные мне', icon: 'mdi-account-multiple' },
-                { text: 'Starred', icon: 'mdi-star' },
-                { text: 'Recent', icon: 'mdi-history' },
-                { text: 'Uploads', icon: 'mdi-upload' },
-                { text: 'Logout', icon: 'mdi-logout' },
+                [{ text: 'Profile', icon: 'mdi-account' }],
+                [{ text: 'Logout', icon: 'mdi-logout' }],
             ],
         }),
         computed: {

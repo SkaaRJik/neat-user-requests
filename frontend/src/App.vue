@@ -6,25 +6,7 @@
                 clipped
 
         >
-            <v-list
-                    nav
-                    dense
-            >
-                <v-list-item-group color="primary">
-                    <v-list-item
-                            v-for="(item, i) in items"
-                            :key="i"
-                    >
-                        <v-list-item-icon>
-                            <v-icon v-text="item.icon"></v-icon>
-                        </v-list-item-icon>
-
-                        <v-list-item-content>
-                            <router-link :to="{...item.link}" tag="div">{{$t(item.text)}}</router-link>
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list-item-group>
-            </v-list>
+            <nav-bar-body/>
         </v-navigation-drawer>
 
         <v-app-bar
@@ -34,13 +16,13 @@
             <v-app-bar-nav-icon v-if="loggedIn" @click.stop="drawer = !drawer"/>
             <v-toolbar-title>NEAT</v-toolbar-title>
             <v-spacer></v-spacer>
-            <avatar></avatar>
+            <avatar/>
 
 
         </v-app-bar>
 
         <v-content>
-            <router-view></router-view>
+            <router-view/>
         </v-content>
 
         <v-footer app>
@@ -51,9 +33,11 @@
 
 <script>
     import Avatar from "./components/avatar/Avatar";
+    import NavBarBody from "./components/navigation/NavBarBody";
 
     export default {
         components:{
+            NavBarBody,
             Avatar,
         },
         props: {
@@ -67,17 +51,11 @@
         data: () => ({
             drawer: false,
 
-            items: [
-                { text: 'My_Projects', icon: 'mdi-folder', link:{name: 'projects'}},
-                { text: 'Доступные мне', icon: 'mdi-account-multiple', link:{name: 'projects'}},
-                { text: 'Starred', icon: 'mdi-star', link:{name: 'projects'} },
-                { text: 'Recent', icon: 'mdi-history', link:{name: 'projects'} },
-                { text: 'Uploads', icon: 'mdi-upload', link:{name: 'projects'} },
-            ],
+
         }),
         created() {
             if (this.loggedIn) {
-                this.$router.push('/about');
+                this.$router.push('/projects');
             }
         },
 
