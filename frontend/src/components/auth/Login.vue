@@ -20,7 +20,7 @@
 
                     <v-flex xs12>
                         <v-text-field
-                                label="Логин / Email"
+                                :label="$t('Login_Or_Email')"
                                 type="email"
                                 v-model="dataToLogin.username"
                                 v-on:focusout="checkUsername"
@@ -28,7 +28,7 @@
                                 required/>
                     </v-flex>
                     <v-flex xs12>
-                        <v-text-field label="Пароль"
+                        <v-text-field :label="$t('Password')"
                                       type="password"
                                       v-on:focusin="()=>{checkUsername}"
                                       v-model="dataToLogin.password"
@@ -44,7 +44,7 @@
                             indeterminate
                             color="amber"
                     ></v-progress-circular>
-                <div v-show="!isLoading">Войти</div></v-btn>
+                <div v-show="!isLoading">{{$t("To_Sign_In")}}</div></v-btn>
         </v-card-actions>
     </v-card>
 </template>
@@ -87,7 +87,7 @@
 
                         if(e.response) {
                             if (e.response.status === 401) {
-                                this.dataToLogin.message =  'Неверный логин или пароль'
+                                this.dataToLogin.message =  this.$t('Wrong_Password_Or_Login_Error')
                             } else {
                                 this.dataToLogin.message =  e.response.data.message
                             }
@@ -105,7 +105,7 @@
                     console.log('[Login].checkUsername :',usernameExist)
                     if (usernameExist.data === false) {
                         this.alertType = 'info'
-                        this.dataToLogin.message  = 'Пользователя с таким Логином не существует!'
+                        this.dataToLogin.message  = this.$t('User_With_Such_Username_Does_Not_Exist_Info')
                     } else {
                         this.dataToLogin.message = ''
                     }
@@ -116,20 +116,20 @@
                         console.log('[Login].checkUsername :',emailExists)
                         if (emailExists.data === false) {
                             this.alertType = 'info'
-                            this.dataToLogin.message  = 'Пользователя с таким e-mail не существует!'
+                            this.dataToLogin.message  = this.$t('User_With_Such_Email_Does_Not_Exist_Info')
                         } else {
                             this.dataToLogin.message = ''
                         }
                     } else {
                         this.alertType = 'error'
-                        this.dataToLogin.message = 'Ваш e-mail не валиден!'
+                        this.dataToLogin.message = this.$t('Email_Is_Not_Valid')
                     }
                 }
             },
             validateFields() {
-                if (!this.dataToLogin.username) return 'Заполните поле "Логин/Email"'
+                if (!this.dataToLogin.username) return this.$t('Fill_Field', {field: this.$t('Login_Or_Email')})
                 if (this.dataToLogin.message) return this.dataToLogin.message
-                if (!this.dataToLogin.password) return 'Заполните поле "Пароль"'
+                if (!this.dataToLogin.password) return this.$t('Fill_Field', {field: this.$t('Password')})
                 return null
             }
         }

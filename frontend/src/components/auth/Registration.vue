@@ -18,7 +18,7 @@
             <v-container grid-list-md>
                 <v-layout wrap>
                     <v-flex xs12>
-                        <v-text-field label="Email*"
+                        <v-text-field :label="$t('Email')+' *'"
                                       v-model="userDetails.email"
                                       :hint="emailError"
                                       v-on:focusout="checkEmail"
@@ -28,7 +28,7 @@
                         </v-text-field>
                     </v-flex>
                     <v-flex xs12>
-                        <v-text-field label="Логин*"
+                        <v-text-field :label="$t('Login')+' *'"
                                       v-model="userDetails.username"
                                       :hint="usernameError"
                                       v-on:focusout="checkUsername"
@@ -38,11 +38,11 @@
                         </v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6>
-                        <v-text-field label="Пароль*" type="password" v-model="userDetails.password"
+                        <v-text-field :label="$t('Password')+' *'" type="password" v-model="userDetails.password"
                                       required></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6>
-                        <v-text-field label="Повторите пароль*"
+                        <v-text-field :label="$t('Password_Repeat')+' *'"
                                       type="password"
                                       v-model="repeatPassword"
                                       :hint="passwordError"
@@ -51,26 +51,26 @@
                         </v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6>
-                        <v-text-field label="Имя*" required v-model="userDetails.firstName"></v-text-field>
+                        <v-text-field :label="$t('First_Name')+' *'" required v-model="userDetails.firstName"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6>
-                        <v-text-field label="Фамилия*" required v-model="userDetails.lastName"></v-text-field>
+                        <v-text-field :label="$t('Last_Name')+' *'" required v-model="userDetails.lastName"></v-text-field>
                     </v-flex>
                 </v-layout>
             </v-container>
-            <small>*indicates required field</small>
+            <small>{{$t('*_Is_Required')}}</small>
         </v-card-text>
         <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="signUp">Зарегистрироваться</v-btn>
+            <v-btn color="blue darken-1" text @click="signUp">{{$t('To_Sign_Up')}}</v-btn>
         </v-card-actions>
     </v-card>
 </template>
 
 <script>
-    import AuthApi from "../../services/api/AuthAPI";
+
     import {checkEmailExist, checkUsernameExist, isEmailValid, isUsernameValid} from "../../services/utils/validators";
-    import AuthService from "../../services/AuthService";
+
 
     export default {
         name: "Registration",
@@ -113,8 +113,6 @@
                         return
                     }
                     console.debug('[Registration].signUp() userDetails:', this.userDetails)
-
-                    //let res = await AuthApi.signUp(this.userDetails)
                     const message = await this.$store.dispatch('auth/register', this.userDetails)
                     console.debug('[Registration].signUp() res:', message)
                     this.$emit('onSuccess',  this.userDetails.email, this.userDetails.password, message)
@@ -129,10 +127,10 @@
                 if (isEmailValid(this.userDetails.email)) {
                     const emailExists = await checkEmailExist(this.userDetails.email)
                     if (emailExists.data === true) {
-                        this.emailError = 'Пользователь с таким e-mail уже зарегистрирован!'
+                        this.emailError = this.$t('Email_Already_Taken_Info')
                     }
                 } else {
-                    this.emailError = 'Ваш e-mail не валиден!'
+                    this.emailError = this.$t('Email_Is_Not_Valid')
                 }
             },
             async checkUsername(){
@@ -140,22 +138,22 @@
                 if (isUsernameValid(this.userDetails.username)) {
                     const usernameExist = await checkUsernameExist(this.userDetails.username)
                     if (usernameExist.data === true) {
-                        this.usernameError = 'Логин уже занят'
+                        this.usernameError = this.$t('Login_Already_Taken_Info')
                     }
                 } else {
-                    this.usernameError = 'Ваш логин не валиден!\n Нельзя использовать символ @'
+                    this.usernameError = this.$t('Login_is_not_valid', {symbols:'@ , .'})
                 }
             },
             validateFields() {
-                if (!this.userDetails.email) return 'Заполните поле "Email"'
+                if (!this.userDetails.email) return this.$t('Fill_Field', {field: this.$t('Email')})
                 if (this.emailError) return this.emailError
-                if (!this.userDetails.username) return 'Заполните поле "Логин"'
+                if (!this.userDetails.username) return this.$t('Fill_Field', {field: this.$t('Login')})
                 if (this.usernameError) return this.usernameError
-                if (!this.userDetails.password) return 'Заполните поле "Пароль"'
-                if (!this.repeatPassword) return 'Заполните поле "Повторите пароль"'
+                if (!this.userDetails.password) return this.$t('Fill_Field', {field: this.$t('Password')})
+                if (!this.repeatPassword) return this.$t('Fill_Field', {field: this.$t('Password_Repeat')})
                 if (this.passwordError) return this.passwordError
-                if (!this.userDetails.firstName) return 'Заполните поле "Имя"'
-                if (!this.userDetails.lastName) return 'Заполните поле "Фамилия"'
+                if (!this.userDetails.firstName) return this.$t('Fill_Field', {field: this.$t('First_Name')})
+                if (!this.userDetails.lastName) return this.$t('Fill_Field', {field: this.$t('Last_Name')})
                 return null
             }
         },
@@ -165,7 +163,7 @@
                 if(this.repeatPassword
                     && this.repeatPassword.length !== 0
                     && this.repeatPassword !== this.userDetails.password) {
-                    return 'Пароли не совпадают!'
+                    return this.$t('Passwords_Mismatch')
                 }
                 return null
 

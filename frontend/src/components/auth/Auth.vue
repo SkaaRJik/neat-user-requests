@@ -11,12 +11,12 @@
                     <v-tab
                             href="#sign-in"
                     >
-                        Вход
+                        {{$t("Sign_In")}}
                     </v-tab>
                     <v-tab
                             href="#sign-up"
                     >
-                        Регистрация
+                        {{$t("Sign_Up")}}
                     </v-tab>
                 </v-tabs>
                 <v-spacer></v-spacer>
