@@ -19,19 +19,32 @@
                                         hide-details
                                 ></v-text-field>
                                 <v-spacer></v-spacer>
-                                <v-text-field
-                                        :value="itemsPerPage"
-                                        label="Items per page"
-                                        type="number"
-                                        min="5"
-                                        max="50"
-                                        single-line
-                                        hide-details
-                                        @input="itemsPerPage = parseInt($event, 10)"
-                                ></v-text-field>
+                                <v-btn-toggle
+                                        v-model="itemsPerPage"
+                                        shaped
+                                        mandatory
+                                        color="primary"
+                                >
+                                    <v-btn :value="5">
+                                       5
+                                    </v-btn>
+
+                                    <v-btn :value="10">
+                                        10
+                                    </v-btn>
+
+                                    <v-btn :value="25">
+                                        25
+                                    </v-btn>
+
+                                    <v-btn :value="50">
+                                        50
+                                    </v-btn>
+                                </v-btn-toggle>
                             </v-card-title>
                             <v-data-table
                                     :headers="headers"
+                                    :search="search"
                                     :items="desserts"
                                     :page.sync="page"
                                     :items-per-page="itemsPerPage"
