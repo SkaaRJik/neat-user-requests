@@ -1,11 +1,16 @@
 {
   "Profile": "Профиль",
+  "Projects": "Проекты",
   "My_Projects": "Мои проекты",
+  "Project_Name": "Имя проекта",
+  "Training_Error": "Ошибка обучения",
+  "Prediction_Error": "Ошибка прогнозирования",
+  "Status": "Статус",
   "Logout": "Выйти",
-  "Profile": "Профиль",
   "Shared_with_me": "Доступные мне",
   "Recent": "Недавние",
   "Sign_In": "Вход",
+  "Search": "Поиск",
   "To_Sign_In": "Войти",
   "Sign_Up": "Регистрация",
   "To_Sign_Up": "Зарегистрироваться",
@@ -25,5 +30,7 @@
   "Email_Is_Not_Valid": "Ваш e-mail не валиден!",
   "Fill_Field": "Заполните поле \"{field}\"",
   "*_Is_Required": "* - Необходимые к заполеннеию поля",
-  "Login_is_not_valid": "Ваш логин не валиден!\n Нельзя использовать символы: {symbols}"
+  "Login_is_not_valid": "Ваш логин не валиден!\n Нельзя использовать символы: {symbols}",
+  "In_Queue": "Ожидание. Вы в очереди: {size}",
+  "Done": "Готово"
 }
