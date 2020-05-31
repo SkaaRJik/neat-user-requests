@@ -1,8 +1,8 @@
-<template>
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
     <div>
         <!-- Full screen template       -->
         <div class="d-none d-lg-block">
-            <v-btn
+            <v-btn v-if="!shared"
                     color="primary"
                     small
                     bottom
@@ -28,6 +28,7 @@
                                         :label="$t('Search')"
                                         single-line
                                         hide-details
+
                                 ></v-text-field>
                                 <v-spacer></v-spacer>
                                 <v-btn-toggle
@@ -35,6 +36,7 @@
                                         shaped
                                         mandatory
                                         color="primary"
+
                                 >
                                     <v-btn :value="5">
                                        5
@@ -62,6 +64,7 @@
                                     hide-default-footer
                                     class="elevation-1"
                                     @page-count="pageCount = $event"
+                                    @click:row="clicked"
                             >
                                 <template v-slot:item.status="{ item }">
                                     <span v-if="item.status === 'In_Queue'">{{$t(item.status, {size: item.inQueue})}}</span>
@@ -122,62 +125,22 @@
 <script>
     export default {
         name: "Projects",
+        props:{
+            shared: Boolean
+        },
         methods: {
             clicked(value) {
                 console.log('[Projects].clicked() value:',value)
             },
-            changeStatus() {
-                if(this.projects[0].inQueue){
-                    this.projects[0].inQueue--;
-                    if(this.projects[0].inQueue === 0) {
-                        delete this.projects[0].inQueue
-                        this.projects[0].status = 'In_Progress'
-                        this.progress = 0
-                    }
-                    return;
-                }
-                if(this.progress < 100 && this.projects[0].status === 'In_Progress'){
-                    this.progress += 25
-                    console.log('[Projects].changeStatus this.projects[0].progress:',this.progress)
-                    return;
-                }
-                if(this.projects[0].trainingError === '??') {
-                    this.projects[0].status = 'Done'
-                    this.projects[0].trainingError = Math.random()
-                    this.projects[0].predictionError = Math.random()
-                    return;
-                }
-                this.projects = [
-                    {
-                        name: 'Frozen Yogurt',
-                        trainingError: '??',
-                        predictionError: '??',
-                        inQueue: 1,
-                        status: 'In_Queue',
+            rightClick: (e) => {
 
-                    },
+                console.log('[Projects].rightClick() value:')
+                e.preventDefault();
 
-                ]
-                clearInterval(this.intervalId)
             },
-            newProject() {
-                    if(this.intervalId){
-                        clearInterval(this.intervalId)
-                        this.projects = [
-                            {
-                                name: 'Frozen Yogurt',
-                                trainingError: '??',
-                                predictionError: '??',
-                                inQueue: 1,
-                                status: 'In_Queue',
-
-                            },
-
-                        ]
-                    }
-
-                    this.intervalId = setInterval(this.changeStatus, 1000);
-            }
+            async newProject() {
+                await this.$router.push({name:'new-project'})
+            },
         },
         data () {
             return {

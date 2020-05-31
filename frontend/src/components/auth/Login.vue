@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title>
             <v-alert
-                    v-model="dataToLogin.message !== ''"
+                    v-model="showAlert"
                     :type="alertType"
                     transition="scale-transition"
                     dense
@@ -62,6 +62,13 @@
             dataToLogin: Object,
         },
 
+        computed:{
+            showAlert: function () {
+                console.log('[Login].showAlert() :',)
+                return this.dataToLogin.message !== ''
+            }
+        },
+
         data() {
             return {
                 isLoading: false,
@@ -78,10 +85,8 @@
                     this.dataToLogin.message = error
                 } else {
                     try {
-                        const result = await this.$store.dispatch('auth/login', this.dataToLogin)
-                        console.log('[Login].signIn result:',result)
-                        console.log('[Login].signIn store.userData:',this.$store.getters['auth/userData'])
-                        await this.$router.push({name:'about'})
+                        await this.$store.dispatch('auth/login', this.dataToLogin)
+                        await this.$router.push({name:'projects'})
                     } catch (e) {
                         this.alertType = 'error'
 
