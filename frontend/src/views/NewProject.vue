@@ -63,28 +63,29 @@
                                 </template>
                             </v-file-input>
                         </v-col>
-                        <v-col cols="12">
-                            <v-row
-                                    align="center"
-                                    justify="center"
+                    </v-row>
+                    <v-row>
+                        <v-col
+                                cols="auto"
+                                class="mr-auto"
+                        >
+                            <v-btn class="ma-3" text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>
+                        </v-col>
+                        <v-col cols="auto">
+                            <v-btn
+                                    class="ma-3"
+                                    color="primary"
+                                    @click="uploadXLSX"
+                                    :disabled="nextPageDisabled"
                             >
-                                <v-btn class="ma-3" text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>
-                                <v-btn
-                                        class="ma-3"
+                                {{$t('Continue')}}
+                                <v-progress-circular
+                                        v-if="excelUploading"
+                                        indeterminate
                                         color="primary"
-                                        @click="uploadXLSX"
-                                        :disabled="nextPageDisabled"
-                                >
-                                    {{$t('Continue')}}
-                                    <v-progress-circular
-                                            v-if="excelUploading"
-                                            indeterminate
-                                            color="primary"
-                                    ></v-progress-circular>
-                                    <v-icon v-else right> mdi-arrow-right</v-icon>
-                                </v-btn>
-
-                            </v-row>
+                                ></v-progress-circular>
+                                <v-icon v-else right> mdi-arrow-right</v-icon>
+                            </v-btn>
                         </v-col>
                     </v-row>
 
@@ -115,20 +116,67 @@
                                     :label="$t('Legend')"
                             />
                         </v-col>
-                        <v-col cols="12">
+                    </v-row>
+                    <v-row>
+                        <v-col
+                                cols="auto"
+                                class="mr-auto"
+                        >
+                            <v-btn class="ma-3" text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>
+                        </v-col>
+                        <v-col cols="auto">
                             <v-card-actions>
-                                <v-btn class="ma-3" text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>
-                                <v-spacer></v-spacer>
-
                                 <v-btn
-                                    @click="back()"
-                                    class="ma-3"
+                                        @click="step = 1"
+                                        class="ma-3"
 
-                            >
-                                <v-icon left> mdi-arrow-left</v-icon>
-                                {{$t('Back')}}
-                            </v-btn>
+                                >
+                                    <v-icon left> mdi-arrow-left</v-icon>
+                                    {{$t('Back')}}
+                                </v-btn>
+                                <v-btn
+                                        class="ma-3"
+                                        color="primary"
+                                        @click="step = 3"
 
+                                >
+                                    {{$t('Continue')}}
+                                    <v-icon> mdi-arrow-right</v-icon>
+                                </v-btn>
+                            </v-card-actions>
+
+                        </v-col>
+
+                    </v-row>
+                </v-container>
+
+                <!-- <v-btn text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>-->
+            </v-stepper-content>
+
+            <v-stepper-content step="3">
+                <v-container>
+                    <v-row>
+                        <v-col cols="12">
+
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col
+                                cols="auto"
+                                class="mr-auto"
+                        >
+                            <v-btn class="ma-3" text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>
+                        </v-col>
+                        <v-col cols="auto">
+                            <v-card-actions>
+                                <v-btn
+                                        @click="back()"
+                                        class="ma-3"
+
+                                >
+                                    <v-icon left> mdi-arrow-left</v-icon>
+                                    {{$t('Back')}}
+                                </v-btn>
                                 <v-btn
                                         class="ma-3"
                                         color="primary"
@@ -141,47 +189,12 @@
                                             indeterminate
                                             color="primary"
                                     ></v-progress-circular>
-                                    <v-icon v-else right> mdi-arrow-right</v-icon>
-                                </v-btn></v-card-actions>
-                            <v-row
-                                    align="center"
-                                    justify="center"
-                            >
-
-                            </v-row>
+                                    <v-icon v-else right> mdi-check</v-icon>
+                                </v-btn>
+                            </v-card-actions>
                         </v-col>
                     </v-row>
-
                 </v-container>
-
-                <!-- <v-btn text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>-->
-            </v-stepper-content>
-
-            <v-stepper-content step="3">
-                <v-card
-                        class="mb-12"
-                        color="grey lighten-1"
-                        height="200px"
-                ></v-card>
-
-                <v-btn
-                        @click="step = 2"
-
-                >
-                    <span>
-                        {{$t('Back')}}
-                    </span>
-                </v-btn>
-                <v-btn
-                        color="primary"
-                        @click="step = 3"
-                >
-                    <span>
-                        {{$t('Continue')}}
-                    </span>
-                </v-btn>
-
-                <!--<v-btn text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>-->
             </v-stepper-content>
         </v-stepper-items>
     </v-stepper>
@@ -203,18 +216,17 @@
                 this.excelUploading = true
                 try{
                     this.parsedData = (await ProjectsApi.parseExcelFile(this.file)).data
-                    await this.$router.push({name: "new-project", query:{step: 2}})
+                    this.step = 2;
                 } catch (e) {
                     console.error('[NewProject].uploadXLSX() EXCEPTION:',e)
                 }
-
 
                 this.excelUploading = false
 
             },
 
             async back() {
-                await this.$router.go(-1)
+                this.step--;
             },
 
 
@@ -225,8 +237,7 @@
                 file: null,
                 excelUploading: false,
                 parsedData: null,
-                headers: {items: [], values:[]},
-                legend: {items: [], values:[]}
+                step: 1,
             }
         },
 
@@ -234,29 +245,7 @@
             nextPageDisabled: function () {
                 return !this.file || this.excelUploading
             },
-            step: function () {
-                const query_step = this.$route.query.step
 
-                if(!query_step) {
-                    return 1;
-                }
-
-                if(query_step == 2){
-                    if(!this.parsedData) {
-                        this.$router.push({name: "new-project", query: {step: 1}})
-                        return 1;
-                    }
-                }
-
-                if(query_step == 3){
-                    if(!this.parsedData) {
-                        this.$router.push({name: "new-project", query: {step: 1}})
-                        return 1;
-                    }
-                }
-
-                return query_step;
-            },
             parsedHeaders() {
                 if(this.parsedData) {
                     return this.parsedData.headers
@@ -270,6 +259,29 @@
                 }
                 return []
             }
+        },
+
+        watch: {
+            step:  (newVal) => {
+                if(!newVal) {
+                    this.step = 1;
+
+                } else {
+                    if(newVal == 2){
+                        if(!this.parsedData) {
+                            this.step = 1;
+                        }
+                    }
+
+                    if(newVal == 3){
+                        if(!this.parsedData) {
+                            this.step = 1;
+                        }
+                    }
+                }
+
+
+            },
         }
 
     }
