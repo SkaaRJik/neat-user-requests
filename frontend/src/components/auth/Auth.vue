@@ -63,11 +63,6 @@
             Login,
             Registration
         },
-        computed: {
-            loggedIn() {
-                return this.$store.state.auth.status.loggedIn;
-            }
-        },
         methods: {
             closeDialog() {
                 this.$emit("close")
@@ -79,15 +74,7 @@
                 this.dataToLogin.message = message
                 this.tab = 'sign-in';
             },
-            switchTab(modelName) {
-                this.tab = modelName;
-                for (let ia = 0; ia < 3; ia++) {
-
-                }
-            },
         }
-
-
     }
 </script>
 

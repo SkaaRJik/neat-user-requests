@@ -56,7 +56,7 @@ axiosInstance.interceptors.response.use(response => response, async error => {
     }
 
     if (status === 406) {
-        await router.push('/')
+        await router.push('/login')
     }
 
     return Promise.reject(error);

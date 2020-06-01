@@ -1,8 +1,8 @@
-<template>
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
     <div>
         <!-- Full screen template       -->
         <div class="d-none d-lg-block">
-            <projects-view-full-screen />
+            <projects-view-full-screen/>
         </div>
         <!-- Mobile version  -->
         <div class="d-md-none">
@@ -18,6 +18,9 @@
     export default {
         name: "Projects",
         components: {ProjectsViewMobile, ProjectsViewFullScreen},
+        props:{
+            shared: Boolean
+        },
         methods: {
 
         },
@@ -30,7 +33,5 @@
 </script>
 
 <style scoped>
-    .v-progress-linear__bar, .v-progress-linear__bar__determinate {
-        transition: none;
-    }
+
 </style>

@@ -28,7 +28,7 @@
             return {
                 items: [
                     { text: 'My_Projects', icon: 'mdi-folder', link:{name: 'projects'}},
-                    { text: 'Shared_with_me', icon: 'mdi-account-multiple', link:{name: 'projects'}},
+                    { text: 'Shared_with_me', icon: 'mdi-account-multiple', link:{name: 'shared-projects'}},
                     { text: 'Recent', icon: 'mdi-history', link:{name: 'projects'} },
                 ],
             }
