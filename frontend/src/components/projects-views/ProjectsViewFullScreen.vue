@@ -7,6 +7,7 @@
             right
             fab
             fixed
+            @click="newProject"
     >
         <v-icon>mdi-plus</v-icon>
     </v-btn>
@@ -105,6 +106,9 @@
         methods: {
             clicked(value) {
                 console.log('[Projects].clicked() value:',value)
+            },
+            async newProject() {
+                await this.$router.push({name:'new-project'})
             },
         },
         data () {

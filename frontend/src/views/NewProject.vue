@@ -18,6 +18,29 @@
                 <v-container>
                     <v-row>
                         <v-col cols="12">
+                            <v-row
+                                    align="center"
+                                    justify="center"
+                            >
+                                <v-btn
+                                        class="ma-3"
+                                        color="primary"
+                                >
+                                    <v-icon left>mdi-arrow-down-bold</v-icon> {{$t("Template")}}
+                                </v-btn>
+                                <v-btn
+                                        class="ma-3"
+                                >
+                                    <v-icon left>mdi-arrow-down-bold</v-icon> {{$t("Example", {number: 1})}}
+                                </v-btn>
+                                <v-btn
+                                        class="ma-3"
+                                >
+                                    <v-icon left>mdi-arrow-down-bold</v-icon> {{$t("Example", {number: 2})}}
+                                </v-btn>
+                            </v-row>
+                        </v-col>
+                        <v-col cols="12">
                             <v-file-input
                                     v-model="file"
                                     class="py-2"
@@ -45,21 +68,22 @@
                                     align="center"
                                     justify="center"
                             >
+                                <v-btn class="ma-3" text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>
                                 <v-btn
+                                        class="ma-3"
                                         color="primary"
                                         @click="uploadXLSX"
                                         :disabled="nextPageDisabled"
                                 >
+                                    {{$t('Continue')}}
                                     <v-progress-circular
                                             v-if="excelUploading"
                                             indeterminate
                                             color="primary"
                                     ></v-progress-circular>
-                                    <span v-else>
-                        {{$t('Continue')}}
-                    </span>
+                                    <v-icon v-else right> mdi-arrow-right</v-icon>
                                 </v-btn>
-                                <v-btn text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>
+
                             </v-row>
                         </v-col>
                     </v-row>
@@ -68,26 +92,68 @@
             </v-stepper-content>
 
             <v-stepper-content step="2">
-                <div>
-                    <v-btn
-                            @click="step = 1"
 
-                    >
-                    <span>
-                        {{$t('Back')}}
-                    </span>
-                    </v-btn>
+                <v-container>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-select
+                                    :items="parsedHeaders"
+                                    v-model="parsedHeaders"
+                                    readonly
+                                    chips
+                                    multiple
+                                    :label="$t('Headers')"
+                            />
+                        </v-col>
+                        <v-col cols="12">
+                            <v-select
+                                    v-model="parsedLegend"
+                                    :items="parsedLegend"
+                                    readonly
+                                    chips
+                                    multiple
+                                    :label="$t('Legend')"
+                            />
+                        </v-col>
+                        <v-col cols="12">
+                            <v-card-actions>
+                                <v-btn class="ma-3" text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>
+                                <v-spacer></v-spacer>
 
-                    <v-btn
-                            color="primary"
-                            @click="step = 3"
+                                <v-btn
+                                    @click="back()"
+                                    class="ma-3"
 
-                    >
-                    <span>
-                        {{$t('Continue')}}
-                    </span>
-                    </v-btn>
-                </div>
+                            >
+                                <v-icon left> mdi-arrow-left</v-icon>
+                                {{$t('Back')}}
+                            </v-btn>
+
+                                <v-btn
+                                        class="ma-3"
+                                        color="primary"
+                                        @click="step = 3"
+
+                                >
+                                    {{$t('Continue')}}
+                                    <v-progress-circular
+                                            v-if="excelUploading"
+                                            indeterminate
+                                            color="primary"
+                                    ></v-progress-circular>
+                                    <v-icon v-else right> mdi-arrow-right</v-icon>
+                                </v-btn></v-card-actions>
+                            <v-row
+                                    align="center"
+                                    justify="center"
+                            >
+
+                            </v-row>
+                        </v-col>
+                    </v-row>
+
+                </v-container>
+
                 <!-- <v-btn text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>-->
             </v-stepper-content>
 
@@ -99,7 +165,7 @@
                 ></v-card>
 
                 <v-btn
-                        @click="step = 1"
+                        @click="step = 2"
 
                 >
                     <span>
@@ -108,7 +174,7 @@
                 </v-btn>
                 <v-btn
                         color="primary"
-                        @click="step = 2"
+                        @click="step = 3"
                 >
                     <span>
                         {{$t('Continue')}}
@@ -127,53 +193,82 @@
 
     export default {
         name: "NewProject",
-        props: {
-            parsedData: Object,
-            confirmedData: Object
-        },
-        created: () => {
-            this.navigate()
-        },
-        data () {
-            return {
-                step: 1,
-                file: null,
-                excelUploading: false,
-            }
-        },
         methods: {
-            navigate(){
 
-                this.step =  router.query.step ? router.query.step : 1
-
-                console.log('[NewProject].navigate() this.$route.query:', router.query.step)
-
-                if(this.step === 2 && this.parsedData === undefined){
-                    router.push({path: "/new-project?step=1"})
-                }
+            redirectToProjectsPage(){
+                this.$router.push({name:'projects'})
             },
-            async redirectToProjectsPage(){
-                await this.$router.push({name:'projects'})
-            },
+
             async uploadXLSX(){
                 this.excelUploading = true
                 try{
-                    const parsedFile = (await ProjectsApi.parseExcelFile(this.file)).data
-
+                    this.parsedData = (await ProjectsApi.parseExcelFile(this.file)).data
+                    await this.$router.push({name: "new-project", query:{step: 2}})
                 } catch (e) {
                     console.error('[NewProject].uploadXLSX() EXCEPTION:',e)
                 }
 
-                console.log('[NewProject].uploadXLSX() this.parsedFile:', this.parsedFile)
 
                 this.excelUploading = false
-                this.step = 2
+
             },
 
+            async back() {
+                await this.$router.go(-1)
+            },
+
+
+
         },
+        data () {
+            return {
+                file: null,
+                excelUploading: false,
+                parsedData: null,
+                headers: {items: [], values:[]},
+                legend: {items: [], values:[]}
+            }
+        },
+
         computed: {
             nextPageDisabled: function () {
                 return !this.file || this.excelUploading
+            },
+            step: function () {
+                const query_step = this.$route.query.step
+
+                if(!query_step) {
+                    return 1;
+                }
+
+                if(query_step == 2){
+                    if(!this.parsedData) {
+                        this.$router.push({name: "new-project", query: {step: 1}})
+                        return 1;
+                    }
+                }
+
+                if(query_step == 3){
+                    if(!this.parsedData) {
+                        this.$router.push({name: "new-project", query: {step: 1}})
+                        return 1;
+                    }
+                }
+
+                return query_step;
+            },
+            parsedHeaders() {
+                if(this.parsedData) {
+                    return this.parsedData.headers
+                }
+                return []
+            },
+
+            parsedLegend() {
+                if(this.parsedData) {
+                    return this.parsedData.legend
+                }
+                return []
             }
         }
 

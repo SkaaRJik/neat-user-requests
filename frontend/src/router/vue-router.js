@@ -50,9 +50,6 @@ router.beforeEach((to, from, next) => {
             const user = JSON.parse(localStorage.getItem('user'))
             const roles = user.roles
             if(to.matched.some(record => record.meta.is_admin)) {
-
-
-
                 if(roles.includes('ADMIN')){
                     next()
                 }

@@ -39,5 +39,9 @@
   "Back": "Назад",
   "Files_Size": "Файлов: {count} (Общий размер: {size} байт)",
   "Actions": "Действия",
+  "Template": "Шаблон",
+  "Example": "Пример - {number}",
+  "Headers": "Заголовки",
+  "Legend": "Легенда",
   "Continue": "Продолжить"
 }

@@ -25,7 +25,7 @@ public class ExcelParser {
         List<String> headers = new ArrayList<>(10);
         List<Object> legend = new ArrayList<>(50);
         String legendHeader = "";
-        int j = 0;
+        int j;
         while (rowIterator.hasNext()){
             if(emptyRowCounter >= ALLOWED_COUNT_OF_EMPTY_ROWS) {
                 break;
@@ -35,19 +35,18 @@ public class ExcelParser {
 
             List<Object>  rowData = new ArrayList<>(10);
             int emptyCells = 0;
-
+            j = 0;
             while(cellIterator.hasNext()){
                 cell = cellIterator.next();
                 switch (cell.getCellType()) {
                     case STRING:
-                    case NUMERIC:
-                    case FORMULA:
                         if( i == 0 ) {
                             if(j == 0){
                                 legendHeader = cell.getStringCellValue().trim();
                             } else {
                                 headers.add(cell.getStringCellValue().trim());
                             }
+
                         } else {
                             if(j == 0) {
                                 legend.add(cell.getStringCellValue().trim());
@@ -56,11 +55,29 @@ public class ExcelParser {
                             }
                         }
                         break;
+                    case NUMERIC:
+                    case FORMULA:
+                        if( i == 0 ) {
+                            if(j == 0){
+                                legendHeader = String.valueOf(cell.getNumericCellValue());
+                            } else {
+                                headers.add( String.valueOf(cell.getNumericCellValue()) );
+                            }
+
+                        } else {
+                            if(j == 0) {
+                                legend.add(cell.getNumericCellValue());
+                            } else {
+                                rowData.add(cell.getNumericCellValue());
+                            }
+                        }
+                        break;
                     default:
                         ++emptyCells;
                         rowData.add("");
                         break;
                 }
+                j++;
             }
 
             if(rowData.size() != emptyCells){
