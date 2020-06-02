@@ -43,5 +43,7 @@
   "Example": "Пример - {number}",
   "Headers": "Заголовки",
   "Legend": "Легенда",
-  "Continue": "Продолжить"
+  "Items": "Объектов: {size}",
+  "Continue": "Продолжить",
+  "CANT_PROCESS_FILE": "Невозможно обработать файл"
 }

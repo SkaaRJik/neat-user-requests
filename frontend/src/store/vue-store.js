@@ -1,12 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {auth} from "./modules/auth.module";
+import {error} from "./modules/error-from-server.module";
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
 
     modules: {
-        auth
+        auth,
+        error,
     }
 })
+
+export default store;

@@ -26,13 +26,13 @@ public class ExcelParser {
         List<Object> legend = new ArrayList<>(50);
         String legendHeader = "";
         int j;
+        List<String> dataErrors = new ArrayList<>(10);
         while (rowIterator.hasNext()){
             if(emptyRowCounter >= ALLOWED_COUNT_OF_EMPTY_ROWS) {
                 break;
             }
             row = rowIterator.next();
             Iterator<Cell> cellIterator = row.cellIterator();
-
             List<Object>  rowData = new ArrayList<>(10);
             int emptyCells = 0;
             j = 0;
@@ -51,6 +51,7 @@ public class ExcelParser {
                             if(j == 0) {
                                 legend.add(cell.getStringCellValue().trim());
                             } else {
+                                dataErrors.add(String.format("Колонка - %s, Строка - %s, Значение - %s ",headers.get(j), legend.get(i), cell.getStringCellValue().trim()));
                                 rowData.add(cell.getStringCellValue().trim());
                             }
                         }
@@ -90,7 +91,7 @@ public class ExcelParser {
 
         }
 
-        return new ExcelFile(headers, data, legend, legendHeader);
+        return new ExcelFile(headers, data, legend, legendHeader, dataErrors);
 
 
 

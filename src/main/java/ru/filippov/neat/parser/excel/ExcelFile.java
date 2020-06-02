@@ -14,4 +14,5 @@ public class ExcelFile {
     private List<List<Object>> data;
     private List<Object> legend;
     private String legendHeader;
+    private List<String> dataErrors;
 }

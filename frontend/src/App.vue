@@ -23,6 +23,21 @@
         </v-app-bar>
 
         <v-content>
+            <v-alert
+                    :value="serverErrors.length !== 0"
+                    type="error"
+                    prominent
+                    dense
+                    color="#a52a2a"
+                    border="right"
+                    transition="scale-transition"
+                    class="ma-2 py-3"
+                    >
+                <v-row align="center" v-for="(item, index) in serverErrors" :key="index">
+                    <v-col class="grow" > {{$t(item.text)}} ({{item.status}})</v-col>
+                </v-row>
+
+            </v-alert>
             <router-view/>
         </v-content>
 
@@ -43,21 +58,34 @@
         },
         props: {
             source: String,
+
         },
         computed: {
             loggedIn() {
                 return this.$store.state.auth.status.loggedIn;
+            },
+            serverErrors(){
+                const errorsObject = Object.values(this.$store.state.error.errors);
+                console.log('[App].serverErrors errorsObject:', errorsObject)
+                //Object.keys(errorsObject).forEach()
+
+                return errorsObject;
             }
         },
         data: () => ({
             drawer: false,
-
-
+            problems: [{status: 400, text: 'АШИПКА'}],
+            serverErrors: []
         }),
-        created() {
+        created: function () {
+
             if (this.loggedIn) {
                 this.$router.push('/projects');
             }
+            this.$store.watch(state => state.error.errors, () => {
+                this.serverErrors = Object.values(this.$store.state.error.errors);
+            })
+
         },
 
     }

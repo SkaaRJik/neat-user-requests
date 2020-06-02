@@ -29,10 +29,10 @@ Vue.prototype.$http = axiosInstance;
 // Axios.defaults.baseURL = API_SERVER
 axiosInstance.interceptors.response.use(response => response, async error => {
     const status = error.response ? error.response.status : null
+    const text = error.response ? error.response.data : null
     console.log('[axios.js]interceptors. : status',status)
     if (status === 401) {
         // will loop if refreshToken returns 401
-
         try{
             console.log('[axios].refreshTokens OLD error.config.headers[Authorization]:',error.config.headers['Authorization'])
             const tokens = await store.dispatch('auth/refreshTokens')
@@ -54,9 +54,13 @@ axiosInstance.interceptors.response.use(response => response, async error => {
         // Would be nice to catch an error here, which would work, if the interceptor is omitted
 
     }
-
     if (status === 406) {
         await router.push('/login')
+    }
+
+    else if(status) {
+        console.log('[Axios]. status text:',status, text)
+        await store.dispatch({ type:'error/setError', status, text} )
     }
 
     return Promise.reject(error);

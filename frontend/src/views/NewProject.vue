@@ -104,7 +104,9 @@
                                     chips
                                     multiple
                                     :label="$t('Headers')"
-                            />
+                            >
+                                <span slot="append" color="green">{{$t('Items', {size: parsedHeaders.length})}}</span>
+                            </v-select>
                         </v-col>
                         <v-col cols="12">
                             <v-select
@@ -114,17 +116,38 @@
                                     chips
                                     multiple
                                     :label="$t('Legend')"
-                            />
+                            >
+                                <span slot="append" color="green">{{$t('Items', {size: parsedLegend.length})}}</span>
+                            </v-select>
+                        </v-col>
+                        <v-col cols="12" v-if="shouldRenderDataErrors">
+                            <v-expansion-panels :value="0">
+                                <v-expansion-panel
+                                >
+                                    <v-expansion-panel-header disable-icon-rotate>
+                                        Следующие поля содержат строку вместо числа:
+                                        <template v-slot:actions>
+                                            <v-icon color="error">mdi-alert-circle</v-icon>
+                                        </template>
+                                    </v-expansion-panel-header>
+                                    <v-expansion-panel-content>
+                                        <v-list-item v-for="(item,index) in parsedErrors" :key="index">
+                                            {{item}}
+                                        </v-list-item>
+                                    </v-expansion-panel-content>
+                                </v-expansion-panel>
+                            </v-expansion-panels>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col
                                 cols="auto"
                                 class="mr-auto"
+                                xs="12"
                         >
                             <v-btn class="ma-3" text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>
                         </v-col>
-                        <v-col cols="auto">
+                        <v-col cols="auto" xs="12">
                             <v-card-actions>
                                 <v-btn
                                         @click="step = 1"
@@ -208,6 +231,17 @@
         name: "NewProject",
         methods: {
 
+            shouldRenderDataErrors() {
+              return this.parsedData && this.parsedData.dataErrors && this.parsedData.dataErrors.length > 0
+            },
+
+            parsedErrors() {
+                if(this.parsedData) {
+                    return this.parsedData.dataErrors
+                }
+                return []
+            },
+
             redirectToProjectsPage(){
                 this.$router.push({name:'projects'})
             },
@@ -260,30 +294,6 @@
                 return []
             }
         },
-
-        watch: {
-            step:  (newVal) => {
-                if(!newVal) {
-                    this.step = 1;
-
-                } else {
-                    if(newVal == 2){
-                        if(!this.parsedData) {
-                            this.step = 1;
-                        }
-                    }
-
-                    if(newVal == 3){
-                        if(!this.parsedData) {
-                            this.step = 1;
-                        }
-                    }
-                }
-
-
-            },
-        }
-
     }
 </script>
 
