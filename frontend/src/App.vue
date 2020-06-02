@@ -64,13 +64,6 @@
             loggedIn() {
                 return this.$store.state.auth.status.loggedIn;
             },
-            serverErrors(){
-                const errorsObject = Object.values(this.$store.state.error.errors);
-                console.log('[App].serverErrors errorsObject:', errorsObject)
-                //Object.keys(errorsObject).forEach()
-
-                return errorsObject;
-            }
         },
         data: () => ({
             drawer: false,
