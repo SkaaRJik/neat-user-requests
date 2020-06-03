@@ -13,15 +13,23 @@ export const error = {
     },
     mutations: {
         addError(state, {timerId, status, text}) {
-            state.errors[timerId] = {status, text};
+            console.log('[ErrorFromServerModule].addError() timerId:',timerId)
+            state.errors = {
+                ...state.errors,
+                [timerId]: {status, text}
+            }
         },
         removeError(state, timerId) {
             delete state.errors[timerId]
+            state.errors = state.errors;
         },
     },
     getters: {
         errors: state => {
             return state.errors
         }
-    }
+    },
+    beforeDestroy() {
+        this.unwatch();
+    },
 };

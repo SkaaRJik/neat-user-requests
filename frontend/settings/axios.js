@@ -35,13 +35,13 @@ axiosInstance.interceptors.response.use(response => response, async error => {
         // will loop if refreshToken returns 401
         try{
             console.log('[axios].refreshTokens OLD error.config.headers[Authorization]:',error.config.headers['Authorization'])
-            const tokens = await store.dispatch('auth/refreshTokens')
+            let tokens = await store.dispatch('auth/refreshTokens')
             error.config.headers['Authorization'] = tokens.accessToken
             console.log('[axios].refreshTokens new error.config.headers[Authorization]:',error.config.headers['Authorization'])
             return Vue.prototype.$http.request(error.config);
         } catch (e) {
             console.log('[axios.js]. status === 401 error:',e)
-            return Promise.reject(e);
+            return Promise.reject(error);
         }
 
 

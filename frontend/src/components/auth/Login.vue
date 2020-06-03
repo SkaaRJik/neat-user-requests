@@ -79,22 +79,25 @@
 
         methods: {
             async signIn() {
+                console.log('[Login].signIn() start:')
                 const error = this.validateFields()
+                console.log('[Login].signIn() error:',error)
                 if(error){
                     this.alertType = 'error'
                     this.dataToLogin.message = error
                 } else {
                     try {
+
                         await this.$store.dispatch('auth/login', this.dataToLogin)
                         await this.$router.push({name:'projects'})
                     } catch (e) {
                         this.alertType = 'error'
-
+                        console.log('[Login].signIn() e.response:',e.response)
                         if(e.response) {
                             if (e.response.status === 401) {
                                 this.dataToLogin.message =  this.$t('Wrong_Password_Or_Login_Error')
                             } else {
-                                this.dataToLogin.message =  e.response.data.message
+                                this.dataToLogin.message =  e.response.data
                             }
                         } else {
                             this.dataToLogin.message =  e.message
@@ -133,7 +136,6 @@
             },
             validateFields() {
                 if (!this.dataToLogin.username) return this.$t('Fill_Field', {field: this.$t('Login_Or_Email')})
-                if (this.dataToLogin.message) return this.dataToLogin.message
                 if (!this.dataToLogin.password) return this.$t('Fill_Field', {field: this.$t('Password')})
                 return null
             }

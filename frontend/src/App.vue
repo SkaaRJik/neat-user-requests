@@ -75,10 +75,27 @@
             if (this.loggedIn) {
                 this.$router.push('/projects');
             }
-            this.$store.watch(state => state.error.errors, () => {
-                this.serverErrors = Object.values(this.$store.state.error.errors);
-            })
+            this.unwatch = this.$store.watch(
+                (state, getters) => getters.status,
+                (newValue, oldValue) => {
+                    console.log(`Updating from ${oldValue} to ${newValue}`);
 
+                    /*// Do whatever makes sense now
+                    if (newValue === 'success') {
+                        this.complex = {
+                            deep: 'some deep object',
+                        };
+                    }*/
+                },
+            );
+            /*this.$store.watch(state => state.error.errors, () => {
+                console.log('[App].created() this.$store.state.error.errors:',Object.values(this.$store.state.error.errors))
+                this.serverErrors = Object.values(this.$store.state.error.errors);
+            })*/
+
+        },
+        beforeDestroy() {
+            this.unwatch();
         },
 
     }

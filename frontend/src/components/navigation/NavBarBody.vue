@@ -4,18 +4,19 @@
             dense
     >
         <v-list-item-group color="primary">
-            <v-list-item
-                    v-for="(item, i) in items"
-                    :key="i"
-            >
+            <router-link  v-for="(item, i) in items"
+                          :key="i"
+                          :to="{...item.link}"
+                          tag="v-list-item">
+
                 <v-list-item-icon>
                     <v-icon v-text="item.icon"></v-icon>
                 </v-list-item-icon>
 
                 <v-list-item-content>
-                    <router-link :to="{...item.link}" tag="div">{{$t(item.text)}}</router-link>
+                   {{$t(item.text)}}
                 </v-list-item-content>
-            </v-list-item>
+            </router-link>
         </v-list-item-group>
     </v-list>
 </template>
