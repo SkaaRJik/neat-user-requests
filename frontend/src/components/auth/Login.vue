@@ -92,7 +92,6 @@
                         await this.$router.push({name:'projects'})
                     } catch (e) {
                         this.alertType = 'error'
-                        console.log('[Login].signIn() e.response:',e.response)
                         if(e.response) {
                             if (e.response.status === 401) {
                                 this.dataToLogin.message =  this.$t('Wrong_Password_Or_Login_Error')

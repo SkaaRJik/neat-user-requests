@@ -1,31 +1,55 @@
-let SnackbarNotificationQueue = {
-    data: {
-        notificationText: "",
+const SnackBarQueue = {
+    data: () => ({
+        toast: {
+            text: 'I am a Snackbar !',
+            color: 'success',
+            timeout: 5000,
+            top: true,
+            bottom: false,
+            right: false,
+            left: false,
+            multiline: false
+        },
         notificationQueue: [],
         notification: false
-    },
+    }),
     computed: {
-        hasNotificationsPending() {
+        hasNotificationsPending () {
             return this.notificationQueue.length > 0
         }
     },
     watch: {
-        notification() {
-            if(!this.notification && this.hasNotificationsPending) {
-                this.notificationText = this.notificationQueue.shift()
-                this.$nextTick(() => this.notification = true)
+        notification () {
+            if (!this.notification && this.hasNotificationsPending) {
+                this.toast = this.notificationQueue.shift()
+                this.$nextTick(() => { this.notification = true })
             }
         }
     },
     methods: {
-        addNotification(text) {
-            this.notificationQueue.push(text)
-            if(!this.notification) {
-                this.notificationText = this.notificationQueue.shift()
+        addNotification (toast) {
+            if (typeof toast !== 'object') return
+            this.notificationQueue.push(toast)
+
+            if (!this.notification) {
+                this.toast = this.notificationQueue.shift()
                 this.notification = true
+            }
+        },
+        makeToast (text, color = 'info', timeout = 6000, top = true, bottom = false, right = false, left = false, multiline = false, vertical = false) {
+            return {
+                text,
+                color,
+                timeout,
+                top,
+                bottom,
+                right,
+                left,
+                multiline,
+                vertical
             }
         }
     }
 }
 
-export default SnackbarNotificationQueue
+export default SnackBarQueue;

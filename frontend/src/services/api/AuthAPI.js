@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import axiosInstance from "../../../settings/axios";
+
 
 const controllerPath = ''
 export default {
@@ -21,7 +21,7 @@ export default {
     },
     test: () => {
         console.log('[AuthApi].test headers:',Vue.prototype.$http.defaults.headers['Authorization'])
-        return axiosInstance.get('/api/trainer/default-config')
+        return Vue.prototype.$http.get('/api/trainer/default-config')
     },
 
     refreshTokens(refreshToken) {

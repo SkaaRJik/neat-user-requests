@@ -1,6 +1,5 @@
 import AuthAPI from "./api/AuthAPI";
 import Vue from 'vue'
-import axiosInstance from "../../settings/axios";
 
 class AuthService {
     async login(user) {

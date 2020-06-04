@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import axiosInstance from "../../../settings/axios";
 
 const controllerPath = '/api/projects'
 export default {

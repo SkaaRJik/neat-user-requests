@@ -9,25 +9,24 @@ Vue.config.productionTip = false
 const user = JSON.parse(localStorage.getItem('user'))
 let token = null
 
+console.log('[Axios].() user:', user)
+
 if (user) {
     console.log('[Axios]. :',user)
     token = user.tokens.accessToken
 }
 
-console.log('[Axios]. :',token)
+console.log('[Axios]. token:',token)
 
-const axiosInstance = axios.create({
-    baseURL: API_SERVER,
-    headers: {
-        Authorization: token
-    }
-})
+axios.defaults.baseURL = API_SERVER;
+axios.defaults.headers.Authorization = token;
 
-Vue.prototype.$http = axiosInstance;
+
+Vue.prototype.$http = axios;
 
 
 // Axios.defaults.baseURL = API_SERVER
-axiosInstance.interceptors.response.use(response => response, async error => {
+axios.interceptors.response.use(response => response, async error => {
     const status = error.response ? error.response.status : null
     const text = error.response ? error.response.data : null
     console.log('[axios.js]interceptors. : status',status)
@@ -66,7 +65,7 @@ axiosInstance.interceptors.response.use(response => response, async error => {
     return Promise.reject(error);
 });
 
-export default axiosInstance
+
 
 
 

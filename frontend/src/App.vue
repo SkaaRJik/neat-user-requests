@@ -23,21 +23,28 @@
         </v-app-bar>
 
         <v-content>
-            <v-alert
-                    :value="serverErrors.length !== 0"
-                    type="error"
-                    prominent
-                    dense
-                    color="#a52a2a"
-                    border="right"
-                    transition="scale-transition"
-                    class="ma-2 py-3"
-                    >
+
+            <v-snackbar
+                    v-model="serverErrors.length !== 0"
+                    multi-line
+                    :auto-height="true"
+                    :vertical="true"
+                    :color="'transparent'"
+                    right
+                    top
+            >
                 <v-row align="center" v-for="(item, index) in serverErrors" :key="index">
                     <v-col class="grow" > {{$t(item.text)}} ({{item.status}})</v-col>
                 </v-row>
+                <!--<v-btn
+                        color="pink"
+                        text
+                        @click="() => $store.dispatch('error/clearErrors')"
+                >
+                    Close
+                </v-btn>-->
+            </v-snackbar>
 
-            </v-alert>
             <router-view/>
         </v-content>
 
@@ -75,23 +82,9 @@
             if (this.loggedIn) {
                 this.$router.push('/projects');
             }
-            this.unwatch = this.$store.watch(
-                (state, getters) => getters.status,
-                (newValue, oldValue) => {
-                    console.log(`Updating from ${oldValue} to ${newValue}`);
-
-                    /*// Do whatever makes sense now
-                    if (newValue === 'success') {
-                        this.complex = {
-                            deep: 'some deep object',
-                        };
-                    }*/
-                },
-            );
-            /*this.$store.watch(state => state.error.errors, () => {
-                console.log('[App].created() this.$store.state.error.errors:',Object.values(this.$store.state.error.errors))
+            this.unwatch = this.$store.watch(state => state.error.errors, () => {
                 this.serverErrors = Object.values(this.$store.state.error.errors);
-            })*/
+            })
 
         },
         beforeDestroy() {
