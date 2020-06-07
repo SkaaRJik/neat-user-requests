@@ -5,7 +5,7 @@ spring:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/neat
     username: postgres
-    password: postgres
+    password: root
     driverClassName: org.postgresql.Driver
   resources:
     static-locations: /home/victor/IdeaProjects/neatvue/public

@@ -18,11 +18,13 @@ if (user) {
 
 console.log('[Axios]. token:',token)
 
-axios.defaults.baseURL = API_SERVER;
-axios.defaults.headers.Authorization = token;
-
-
 Vue.prototype.$http = axios;
+
+Vue.prototype.$http.defaults.baseURL = API_SERVER;
+Vue.prototype.$http.defaults.headers.common['Authorization'] = token;
+
+
+
 
 
 // Axios.defaults.baseURL = API_SERVER
@@ -35,6 +37,7 @@ axios.interceptors.response.use(response => response, async error => {
         try{
             console.log('[axios].refreshTokens OLD error.config.headers[Authorization]:',error.config.headers['Authorization'])
             let tokens = await store.dispatch('auth/refreshTokens')
+            Vue.prototype.$http.defaults.headers.common['Authorization'] = tokens.accessToken
             error.config.headers['Authorization'] = tokens.accessToken
             console.log('[axios].refreshTokens new error.config.headers[Authorization]:',error.config.headers['Authorization'])
             return Vue.prototype.$http.request(error.config);
@@ -54,12 +57,22 @@ axios.interceptors.response.use(response => response, async error => {
 
     }
     if (status === 406) {
+        Vue.$toast.open({
+            message: `${Vue.$t('YOU_WERE_LOGGED_OUT')}`,
+            type: 'error',
+            position: 'bottom-right'
+        });
         await router.push('/login')
     }
 
     else if(status) {
         console.log('[Axios]. status text:',status, text)
-        await store.dispatch({ type:'error/setError', status, text} )
+        Vue.$toast.open({
+            message: `${Vue.$t(text)} (${status})`,
+            type: 'error',
+            position: 'bottom-right'
+        });
+       /* await store.dispatch({ type:'error/setError', status, text} )*/
     }
 
     return Promise.reject(error);

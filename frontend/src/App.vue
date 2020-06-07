@@ -24,26 +24,7 @@
 
         <v-content>
 
-            <v-snackbar
-                    v-model="serverErrors.length !== 0"
-                    multi-line
-                    :auto-height="true"
-                    :vertical="true"
-                    :color="'transparent'"
-                    right
-                    top
-            >
-                <v-row align="center" v-for="(item, index) in serverErrors" :key="index">
-                    <v-col class="grow" > {{$t(item.text)}} ({{item.status}})</v-col>
-                </v-row>
-                <!--<v-btn
-                        color="pink"
-                        text
-                        @click="() => $store.dispatch('error/clearErrors')"
-                >
-                    Close
-                </v-btn>-->
-            </v-snackbar>
+
 
             <router-view/>
         </v-content>
@@ -67,25 +48,16 @@
             source: String,
 
         },
-        computed: {
-            loggedIn() {
-                return this.$store.state.auth.status.loggedIn;
-            },
-        },
         data: () => ({
             drawer: false,
-            problems: [{status: 400, text: 'АШИПКА'}],
-            serverErrors: []
+            loggedIn: false,
         }),
         created: function () {
+            this.loggedIn = this.$store.state.auth.status.loggedIn
 
-            if (this.loggedIn) {
-                this.$router.push('/projects');
-            }
-            this.unwatch = this.$store.watch(state => state.error.errors, () => {
-                this.serverErrors = Object.values(this.$store.state.error.errors);
+            this.unwatch = this.$store.watch(state => state.auth.status.loggedIn, () => {
+                this.loggedIn = this.$store.state.auth.status.loggedIn;
             })
-
         },
         beforeDestroy() {
             this.unwatch();
@@ -93,3 +65,9 @@
 
     }
 </script>
+
+<style>
+    .transparent_container{
+        opacity: 0.5;
+    }
+</style>

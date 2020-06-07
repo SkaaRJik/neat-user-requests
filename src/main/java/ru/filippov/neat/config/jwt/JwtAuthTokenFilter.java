@@ -46,7 +46,7 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
         } catch (TokenExpiredException e) {
             logger.warn("the token is expired and not valid anymore", e);
         } catch(SignatureVerificationException e){
-            logger.error("Someone change the token!.");
+            logger.error("Someone change the token!");
         } catch (Exception e) {
             log.error("Can NOT set user authentication -> Message: {}", e);
         }

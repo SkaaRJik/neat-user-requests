@@ -120,6 +120,43 @@
                                 <span slot="append" color="green">{{$t('Items', {size: parsedLegend.length})}}</span>
                             </v-select>
                         </v-col>
+
+
+                        <v-col cols="12">
+
+                            <v-autocomplete
+                                    v-model="textFormat"
+                                    :items="formats"
+                                    :filter="customFilter"
+                                    item-text="name"
+                                    :label="$t('Date_format_inside_the_document')"
+                            >
+                                <template v-slot:selection="{ attr, on, item, selected }">
+                                    <span v-text="item.text"></span>
+                                    <v-chip
+                                            v-bind="attr"
+                                            :input-value="selected"
+                                            color="blue-grey"
+                                            class="white--text"
+                                            v-on="on"
+                                    >
+                                        {{formatDate(item.format)}}
+
+                                    </v-chip>
+                                </template>
+                                <template v-slot:item="{ item }">
+
+                                    <v-list-item-content>
+                                        <v-list-item-title v-text="item.text"></v-list-item-title>
+                                        <v-spacer></v-spacer>
+                                        <v-list-item-title v-text="formatDate(item.format)"></v-list-item-title>
+                                    </v-list-item-content>
+                                </template>
+
+                            </v-autocomplete>
+
+
+                        </v-col>
                         <v-col cols="12" v-if="shouldRenderDataErrors">
                             <v-expansion-panels :value="0">
                                 <v-expansion-panel
@@ -131,9 +168,11 @@
                                         </template>
                                     </v-expansion-panel-header>
                                     <v-expansion-panel-content>
-                                        <v-list-item v-for="(item,index) in parsedErrors" :key="index">
-                                            {{item}}
-                                        </v-list-item>
+                                        <template v-for="(item,index) in parsedErrors">
+                                            <v-list-item  :id="index" :key="index">
+                                                {{item.error}} {{parsedData.headers[item.column] ? parsedData.headers[item.column] : item.column}} {{parsedData.legend[item.row] ? parsedData.legend[item.row] : item.row}}
+                                            </v-list-item>
+                                        </template>
                                     </v-expansion-panel-content>
                                 </v-expansion-panel>
                             </v-expansion-panels>
@@ -224,22 +263,25 @@
 </template>
 
 <script>
-    import ProjectsApi from '../services/api/ProjectsAPI'
-    import router from "../router/vue-router";
+    import parseExcel from "../parser/ExcelParser";
+    import Vue from "vue";
+    import moment from 'moment'
 
     export default {
         name: "NewProject",
         methods: {
 
-            shouldRenderDataErrors() {
-              return this.parsedData && this.parsedData.dataErrors && this.parsedData.dataErrors.length > 0
+            formatDate(format){
+              return  moment(this.date).format(format)
             },
 
-            parsedErrors() {
-                if(this.parsedData) {
-                    return this.parsedData.dataErrors
-                }
-                return []
+            customFilter (item, queryText, itemText) {
+                const textOne = item.name.toLowerCase()
+                const textTwo = item.abbr.toLowerCase()
+                const searchText = queryText.toLowerCase()
+
+                return textOne.indexOf(searchText) > -1 ||
+                    textTwo.indexOf(searchText) > -1
             },
 
             redirectToProjectsPage(){
@@ -249,10 +291,17 @@
             async uploadXLSX(){
                 this.excelUploading = true
                 try{
-                    this.parsedData = (await ProjectsApi.parseExcelFile(this.file)).data
+                    this.parsedData = await parseExcel(this.file)
+                    //this.parsedData = (await ProjectsApi.parseExcelFile(this.file)).data
                     this.step = 2;
                 } catch (e) {
                     console.error('[NewProject].uploadXLSX() EXCEPTION:',e)
+                    await Vue.$toast.open({
+                        message: `${this.$t(e)}`,
+                        type: 'error',
+                        position: 'top-right',
+                        dismissible: true,
+                    });
                 }
 
                 this.excelUploading = false
@@ -272,6 +321,31 @@
                 excelUploading: false,
                 parsedData: null,
                 step: 1,
+                textFormat: null,
+                date: new Date(),
+                formats: [
+                    { format: 'DD.MM.YYYY', text: 'ДД.ММ.ГГГГ' },
+                    { format: 'DD.MMM.YYYY' , text: 'ДД.МММ.ГГГГ' },
+                    { format: 'DD.MMMM.YYYY', text: 'ДД.ММММ.ГГГГ' },
+                    { format: 'DD.MM.YY', text: 'ДД.ММ.ГГ' },
+                    { format: 'DD.MMM.YY', text: 'ДД.МММ.ГГ' },
+                    { format: 'DD.MMMM.YY', text: 'ДД.ММММ.ГГ' },
+                    { format: 'DD.MM', text: 'ДД.ММ' },
+                    { format: 'DD.MMM', text: 'ДД.МММ' },
+                    { format: 'DD.MMMM', text: 'ДД.ММММ' },
+                    { format: 'DD-MM-YYYY', text: 'ДД-ММ-ГГГГ' },
+                    { format: 'DD-MMM-YYYY', text: 'ДД-МММ-ГГГГ' },
+                    { format: 'DD-MMMM-YYYY', text: 'ДД-МММ-ГГГГ' },
+                    { format: 'DD-MM-YY', text: 'ДД-ММ-ГГ' },
+                    { format: 'DD-MMM-YY', text: 'ДД-МММ-ГГ' },
+                    { format: 'DD-MMMM-YY', text: 'ДД-ММММ-ГГ' },
+                    { format: 'DD/MM/YYYY', text: 'ДД/ММ/ГГГГ' },
+                    { format: 'DD/MMM/YYYY', text: 'ДД/МММ/ГГГГ' },
+                    { format: 'DD/MMMM/YYYY', text: 'ДД/ММММ/ГГГГ' },
+                    { format: 'DD/MM/YY', text: 'ДД/ММ/ГГГГ' },
+                    { format: 'DD/MMM/YY', text: 'ДД/ММ/ГГГГ' },
+                    { format: 'DD/MMMM/YY', text: 'ДД/ММ/ГГГГ' },
+                ],
             }
         },
 
@@ -279,10 +353,21 @@
             nextPageDisabled: function () {
                 return !this.file || this.excelUploading
             },
-
+            shouldRenderDataErrors() {
+                if(this.parsedData){
+                    return this.parsedData.dataErrors.length > 0
+                }
+                return false
+            },
+            parsedErrors() {
+                if(this.parsedData) {
+                    return this.parsedData.dataErrors
+                }
+                return []
+            },
             parsedHeaders() {
                 if(this.parsedData) {
-                    return this.parsedData.headers
+                    return [this.parsedData.legendHeader, ...this.parsedData.headers]
                 }
                 return []
             },

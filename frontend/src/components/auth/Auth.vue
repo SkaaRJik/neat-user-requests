@@ -74,7 +74,7 @@
                 this.dataToLogin.message = message
                 this.tab = 'sign-in';
             },
-        }
+        },
     }
 </script>
 

@@ -45,5 +45,6 @@
   "Legend": "Легенда",
   "Items": "Объектов: {size}",
   "Continue": "Продолжить",
+  "Date_format_inside_the_document": "Формат даты в документе",
   "CANT_PROCESS_FILE": "Невозможно обработать файл"
 }

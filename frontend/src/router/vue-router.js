@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Auth from "../components/auth/Auth";
-import Login from "../components/auth/Login";
 import projects_routes from "./projects-routes";
 
 
@@ -16,7 +15,7 @@ const routes = [
     {
         path: '/login',
         name: 'login',
-        component: Login,
+        component: Auth,
         props: {dataToLogin: {message: ''}},
         meta: {
             guest: true
@@ -39,7 +38,7 @@ const router = new VueRouter({
 
 
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, fromRoute, next) => {
     if(to.matched.some(record => record.meta.requiresAuth)) {
         if (localStorage.getItem('user') == null) {
             next({
@@ -65,7 +64,7 @@ router.beforeEach((to, from, next) => {
             next()
         }
         else{
-            next({ name: 'home'})
+            next(fromRoute)
         }
     }else {
         next()

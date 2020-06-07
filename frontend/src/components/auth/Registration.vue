@@ -159,14 +159,12 @@
         },
         computed: {
             passwordError: function () {
-
                 if(this.repeatPassword
                     && this.repeatPassword.length !== 0
                     && this.repeatPassword !== this.userDetails.password) {
                     return this.$t('Passwords_Mismatch')
                 }
                 return null
-
             }
         }
 
