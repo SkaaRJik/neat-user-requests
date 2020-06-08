@@ -123,8 +123,9 @@
 
 
                         <v-col cols="12">
-
+                            <v-switch v-if="!parsedData.isNumber" v-model="parsedData.isDate" :label="$t('Is_Date')"></v-switch>
                             <v-autocomplete
+                                    v-if="parsedData.isDate"
                                     v-model="textFormat"
                                     :items="formats"
                                     :filter="customFilter"
@@ -200,6 +201,7 @@
                                         class="ma-3"
                                         color="primary"
                                         @click="step = 3"
+                                        :disabled="shouldRenderDataErrors"
 
                                 >
                                     {{$t('Continue')}}
@@ -303,7 +305,7 @@
                         dismissible: true,
                     });
                 }
-
+                console.log('[NewProject].uploadXLSX this.parsedData:',this.parsedData)
                 this.excelUploading = false
 
             },
@@ -319,9 +321,9 @@
             return {
                 file: null,
                 excelUploading: false,
-                parsedData: null,
+                parsedData: {isNumber: false, isDate: false},
                 step: 1,
-                textFormat: null,
+                textFormat: 'DD.MM.YYYY',
                 date: new Date(),
                 formats: [
                     { format: 'DD.MM.YYYY', text: 'ДД.ММ.ГГГГ' },
@@ -354,27 +356,44 @@
                 return !this.file || this.excelUploading
             },
             shouldRenderDataErrors() {
-                if(this.parsedData){
+                if(this.parsedData.dataErrors){
                     return this.parsedData.dataErrors.length > 0
                 }
                 return false
             },
             parsedErrors() {
-                if(this.parsedData) {
+                if(this.parsedData.dataErrors) {
                     return this.parsedData.dataErrors
                 }
                 return []
             },
             parsedHeaders() {
-                if(this.parsedData) {
+                if(this.parsedData.headers) {
                     return [this.parsedData.legendHeader, ...this.parsedData.headers]
                 }
                 return []
             },
 
             parsedLegend() {
-                if(this.parsedData) {
-                    return this.parsedData.legend
+                if(this.parsedData.legend) {
+                    console.log('[NewProject].parsedLegend this.parsedData.legend:',this.parsedData.legend)
+                    try {
+                        if (this.parsedData.isNumber)
+                            return this.parsedData.legend
+                        else {
+                            if (this.parsedData.isDate) {
+                                console.log('[NewProject].parsedLegend this.textFormat:',this.textFormat.format)
+                                const newLegend = this.parsedData.legend.map(value => moment(value, this.textFormat.format).format(this.textFormat.format))
+                                console.log('[NewProject].parsedLegend this.parsedData.newLegend:', newLegend)
+                                return newLegend
+                            } else {
+                                return []
+                            }
+                        }
+                    } catch (e) {
+                        console.error('[NewProject].parsedLegend :',e)
+                        return []
+                    }
                 }
                 return []
             }

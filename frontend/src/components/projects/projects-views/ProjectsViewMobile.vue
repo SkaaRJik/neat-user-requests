@@ -50,7 +50,7 @@
 </template>
 
 <script>
-    import {alphabet, getRandomValue} from '../../utils/alphabet.util'
+    import {alphabet, getRandomValue} from '../../../utils/alphabet.util'
 
     const statuses = ['In_Queue', 'Done' ,'In_Progress']
 

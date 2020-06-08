@@ -1,4 +1,5 @@
 import xlsxFile from 'read-excel-file'
+import * as moment from "moment";
 
 
 function isNumeric(n) {
@@ -16,23 +17,22 @@ export default function parseExcel(file) {
             const dataErrors = []
 
             let isDate = false;
-            let isNumber = false;
+            let isNumber = true;
 
             for (let i = 0; i < data.length; i++) {
                 let row = data[i];
                 legend.push(row[0]);
-                console.log('[ExcelParserJs].parseExcel row:', row[0], isNumeric(row[0]));
+                console.log('[ExcelParserJs].parseExcel row:', row[0], isNumeric(row[0]), moment(row[0], 'dd.MM.yyyy').date().valueOf());
 
-                isNumber = isNumeric(row[0]);
 
-                if(!isNumeric()){
-                    isDate = true
+                isNumber = isNumber && isNumeric(row[0]);
+
+                if(!isNumber){
+                    if(!isNaN(moment(row[0], 'dd.MM.yyyy').date().valueOf()))
+                        isDate = true
                 }
 
-
-
-
-                data[i] = row.slice(0, 1);
+                data[i] = row.slice(1, row.length);
                 row = data[i];
 
                 for (let j = 0; j < row.length; j++) {
@@ -48,7 +48,9 @@ export default function parseExcel(file) {
                 headers,
                 legendHeader,
                 legend,
-                dataErrors
+                dataErrors,
+                isDate,
+                isNumber
             })
 
 

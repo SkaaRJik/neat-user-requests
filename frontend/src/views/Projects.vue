@@ -13,8 +13,8 @@
 </template>
 
 <script>
-    import ProjectsViewFullScreen from "../components/projects-views/ProjectsViewFullScreen";
-    import ProjectsViewMobile from "../components/projects-views/ProjectsViewMobile";
+    import ProjectsViewFullScreen from "../components/projects/projects-views/ProjectsViewFullScreen";
+    import ProjectsViewMobile from "../components/projects/projects-views/ProjectsViewMobile";
     export default {
         name: "Projects",
         components: {ProjectsViewMobile, ProjectsViewFullScreen},
