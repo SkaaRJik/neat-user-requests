@@ -2,7 +2,7 @@ import xlsxFile from 'read-excel-file'
 import * as moment from "moment";
 import _ from "lodash"
 
-function isString (value) {
+function isString(value) {
     return typeof value === 'string' || value instanceof String;
 }
 
@@ -23,7 +23,7 @@ export default function parseExcel(file) {
                 let row = data[i];
                 legend.push(row[0]);
 
-                if(!isString(row[0])){
+                if (!isString(row[0])) {
                     try {
                         increment += row[0];
                     } catch (e) {
@@ -33,7 +33,7 @@ export default function parseExcel(file) {
                     increment = 0
                 }
 
-                if(moment(row[0]).toDate().getTime()){
+                if (moment(row[0]).toDate().getTime()) {
                     isAllDates = isAllDates && true;
                 } else {
                     isAllDates = false
@@ -50,7 +50,7 @@ export default function parseExcel(file) {
                 }
             }
 
-            if(increment) {
+            if (increment) {
                 try {
                     increment /= legend.length;
                 } catch (e) {
@@ -61,26 +61,21 @@ export default function parseExcel(file) {
                 increment = 0
             }
 
-            if(increment === 0){
-                dataErrors.push({error: "ERROR_LEGEND_DOESNT_HAVE_INCREMENT"});
-            }
-
-
-            if(isAllDates && legend.length > 0){
+            if (isAllDates && legend.length > 0) {
                 increment = 0;
-                legend = legend.map((value,index,arr) => {
-                    const date = moment(value)
-                    if(arr[index-1]){
-                        increment += date.diff(moment(arr[index-1]), 'days')
-                        console.log('[ExcelParser]. increment:', increment);
-                    }
-                    return date.toDate();
+                legend = legend.map((value) => {
+                    const date = moment(value).toDate()
+                    increment += date.getTime()
+                    return date;
                 })
-                if(increment) {
+                if (increment) {
                     increment /= legend.length;
                 }
             }
 
+            if (increment === 0) {
+                dataErrors.push({error: "ERROR_LEGEND_DOESNT_HAVE_INCREMENT"});
+            }
 
 
             resolve({

@@ -154,7 +154,7 @@
                                     </span>
 
                                     <span class="span-in-row">
-                                        {{$t('Increment', {increment: parsedData.isAllDates ? `${parsedData.increment} ${$t('Days')}` : parsedData.increment.toFixed(3)})}}
+                                        {{$t('Increment', {increment: calculateIncrement()})}}
                                     </span>
                                 </div>
                             </v-select>
@@ -306,6 +306,18 @@
                 this.step--;
             },
 
+            calculateIncrement(){
+                if(this.parsedData.isAllDates){
+                    let diff = moment.duration(this.parsedData.increment, 'years');
+                    if(diff) return `${diff} ${this.$t('Years')}`
+
+
+                }
+                return this.parsedData.increment.toFixed(3)
+
+
+
+            },
 
         },
         data() {
