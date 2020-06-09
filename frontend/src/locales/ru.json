@@ -44,7 +44,9 @@
   "Headers": "Заголовки",
   "Legend": "Легенда",
   "Items": "Объектов: {size}",
+  "Increment": "Наращивание на: {increment}",
   "Continue": "Продолжить",
   "Date_format_inside_the_document": "Формат даты в документе",
-  "CANT_PROCESS_FILE": "Невозможно обработать файл"
+  "CANT_PROCESS_FILE": "Невозможно обработать файл",
+  "Legend_column_as_date_info": "Если столбец легенды содержит каие-либо даты или время, то ячейка должна быть отформатирована в виде Даты."
 }

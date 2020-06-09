@@ -20,9 +20,12 @@
                     </v-tab>
                 </v-tabs>
                 <v-spacer></v-spacer>
-                <v-btn icon dark @click="closeDialog">
+
+                <v-btn v-if="closeDialog" icon dark @click="closeDialog">
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
+
+
             </v-toolbar>
         </v-card-title>
         <v-card-text>

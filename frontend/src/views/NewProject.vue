@@ -22,21 +22,46 @@
                                     align="center"
                                     justify="center"
                             >
+
+                                <v-alert
+
+                                        type="info"
+                                        transition="scale-transition"
+                                        dense
+                                        border="bottom"
+                                        elevation="2"
+                                        class="mb-0"
+                                        style="width: 100%"
+                                >
+                                    {{$t('Legend_column_as_date_info')}}
+                                </v-alert>
+
+
+                            </v-row>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-row
+                                    align="center"
+                                    justify="center"
+                            >
                                 <v-btn
                                         class="ma-3"
                                         color="primary"
                                 >
-                                    <v-icon left>mdi-arrow-down-bold</v-icon> {{$t("Template")}}
+                                    <v-icon left>mdi-arrow-down-bold</v-icon>
+                                    {{$t("Template")}}
                                 </v-btn>
                                 <v-btn
                                         class="ma-3"
                                 >
-                                    <v-icon left>mdi-arrow-down-bold</v-icon> {{$t("Example", {number: 1})}}
+                                    <v-icon left>mdi-arrow-down-bold</v-icon>
+                                    {{$t("Example", {number: 1})}}
                                 </v-btn>
                                 <v-btn
                                         class="ma-3"
                                 >
-                                    <v-icon left>mdi-arrow-down-bold</v-icon> {{$t("Example", {number: 2})}}
+                                    <v-icon left>mdi-arrow-down-bold</v-icon>
+                                    {{$t("Example", {number: 2})}}
                                 </v-btn>
                             </v-row>
                         </v-col>
@@ -105,59 +130,36 @@
                                     multiple
                                     :label="$t('Headers')"
                             >
-                                <span slot="append" color="green">{{$t('Items', {size: parsedHeaders.length})}}</span>
+                                <div class="span-in-row__container" slot="append">
+                                    <span class="span-in-row">
+                                        {{$t('Items', {size: parsedHeaders.length})}}
+                                    </span>
+                                </div>
                             </v-select>
                         </v-col>
                         <v-col cols="12">
                             <v-select
                                     v-model="parsedLegend"
                                     :items="parsedLegend"
+
                                     readonly
                                     chips
                                     multiple
                                     :label="$t('Legend')"
                             >
-                                <span slot="append" color="green">{{$t('Items', {size: parsedLegend.length})}}</span>
+                                <div class="span-in-row__container" slot="append">
+
+                                    <span class="span-in-row">
+                                        {{$t('Items', {size: parsedLegend.length})}}
+                                    </span>
+
+                                    <span class="span-in-row">
+                                        {{$t('Increment', {increment: parsedData.isAllDates ? `${parsedData.increment} ${$t('Days')}` : parsedData.increment.toFixed(3)})}}
+                                    </span>
+                                </div>
                             </v-select>
                         </v-col>
 
-
-                        <v-col cols="12">
-                            <v-switch v-if="!parsedData.isNumber" v-model="parsedData.isDate" :label="$t('Is_Date')"></v-switch>
-                            <v-autocomplete
-                                    v-if="parsedData.isDate"
-                                    v-model="textFormat"
-                                    :items="formats"
-                                    :filter="customFilter"
-                                    item-text="name"
-                                    :label="$t('Date_format_inside_the_document')"
-                            >
-                                <template v-slot:selection="{ attr, on, item, selected }">
-                                    <span v-text="item.text"></span>
-                                    <v-chip
-                                            v-bind="attr"
-                                            :input-value="selected"
-                                            color="blue-grey"
-                                            class="white--text"
-                                            v-on="on"
-                                    >
-                                        {{formatDate(item.format)}}
-
-                                    </v-chip>
-                                </template>
-                                <template v-slot:item="{ item }">
-
-                                    <v-list-item-content>
-                                        <v-list-item-title v-text="item.text"></v-list-item-title>
-                                        <v-spacer></v-spacer>
-                                        <v-list-item-title v-text="formatDate(item.format)"></v-list-item-title>
-                                    </v-list-item-content>
-                                </template>
-
-                            </v-autocomplete>
-
-
-                        </v-col>
                         <v-col cols="12" v-if="shouldRenderDataErrors">
                             <v-expansion-panels :value="0">
                                 <v-expansion-panel
@@ -170,8 +172,10 @@
                                     </v-expansion-panel-header>
                                     <v-expansion-panel-content>
                                         <template v-for="(item,index) in parsedErrors">
-                                            <v-list-item  :id="index" :key="index">
-                                                {{item.error}} {{parsedData.headers[item.column] ? parsedData.headers[item.column] : item.column}} {{parsedData.legend[item.row] ? parsedData.legend[item.row] : item.row}}
+                                            <v-list-item :id="index" :key="index">
+                                                {{item.error}} {{parsedData.headers[item.column] ?
+                                                parsedData.headers[item.column] : item.column}}
+                                                {{parsedData.legend[item.row] ? parsedData.legend[item.row] : item.row}}
                                             </v-list-item>
                                         </template>
                                     </v-expansion-panel-content>
@@ -201,7 +205,7 @@
                                         class="ma-3"
                                         color="primary"
                                         @click="step = 3"
-                                        :disabled="shouldRenderDataErrors"
+                                        :disabled="shouldRenderDataErrors || !parsedData.increment"
 
                                 >
                                     {{$t('Continue')}}
@@ -273,31 +277,19 @@
         name: "NewProject",
         methods: {
 
-            formatDate(format){
-              return  moment(this.date).format(format)
+
+            redirectToProjectsPage() {
+                this.$router.push({name: 'projects'})
             },
 
-            customFilter (item, queryText, itemText) {
-                const textOne = item.name.toLowerCase()
-                const textTwo = item.abbr.toLowerCase()
-                const searchText = queryText.toLowerCase()
-
-                return textOne.indexOf(searchText) > -1 ||
-                    textTwo.indexOf(searchText) > -1
-            },
-
-            redirectToProjectsPage(){
-                this.$router.push({name:'projects'})
-            },
-
-            async uploadXLSX(){
+            async uploadXLSX() {
                 this.excelUploading = true
-                try{
+                try {
                     this.parsedData = await parseExcel(this.file)
                     //this.parsedData = (await ProjectsApi.parseExcelFile(this.file)).data
                     this.step = 2;
                 } catch (e) {
-                    console.error('[NewProject].uploadXLSX() EXCEPTION:',e)
+                    console.error('[NewProject].uploadXLSX() EXCEPTION:', e)
                     await Vue.$toast.open({
                         message: `${this.$t(e)}`,
                         type: 'error',
@@ -305,7 +297,7 @@
                         dismissible: true,
                     });
                 }
-                console.log('[NewProject].uploadXLSX this.parsedData:',this.parsedData)
+                console.log('[NewProject].uploadXLSX this.parsedData:', this.parsedData)
                 this.excelUploading = false
 
             },
@@ -315,92 +307,64 @@
             },
 
 
-
         },
-        data () {
+        data() {
             return {
                 file: null,
                 excelUploading: false,
-                parsedData: {isNumber: false, isDate: false},
+                legendError: false,
+                parsedData: {increment: 0},
                 step: 1,
                 textFormat: 'DD.MM.YYYY',
                 date: new Date(),
-                formats: [
-                    { format: 'DD.MM.YYYY', text: 'ДД.ММ.ГГГГ' },
-                    { format: 'DD.MMM.YYYY' , text: 'ДД.МММ.ГГГГ' },
-                    { format: 'DD.MMMM.YYYY', text: 'ДД.ММММ.ГГГГ' },
-                    { format: 'DD.MM.YY', text: 'ДД.ММ.ГГ' },
-                    { format: 'DD.MMM.YY', text: 'ДД.МММ.ГГ' },
-                    { format: 'DD.MMMM.YY', text: 'ДД.ММММ.ГГ' },
-                    { format: 'DD.MM', text: 'ДД.ММ' },
-                    { format: 'DD.MMM', text: 'ДД.МММ' },
-                    { format: 'DD.MMMM', text: 'ДД.ММММ' },
-                    { format: 'DD-MM-YYYY', text: 'ДД-ММ-ГГГГ' },
-                    { format: 'DD-MMM-YYYY', text: 'ДД-МММ-ГГГГ' },
-                    { format: 'DD-MMMM-YYYY', text: 'ДД-МММ-ГГГГ' },
-                    { format: 'DD-MM-YY', text: 'ДД-ММ-ГГ' },
-                    { format: 'DD-MMM-YY', text: 'ДД-МММ-ГГ' },
-                    { format: 'DD-MMMM-YY', text: 'ДД-ММММ-ГГ' },
-                    { format: 'DD/MM/YYYY', text: 'ДД/ММ/ГГГГ' },
-                    { format: 'DD/MMM/YYYY', text: 'ДД/МММ/ГГГГ' },
-                    { format: 'DD/MMMM/YYYY', text: 'ДД/ММММ/ГГГГ' },
-                    { format: 'DD/MM/YY', text: 'ДД/ММ/ГГГГ' },
-                    { format: 'DD/MMM/YY', text: 'ДД/ММ/ГГГГ' },
-                    { format: 'DD/MMMM/YY', text: 'ДД/ММ/ГГГГ' },
-                ],
             }
         },
-
         computed: {
             nextPageDisabled: function () {
                 return !this.file || this.excelUploading
             },
             shouldRenderDataErrors() {
-                if(this.parsedData.dataErrors){
+                if (this.parsedData.dataErrors) {
                     return this.parsedData.dataErrors.length > 0
                 }
                 return false
             },
             parsedErrors() {
-                if(this.parsedData.dataErrors) {
+                if (this.parsedData.dataErrors) {
                     return this.parsedData.dataErrors
                 }
                 return []
             },
             parsedHeaders() {
-                if(this.parsedData.headers) {
+                if (this.parsedData.headers) {
                     return [this.parsedData.legendHeader, ...this.parsedData.headers]
                 }
                 return []
             },
-
             parsedLegend() {
-                if(this.parsedData.legend) {
-                    console.log('[NewProject].parsedLegend this.parsedData.legend:',this.parsedData.legend)
-                    try {
-                        if (this.parsedData.isNumber)
-                            return this.parsedData.legend
-                        else {
-                            if (this.parsedData.isDate) {
-                                console.log('[NewProject].parsedLegend this.textFormat:',this.textFormat.format)
-                                const newLegend = this.parsedData.legend.map(value => moment(value, this.textFormat.format).format(this.textFormat.format))
-                                console.log('[NewProject].parsedLegend this.parsedData.newLegend:', newLegend)
-                                return newLegend
-                            } else {
-                                return []
-                            }
-                        }
-                    } catch (e) {
-                        console.error('[NewProject].parsedLegend :',e)
-                        return []
+                if (this.parsedData.legend) {
+                    if(this.parsedData.isAllDates){
+                        return this.parsedData.legend.map(value => moment(value).format("DD.MM.YYYY HH:mm"))
+                    }else {
+                        return this.parsedData.legend
                     }
+
                 }
                 return []
-            }
+            },
+
+
         },
     }
 </script>
 
 <style scoped>
 
+    .span-in-row__container {
+        font-size: 12px;
+    }
+
+    .span-in-row {
+        display: flow-root;
+    }
 </style>

@@ -1,46 +1,86 @@
 import xlsxFile from 'read-excel-file'
 import * as moment from "moment";
+import _ from "lodash"
 
-
-function isNumeric(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+function isString (value) {
+    return typeof value === 'string' || value instanceof String;
 }
+
 export default function parseExcel(file) {
 
     return new Promise((resolve, reject) => {
-       xlsxFile(file).then(data => {
+        xlsxFile(file).then(data => {
             let headers = data[0];
             data = data.slice(1, data.length);
             const legendHeader = headers[0];
             headers = headers.slice(1, headers.length);
-            const legend = [];
+            let legend = [];
             const dataErrors = []
-
-            let isDate = false;
-            let isNumber = true;
+            let increment = 0;
+            let isAllDates = true;
 
             for (let i = 0; i < data.length; i++) {
                 let row = data[i];
                 legend.push(row[0]);
-                console.log('[ExcelParserJs].parseExcel row:', row[0], isNumeric(row[0]), moment(row[0], 'dd.MM.yyyy').date().valueOf());
 
-
-                isNumber = isNumber && isNumeric(row[0]);
-
-                if(!isNumber){
-                    if(!isNaN(moment(row[0], 'dd.MM.yyyy').date().valueOf()))
-                        isDate = true
+                if(!isString(row[0])){
+                    try {
+                        increment += row[0];
+                    } catch (e) {
+                        increment = 0;
+                    }
+                } else {
+                    increment = 0
                 }
+
+                if(moment(row[0]).toDate().getTime()){
+                    isAllDates = isAllDates && true;
+                } else {
+                    isAllDates = false
+                }
+
 
                 data[i] = row.slice(1, row.length);
                 row = data[i];
 
                 for (let j = 0; j < row.length; j++) {
-                    if(!isNumeric(row[j])){
-                        dataErrors.push({error: "IS_NOT_NUMBER", row: i, column: j});
+                    if (!_.isNumber(row[j])) {
+                        dataErrors.push({error: "ERROR_IS_NOT_NUMBER", row: i, column: j});
                     }
                 }
             }
+
+            if(increment) {
+                try {
+                    increment /= legend.length;
+                } catch (e) {
+                    console.error('[ExcelParser]. increment error:', e);
+                    increment = 0;
+                }
+            } else {
+                increment = 0
+            }
+
+            if(increment === 0){
+                dataErrors.push({error: "ERROR_LEGEND_DOESNT_HAVE_INCREMENT"});
+            }
+
+
+            if(isAllDates && legend.length > 0){
+                increment = 0;
+                legend = legend.map((value,index,arr) => {
+                    const date = moment(value)
+                    if(arr[index-1]){
+                        increment += date.diff(moment(arr[index-1]), 'days')
+                        console.log('[ExcelParser]. increment:', increment);
+                    }
+                    return date.toDate();
+                })
+                if(increment) {
+                    increment /= legend.length;
+                }
+            }
+
 
 
             resolve({
@@ -49,8 +89,8 @@ export default function parseExcel(file) {
                 legendHeader,
                 legend,
                 dataErrors,
-                isDate,
-                isNumber
+                increment,
+                isAllDates
             })
 
 
