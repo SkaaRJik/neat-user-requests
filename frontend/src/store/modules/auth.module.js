@@ -21,7 +21,6 @@ export const auth = {
             }
         },
         logout({ commit }) {
-
             commit('logout');
         },
         async register({ commit }, user) {

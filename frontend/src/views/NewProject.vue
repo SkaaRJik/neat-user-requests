@@ -165,7 +165,7 @@
                                 <v-expansion-panel
                                 >
                                     <v-expansion-panel-header disable-icon-rotate>
-                                        Следующие поля содержат строку вместо числа:
+                                        {{$t('Errors')}}
                                         <template v-slot:actions>
                                             <v-icon color="error">mdi-alert-circle</v-icon>
                                         </template>
@@ -173,9 +173,7 @@
                                     <v-expansion-panel-content>
                                         <template v-for="(item,index) in parsedErrors">
                                             <v-list-item :id="index" :key="index">
-                                                {{item.error}} {{parsedData.headers[item.column] ?
-                                                parsedData.headers[item.column] : item.column}}
-                                                {{parsedData.legend[item.row] ? parsedData.legend[item.row] : item.row}}
+                                                {{$t(item.error, item)}}
                                             </v-list-item>
                                         </template>
                                     </v-expansion-panel-content>
@@ -225,7 +223,13 @@
                 <v-container>
                     <v-row>
                         <v-col cols="12">
-
+                            <v-text-field
+                                    v-model="projectName"
+                                    :label="$t('Project_Name')"
+                                    outlined
+                                    clearable
+                                    counter="100"
+                            ></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -248,10 +252,11 @@
                                 <v-btn
                                         class="ma-3"
                                         color="primary"
-                                        @click="step = 3"
+                                        @click="handleSaveProject"
+                                        :disabled="projectName.length === 0"
 
                                 >
-                                    {{$t('Continue')}}
+                                    {{$t('Create')}}
                                     <v-progress-circular
                                             v-if="excelUploading"
                                             indeterminate
@@ -272,11 +277,19 @@
     import parseExcel from "../parser/ExcelParser";
     import Vue from "vue";
     import moment from 'moment'
+    import ProjectsAPI from "../services/api/ProjectsAPI";
 
     export default {
         name: "NewProject",
         methods: {
-
+            async handleSaveProject() {
+                const data = {
+                    ...this.parsedData,
+                    name: this.projectName,
+                }
+                const res = await ProjectsAPI.saveProject(data);
+                console.log('[NewProject].handleSaveProject res:', res.data);
+            },
 
             redirectToProjectsPage() {
                 this.$router.push({name: 'projects'})
@@ -307,11 +320,14 @@
             },
 
             calculateIncrement(){
-                if(this.parsedData.isAllDates){
-                    let diff = moment.duration(this.parsedData.increment, 'years');
-                    if(diff) return `${diff} ${this.$t('Years')}`
-
-
+                if(this.parsedData.isDate){
+                    let diff = moment.duration(this.parsedData.increment, 'milliseconds');
+                    if(diff.asYears()) return `${diff.asYears()} ${this.$t('Years')}`
+                    if(diff.asMonths()) return `${diff.asMonths} ${this.$t('Months')}`
+                    if(diff.asDays()) return `${diff.asDays} ${this.$t('Days')}`
+                    if(diff.asHours()) return `${diff.asHours} ${this.$t('Hours')}`
+                    if(diff.asMinutes()) return `${diff.asMinutes} ${this.$t('Minutes')}`
+                    if(diff.asSeconds()) return `${diff.asSeconds()} ${this.$t('Seconds')}`
                 }
                 return this.parsedData.increment.toFixed(3)
 
@@ -322,6 +338,7 @@
         },
         data() {
             return {
+                projectName: '',
                 file: null,
                 excelUploading: false,
                 legendError: false,
@@ -355,7 +372,7 @@
             },
             parsedLegend() {
                 if (this.parsedData.legend) {
-                    if(this.parsedData.isAllDates){
+                    if(this.parsedData.isDate){
                         return this.parsedData.legend.map(value => moment(value).format("DD.MM.YYYY HH:mm"))
                     }else {
                         return this.parsedData.legend

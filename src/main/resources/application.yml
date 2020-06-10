@@ -33,5 +33,7 @@ loger:
     root: DEBUG
 
 
-folders:
-  avatar: ./public/avatar
+path:
+  avatars: ./public/avatars
+  projects:
+    data: ./public/projects

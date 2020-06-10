@@ -19,5 +19,11 @@ export default {
             })
     },
 
+    saveProject: projectDetails => {
+
+        return Vue.prototype.$http.post(`${controllerPath}/save`,
+            projectDetails)
+    },
+
 }
 

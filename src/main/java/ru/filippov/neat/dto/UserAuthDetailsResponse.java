@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Data
 @AllArgsConstructor
 public class UserAuthDetailsResponse {
-
+    private final Long id;
     private final String firstname;
     private final String lastname;
     private final String[] roles;
@@ -26,6 +26,7 @@ public class UserAuthDetailsResponse {
                 .toArray(String[]::new);
 
         return new UserAuthDetailsResponse(
+                userPrincipal.getId(),
                 userPrincipal.getFirstname(),
                 userPrincipal.getLastname(),
                 roles,

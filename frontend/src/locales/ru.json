@@ -45,8 +45,14 @@
   "Legend": "Легенда",
   "Items": "Объектов: {size}",
   "Increment": "Наращивание на: {increment}",
+  "Project_Name": "Имя проекта",
   "Continue": "Продолжить",
   "Date_format_inside_the_document": "Формат даты в документе",
-  "CANT_PROCESS_FILE": "Невозможно обработать файл",
+  "ERROR_CANT_PROCESS_FILE": "Невозможно обработать файл",
+  "ERROR_CANT_BE_STRING": "Легенда не должна содержать Текст! Ряд: {row}, Значение: {value}",
+  "ERROR_CANT_MIX_LEGEND_DATA": "Легенда не должна содержать И дату, И числа! Ряд: {row}",
+  "ERROR_IS_NOT_NUMBER": "Данные не должны содержать Текстовый тип! Ряд: {row}, Колонка: {column}",
+  "ERROR_LEGEND_DOESNT_HAVE_INCREMENT": "Не удалось расчитать значение последующего наращивания легенды",
+  "Errors": "Выявлены следующие ошибки:",
   "Legend_column_as_date_info": "Если столбец легенды содержит каие-либо даты или время, то ячейка должна быть отформатирована в виде Даты."
 }

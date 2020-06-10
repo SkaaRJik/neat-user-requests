@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -27,27 +28,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column
-    @NotBlank
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column
-    @NotBlank
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "first_name")
-    @NotBlank
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
-    @NotBlank
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column
-    @NotBlank
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column
+    @Column(name = "active", nullable = false)
     private boolean active;
 
     @Enumerated(EnumType.STRING)
@@ -58,15 +54,23 @@ public class User {
     @Column
     private String avatar;
 
-    @Column(name = "creation_date", updatable = false)
-    @NotNull
+    @Column(name = "creation_date", updatable = false, nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime creationDate;
 
-    @Column(name = "password_update_date")
-    @NotNull
+    @Column(name = "password_update_date", nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime lastPasswordUpdate;
+
+   /* @OneToMany(
+            mappedBy = "user_projects",
+            cascade = CascadeType.PERSIST,
+            fetch = FetchType.LAZY
+    )
+    private List<Project> projects;*/
+    /*@OneToMany(mappedBy = "project", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    private List<Project> projects;*/
 
 /*    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Auth> tokens;*/

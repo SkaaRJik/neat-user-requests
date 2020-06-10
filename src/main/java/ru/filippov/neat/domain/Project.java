@@ -10,35 +10,28 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "auth")
-public class Auth {
+@Table(name = "projects")
+public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "filename", nullable = false)
+    private String filename;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
-
-    @Column(name = "refresh_token", nullable = false)
-    private String refreshToken;
-
-    @Column(name = "previous_refresh_token")
-    private String previousToken;
-
-    @Column(name = "expiration_date", nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
-    private Date expirationDate;
-
-
 
 }
