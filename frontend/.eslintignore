@@ -1,0 +1,4 @@
+.gitignore
+.eslintrc.js
+/src/services/utils/device.js
+/src/locales/ru.moment.js

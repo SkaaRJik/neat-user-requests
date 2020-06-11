@@ -1,29 +1,19 @@
-import Vue from 'vue'
+import Vue from "vue";
 
-const controllerPath = '/api/projects'
+const controllerPath = "/api/projects";
 export default {
-    parseExcelFile: file => {
+  parseExcelFile: file => {
+    const formData = new FormData();
+    formData.append("file", file, file.name);
 
-        const formData = new FormData();
-        formData.append('file', file, file.name)
+    return Vue.prototype.$http.post(`${controllerPath}/parse`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
+  },
 
-
-
-
-        return Vue.prototype.$http.post(`${controllerPath}/parse`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-    },
-
-    saveProject: projectDetails => {
-
-        return Vue.prototype.$http.post(`${controllerPath}/save`,
-            projectDetails)
-    },
-
-}
-
+  saveProject: projectDetails => {
+    return Vue.prototype.$http.post(`${controllerPath}/save`, projectDetails);
+  }
+};

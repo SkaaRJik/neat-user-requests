@@ -53,7 +53,7 @@ public class ProjectController {
             return ResponseEntity.ok(excelParser.parseFile(file));
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<String>("CANT_PROCESS_FILE", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>("ERROR_CANT_PROCESS_FILE", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -65,9 +65,9 @@ public class ProjectController {
         Project project = null;
         try{
             project = projectService.saveProject(user.toUser(), params);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
-            return new ResponseEntity<String>("CANT_SAVE_FILE", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>("ERROR_CANT_SAVE", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
 
