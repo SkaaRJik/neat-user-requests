@@ -3,7 +3,6 @@ package ru.filippov.neat.service.user;
 import lombok.extern.log4j.Log4j2;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,7 +44,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     );
         }
 
-        return UserPrinciple.toUserPrinciple(user);
+        return UserPrincipal.toUserPrinciple(user);
     }
 
     public Boolean existsByEmail(String email) {

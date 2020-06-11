@@ -27,9 +27,6 @@ public class Project {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "filename", nullable = false)
-    private String filename;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;

@@ -56,7 +56,10 @@ axios.interceptors.response.use(response => response, async error => {
         // Would be nice to catch an error here, which would work, if the interceptor is omitted
 
     }
-    if (status === 406) {
+
+
+    if (status === 406 || status === 400) {
+        await store.dispatch('auth/logout')
         Vue.$toast.open({
             message: `${Vue.$t('YOU_WERE_LOGGED_OUT')}`,
             type: 'error',

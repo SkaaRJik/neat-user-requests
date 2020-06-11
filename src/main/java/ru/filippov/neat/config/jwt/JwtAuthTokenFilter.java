@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,10 +24,13 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private TokenProvider tokenProvider;
 
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, 
-    								HttpServletResponse response, 
-    								FilterChain filterChain) 
+    protected void doFilterInternal(HttpServletRequest request,
+    								HttpServletResponse response,
+    								FilterChain filterChain)
     										throws ServletException, IOException {
         try {
 
@@ -35,8 +39,8 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
                 String username = tokenProvider.getUserNameFromJwtToken(actionToken);
                 List<GrantedAuthority> authorities = tokenProvider.getAuthoritiesFromJwtToken(actionToken);
 
-                UsernamePasswordAuthenticationToken authentication 
-                		= new UsernamePasswordAuthenticationToken(username, null, authorities);
+                UsernamePasswordAuthenticationToken authentication
+                		= new UsernamePasswordAuthenticationToken(userDetailsService.loadUserByUsername(username), null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);

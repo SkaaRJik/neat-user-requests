@@ -21,7 +21,7 @@ import ru.filippov.neat.dto.TokenDto;
 import ru.filippov.neat.exceptions.RefreshTokenNotExists;
 import ru.filippov.neat.service.auth.AuthServiceImpl;
 import ru.filippov.neat.service.user.UserDetailsServiceImpl;
-import ru.filippov.neat.service.user.UserPrinciple;
+import ru.filippov.neat.service.user.UserPrincipal;
 
 import javax.validation.Valid;
 import java.util.Date;
@@ -72,7 +72,7 @@ public class AuthRestAPI {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
 
-        User user = ((UserPrinciple) authentication.getPrincipal()).toUser();
+        User user = ((UserPrincipal) authentication.getPrincipal()).toUser();
 
 
         String[] roles = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toArray(String[]::new);
@@ -86,9 +86,14 @@ public class AuthRestAPI {
 
         String accessToken = jwtProvider.generateAccessToken(user.getUsername(), roles);
 
-        UserAuthDetailsResponse profile = UserAuthDetailsResponse.build(new TokenDto(
-                accessToken, refreshToken, jwtProvider.getAccessTokenExpiration(), jwtProvider.getRefreshTokenExpiration()
-        ),(UserPrinciple) authentication.getPrincipal());
+        UserAuthDetailsResponse profile = UserAuthDetailsResponse
+                .build(TokenDto.builder()
+                                .accessToken(accessToken)
+                                .refreshToken(refreshToken)
+                                .accessTokenExpiredAfterMilliseconds(jwtProvider.getAccessTokenExpiration())
+                                .refreshTokenExpiredAfterMilliseconds(jwtProvider.getRefreshTokenExpiration())
+                                .build(),
+                        (UserPrincipal) authentication.getPrincipal());
 
 
 

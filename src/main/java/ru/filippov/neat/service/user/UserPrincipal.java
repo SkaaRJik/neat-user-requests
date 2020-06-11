@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import ru.filippov.neat.domain.Role;
 import ru.filippov.neat.domain.User;
 
+import javax.security.auth.Subject;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Data
 @Builder(toBuilder = true)
-public class UserPrinciple implements UserDetails {
+public class UserPrincipal implements UserDetails {
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
@@ -43,12 +45,12 @@ public class UserPrinciple implements UserDetails {
 
     private LocalDateTime lastPasswordUpdate;
 
-    public static UserPrinciple toUserPrinciple(User user) {
+    public static UserPrincipal toUserPrinciple(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
                 new SimpleGrantedAuthority(role.name())
         ).collect(Collectors.toList());
 
-        return UserPrinciple.builder()
+        return UserPrincipal.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -105,10 +107,11 @@ public class UserPrinciple implements UserDetails {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        
-        UserPrinciple user = (UserPrinciple) o;
+
+        UserPrincipal user = (UserPrincipal) o;
         return Objects.equals(id, user.id);
     }
+
 
     public User toUser(){
 

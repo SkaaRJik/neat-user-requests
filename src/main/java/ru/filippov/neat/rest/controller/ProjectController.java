@@ -5,20 +5,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.filippov.neat.config.jwt.JwtProvider;
+import ru.filippov.neat.domain.Project;
+import ru.filippov.neat.domain.User;
 import ru.filippov.neat.parser.excel.ExcelParser;
-import ru.filippov.neat.repository.UserRepository;
 import ru.filippov.neat.service.project.ProjectServiceImpl;
-import ru.filippov.neat.service.user.UserDetailsServiceImpl;
-import ru.filippov.neat.service.user.UserPrinciple;
+import ru.filippov.neat.service.user.UserPrincipal;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
+import java.security.Principal;
 import java.util.Map;
 
 @RestController
@@ -54,23 +58,20 @@ public class ProjectController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> parseExcel(@AuthenticationPrincipal UserPrinciple user, @RequestBody Map<String,Object> params){
+    public ResponseEntity<?> saveProject(@AuthenticationPrincipal UserPrincipal user, @RequestBody Map<String,Object> params){
 
 
-        if (params.containsKey("id")){
 
-        } else {
-
+        Project project = null;
+        try{
+            project = projectService.saveProject(user.toUser(), params);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<String>("CANT_SAVE_FILE", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        /*try {
-            return ResponseEntity.ok(excelParser.parseFile(file));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<String>("CANT_PROCESS_FILE", HttpStatus.INTERNAL_SERVER_ERROR);
-        }*/
 
-        return null;
+        return new ResponseEntity<Long>(project.getId(), HttpStatus.OK);
 
     }
 }

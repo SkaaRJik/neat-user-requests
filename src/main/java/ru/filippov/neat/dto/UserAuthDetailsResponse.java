@@ -3,9 +3,7 @@ package ru.filippov.neat.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.filippov.neat.domain.Role;
-import ru.filippov.neat.service.user.UserPrinciple;
-
-import java.util.stream.Collectors;
+import ru.filippov.neat.service.user.UserPrincipal;
 
 
 @Data
@@ -18,7 +16,7 @@ public class UserAuthDetailsResponse {
     private final String username;
     private final TokenDto tokens;
 
-    public static UserAuthDetailsResponse build(TokenDto tokens, UserPrinciple userPrincipal){
+    public static UserAuthDetailsResponse build(TokenDto tokens, UserPrincipal userPrincipal){
 
         String[] roles = userPrincipal.getAuthorities()
                 .stream()
