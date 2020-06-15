@@ -15,5 +15,15 @@ export default {
 
   saveProject: projectDetails => {
     return Vue.prototype.$http.post(`${controllerPath}/save`, projectDetails);
+  },
+
+  getMyProjects: (page, itemsPerPage) => {
+    return Vue.prototype.$http.get(`${controllerPath}/my`, {
+      query: { page, itemsPerPage }
+    });
+  },
+
+  getProjectDetails: id => {
+    return Vue.prototype.$http.get(`${controllerPath}/${id}`);
   }
 };

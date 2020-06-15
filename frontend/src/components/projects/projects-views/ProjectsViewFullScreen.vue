@@ -47,7 +47,11 @@
               :items-per-page="itemsPerPage"
               :page.sync="page"
               :search="search"
-              @click:row="clicked"
+              @click:row="
+                value => {
+                  openProject(value.id);
+                }
+              "
               @page-count="pageCount = $event"
               class="elevation-1"
               hide-default-footer
@@ -64,7 +68,7 @@
               </template>
               <template v-slot:item.status="{ item }">
                 <v-fab-transition>
-                  <span v-if="item.status === 'In_Queue'">{{
+                  <span v-if="item.status === 'IN_QUEUE'">{{
                     $t(item.status, { size: item.inQueue })
                   }}</span>
                   <v-progress-linear
@@ -72,14 +76,15 @@
                     color="light-blue"
                     height="10"
                     striped
-                    v-else-if="item.status === 'In_Progress'"
+                    v-else-if="item.status === 'IN_PROGRESS'"
                   ></v-progress-linear>
                   <v-icon
                     color="success"
-                    v-else-if="item.status === 'Done'"
+                    v-else-if="item.status === 'DONE'"
                     x-large
                     >mdi-check
                   </v-icon>
+                  <span v-else>{{ $t(item.status) }}</span>
                 </v-fab-transition>
               </template>
             </v-data-table>
@@ -94,7 +99,9 @@
 </template>
 
 <script>
-export default {
+  import ProjectsAPI from "../../../services/api/ProjectsAPI";
+
+  export default {
   name: "ProjectsViewFullScreen",
   methods: {
     clicked(value) {
@@ -102,6 +109,17 @@ export default {
     },
     async newProject() {
       await this.$router.push({ name: "new-project" });
+    },
+    async loadProjects() {
+      const projects = await ProjectsAPI.getMyProjects(
+        this.page,
+        this.itemsPerPage
+      );
+      this.projects = projects.data.content;
+      this.pageCount = projects.data.totalPages;
+    },
+    openProject(id) {
+      this.$router.push({ name: "project-page", params: { id } });
     }
   },
   data() {
@@ -115,7 +133,8 @@ export default {
         {
           text: this.$t("Project_Name"),
           align: "start",
-          value: "name"
+          value: "name",
+          sortable: false
         },
         {
           text: this.$t("Training_Error"),
@@ -133,29 +152,11 @@ export default {
         multiSort: false
       },
       progress: {},
-      projects: [
-        {
-          name: "Frozen Yogurt",
-          trainingError: "",
-          predictionError: "",
-          inQueue: 1,
-          status: "In_Queue"
-        },
-        {
-          name: "Hello",
-          trainingError: "",
-          predictionError: "",
-          inQueue: 1,
-          status: "In_Queue"
-        },
-        {
-          name: "Its me",
-          trainingError: Math.random(),
-          predictionError: Math.random(),
-          status: "Done"
-        }
-      ]
+      projects: []
     };
+  },
+  mounted() {
+    this.loadProjects();
   }
 };
 </script>

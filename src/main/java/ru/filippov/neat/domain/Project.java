@@ -1,17 +1,13 @@
 package ru.filippov.neat.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -30,5 +26,22 @@ public class Project {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
+
+    @Column(name = "training_error")
+    private Double trainingError;
+
+    @Column(name = "prediction_error")
+    private Double predictionError;
+
+    @Column(name = "status", nullable = false)
+    private ProjectStatus status;
+
+    @Column(name = "created_date", updatable = false, nullable = false)
+    private LocalDateTime creationDate;
+
+    @Column(name = "updated_date", nullable = false)
+    private LocalDateTime updatedDate;
+
+
 
 }
