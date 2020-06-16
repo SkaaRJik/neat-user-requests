@@ -22,8 +22,7 @@
     };
   },
   watch: {
-    projectId: function(valNew, valOld) {
-      console.log("THIRD - watch - myProp - ", valNew, " ", valOld);
+    projectId: function() {
       this.loadProjectInfo();
     }
   },

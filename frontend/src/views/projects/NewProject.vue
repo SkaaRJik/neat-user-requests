@@ -13,7 +13,11 @@
 
       <v-divider></v-divider>
 
-      <v-stepper-step step="3">Имя проекта</v-stepper-step>
+      <v-stepper-step :complete="step > 3" step="3">Имя проекта</v-stepper-step>
+
+      <v-divider></v-divider>
+
+      <v-stepper-step step="4">{{ $t("Data_Normalization") }}</v-stepper-step>
     </v-stepper-header>
 
     <v-stepper-items>
@@ -74,8 +78,6 @@
             </v-col>
           </v-row>
         </v-container>
-
-        <!-- <v-btn text @click="redirectToProjectsPage">{{$t('Cancel')}}</v-btn>-->
       </v-stepper-content>
 
       <v-stepper-content step="3">
@@ -105,7 +107,16 @@
                 </v-btn>
                 <v-btn
                   :disabled="projectName.length === 0"
-                  @click="handleSaveProject"
+                  @click="step = 4"
+                  class="ma-3"
+                  color="primary"
+                >
+                  {{ $t("Continue") }}
+                  <v-icon> mdi-arrow-right</v-icon>
+                </v-btn>
+                <!--<v-btn
+                  :disabled="projectName.length === 0"
+                  @click="step = 4"
                   class="ma-3"
                   color="primary"
                 >
@@ -116,6 +127,36 @@
                     v-if="excelUploading"
                   ></v-progress-circular>
                   <v-icon right v-else> mdi-check</v-icon>
+                </v-btn>-->
+              </v-card-actions>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-stepper-content>
+
+      <v-stepper-content step="4">
+        <v-container>
+          <data-normalization :parsed-data="parsedData" />
+          <v-row>
+            <v-col class="mr-auto" cols="auto" xs="12">
+              <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                >{{ $t("Cancel") }}
+              </v-btn>
+            </v-col>
+            <v-col cols="auto" xs="12">
+              <v-card-actions>
+                <v-btn @click="step = 1" class="ma-3">
+                  <v-icon left> mdi-arrow-left</v-icon>
+                  {{ $t("Back") }}
+                </v-btn>
+                <v-btn
+                  :disabled="shouldRenderDataErrors || !parsedData.increment"
+                  @click="step = 3"
+                  class="ma-3"
+                  color="primary"
+                >
+                  {{ $t("Continue") }}
+                  <v-icon> mdi-arrow-right</v-icon>
                 </v-btn>
               </v-card-actions>
             </v-col>
@@ -132,12 +173,14 @@
   import ProjectsAPI from "../../services/api/ProjectsAPI";
   import UploadProjectData from "../../components/projects/new/UploadProjectData";
   import ProjectDetails from "../../components/projects/new/ProjectDetails";
+  import DataNormalization from "../../components/DataNormalization";
 
   export default {
   name: "NewProject",
   components: {
     ProjectDetails,
-    UploadProjectData
+    UploadProjectData,
+    DataNormalization
   },
   data() {
     return {
