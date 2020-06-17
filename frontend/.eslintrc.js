@@ -12,13 +12,14 @@ module.exports = {
         "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
         "max-len": [2, 120, 8],
+        "indent": ["error", 4],
         "block-scoped-var": 0, // treat var statements as if they were block scoped (off by default)
-        complexity: 0, // specify the maximum cyclomatic complexity allowed in a program (off by default)
+        "complexity": 0, // specify the maximum cyclomatic complexity allowed in a program (off by default)
         "consistent-return": 0, // require return statements to either always or never specify values
-        curly: 0, // specify curly brace conventions for all control statements
+        "curly": 0, // specify curly brace conventions for all control statements
         "default-case": 0, // require default case in switch statements (off by default)
         "dot-notation": 0, // encourages use of dot notation whenever possible
-        eqeqeq: 0, // require the use of === and !==
+        "eqeqeq": 0, // require the use of === and !==
         "guard-for-in": 0, // make sure for-in loops have an if statement (off by default)
         "no-alert": 0, // disallow the use of alert, confirm, and prompt
         "no-caller": 0, // disallow use of arguments.caller or arguments.callee
@@ -53,7 +54,7 @@ module.exports = {
         "no-sequences": 0, // disallow use of comma operator
         "no-unused-expressions": 0, // disallow usage of expressions in statement position
         "no-void": 0, // disallow use of void operator (off by default)
-        "no-warning-comments": 0, // disallow usage of configurable warning terms in comments, e.g. TODO or FIXME (off by default)
+        "no-warning-comments": 0, // disallow usage of configurable warning terms in comments
         "no-with": 0, // disallow use of the with statement
         "radix": 0, // require use of the second argument for parseInt() (off by default)
         "vars-on-top": 0, // requires to declare all vars on top of their containing scope (off by default)
@@ -62,6 +63,8 @@ module.exports = {
         "prefer-const": ["error", {
             "destructuring": "any",
             "ignoreReadBeforeAssign": false
-        }]
+        }],
+        "require-await": 0,
+        "no-mixed-spaces-and-tabs": 0,
     }
 };

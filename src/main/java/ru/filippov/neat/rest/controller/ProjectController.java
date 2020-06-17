@@ -38,13 +38,13 @@ public class ProjectController {
     }
 
     @Autowired
-    ExcelParser excelParser;
+    private ExcelParser excelParser;
 
     @Autowired
-    JwtProvider tokenProvider;
+    private JwtProvider tokenProvider;
 
     @Autowired
-    ProjectServiceImpl projectService;
+    private ProjectServiceImpl projectService;
 
     @PostMapping("/parse")
     public ResponseEntity<?> parseExcel(@RequestBody MultipartFile file){
