@@ -1,24 +1,42 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <v-select
-        :items="normalizationMethods"
-        :label="$t('Normalization_Method')"
-        v-model="normalizationMethod"
-      >
-        <template v-slot:selection="{ item }">
-          <span>{{ $t(item) }}</span>
-        </template>
-        <template v-slot:item="{ item }">
-          <span>{{ $t(item) }}</span>
-        </template>
-      </v-select>
-      <v-text-field v-model="minRange" :label="$t('Min')" />
-      <v-text-field v-model="maxRange" :label="$t('Max')" />
-      <v-btn :disabled="!normalizationMethod" @click="normalize">{{
-        $t("Normalize")
-      }}</v-btn>
+      <v-row align="center" justify="center">
+        <v-col>
+          <v-select
+            :items="normalizationMethods"
+            :label="$t('Normalization_Method')"
+            v-model="normalizationMethod"
+            class="ma-3"
+          >
+            <template v-slot:selection="{ item }">
+              <span>{{ $t(item) }}</span>
+            </template>
+            <template v-slot:item="{ item }">
+              <span>{{ $t(item) }}</span>
+            </template>
+          </v-select>
+        </v-col>
+
+        <v-col>
+          <v-text-field v-model="minRange" :label="$t('Min')" class="ma-3" />
+        </v-col>
+        <v-col>
+          <v-text-field v-model="maxRange" :label="$t('Max')" class="ma-3" />
+        </v-col>
+      </v-row>
     </v-col>
+    <v-col cols="12">
+      <v-row align="center" justify="center">
+        <v-btn
+          :disabled="!normalizationMethod"
+          @click="normalize"
+          class="ma-3"
+          >{{ $t("Normalize") }}</v-btn
+        ></v-row
+      >
+    </v-col>
+
     <v-col cols="12">
       <div id="normalizationChart"></div>
     </v-col>
