@@ -9,7 +9,6 @@ export default {
       const maxs = [];
       const output = [];
       const statistic = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
       for (let i = 0; i < data[0].length; i++) {
         for (let j = 0; j < data.length; j++) {
           if (i == 0) {
