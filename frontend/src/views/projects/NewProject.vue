@@ -107,7 +107,7 @@
                 </v-btn>
                 <v-btn
                   :disabled="projectName.length === 0"
-                  @click="step = 4"
+                  @click="handleSaveProject"
                   class="ma-3"
                   color="primary"
                 >
@@ -136,7 +136,10 @@
 
       <v-stepper-content step="4">
         <v-container>
-          <data-normalization :parsed-data="parsedData" />
+          <data-normalization
+            :parsed-data="parsedData"
+            v-model="normalizedData"
+          />
           <v-row>
             <v-col class="mr-auto" cols="auto" xs="12">
               <v-btn @click="redirectToProjectsPage" class="ma-3" text
@@ -145,13 +148,12 @@
             </v-col>
             <v-col cols="auto" xs="12">
               <v-card-actions>
-                <v-btn @click="step = 1" class="ma-3">
+                <v-btn @click="step = 3" class="ma-3">
                   <v-icon left> mdi-arrow-left</v-icon>
                   {{ $t("Back") }}
                 </v-btn>
                 <v-btn
-                  :disabled="shouldRenderDataErrors || !parsedData.increment"
-                  @click="step = 3"
+                  :disabled="!normalizedData && !normalizedData.output"
                   class="ma-3"
                   color="primary"
                 >
@@ -168,14 +170,14 @@
 </template>
 
 <script>
-  import parseExcel from "../../parser/ExcelParser";
-  import Vue from "vue";
-  import ProjectsAPI from "../../services/api/ProjectsAPI";
-  import UploadProjectData from "../../components/projects/new/UploadProjectData";
-  import ProjectDetails from "../../components/projects/new/ProjectDetails";
-  import DataNormalization from "../../components/DataNormalization";
+import parseExcel from "../../parser/ExcelParser";
+import Vue from "vue";
+import ProjectsAPI from "../../services/api/ProjectsAPI";
+import UploadProjectData from "../../components/projects/new/UploadProjectData";
+import ProjectDetails from "../../components/projects/new/ProjectDetails";
+import DataNormalization from "../../components/DataNormalization";
 
-  export default {
+export default {
   name: "NewProject",
   components: {
     ProjectDetails,
@@ -189,7 +191,9 @@
       excelUploading: false,
       legendError: false,
       parsedData: { increment: 0 },
-      step: 1
+      step: 1,
+      normalizedData: {},
+      projectId: null,
     };
   },
   methods: {
@@ -198,12 +202,15 @@
         ...this.parsedData,
         name: this.projectName
       };
-      const res = await ProjectsAPI.saveProject(data);
-      console.log("[NewProject].handleSaveProject res:", res.data);
-      await this.$router.push({
-        name: "project-page",
-        params: { id: res.data }
-      });
+      try {
+        const res = await ProjectsAPI.saveProject(data);
+        if(res && res.data) {
+          this.step = 4;
+          this.projectId = res.data;
+        }
+      } catch (e) {
+        console.error('[NewProject].handleSaveProject error:', e);
+      }
     },
 
     redirectToProjectsPage() {

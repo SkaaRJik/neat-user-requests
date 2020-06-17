@@ -19,17 +19,21 @@
         $t("Normalize")
       }}</v-btn>
     </v-col>
-    <v-col cols="12"> </v-col>
+    <v-col cols="12">
+      <div id="normalizationChart"></div>
+    </v-col>
   </v-row>
 </template>
 
 <script>
-  import NormalizationMethodsContainer from "../services/NormalizationMethods";
+import NormalizationMethodsContainer from "../services/NormalizationMethods";
+import Plotly from "plotly.js-dist";
 
-  export default {
+export default {
   name: "DataNormalization",
   props: {
-    parsedData: Object
+    parsedData: Object,
+    value: Object
   },
   data() {
     return {
@@ -48,24 +52,38 @@
         const data = await NormalizationMethodsContainer[
           this.normalizationMethod
         ](this.parsedData.data, this.minRange, this.maxRange);
-        console.log("[DataNormalizationVue].normalize data:", data);
+      this.$emit('input', data)
+        const chartOptions = [
+          {
+            x: [
+              "[0-0.1)",
+              "[0.1-0.2)",
+              "[0.2-0.3)",
+              "[0.3-0.4)",
+              "[0.4-0.5)",
+              "[0.5-0.6)",
+              "[0.6-0.7)",
+              "[0.7-0.8)",
+              "[0.8-0.9)",
+              "[0.9-1.0]",
+              "0 < || > 1"
+            ],
+            y: data.statistic,
+            type: "bar",
+          }
+        ];
+        const layout = {
+          plot_bgcolor:"#303030",
+          paper_bgcolor:"#303030",
+          font: {
+            color: '#FFF'
+          },
+
+        }
+        Plotly.newPlot("normalizationChart", chartOptions, layout);
       } catch (e) {
         console.error("[DataNormalizationVue].normalize error:", e);
       }
-      /*const func = NormalizationMethodsContainer[this.normalizationMethod];
-      console.log(
-        "[DataNormalizationVue].normalize func, func(this.parsedData.data, this.minRange, this.maxRange):",
-        func,
-        func(this.parsedData.data, this.minRange, this.maxRange)
-      );
-      func(this.parsedData.data, this.minRange, this.maxRange);*/
-      /*const normalizedData = NormalizationMethodsContainer[
-        this.normalizationMethod
-      ](this.parsedData.data, this.minRange, this.maxRange);
-      console.log(
-        "[DataNormalizationVue].normalize normalizedData:",
-        normalizedData
-      );*/
     }
   },
   computed: {
@@ -83,7 +101,7 @@
   mounted() {
     this.normalizationMethods = Object.keys(NormalizationMethodsContainer);
     this.normalizationMethod = this.normalizationMethods[0];
-  }
+  },
 };
 </script>
 

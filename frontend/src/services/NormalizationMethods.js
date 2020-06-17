@@ -8,7 +8,7 @@ export default {
       const mins = [];
       const maxs = [];
       const output = [];
-      const statistic = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const statistic = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
       for (let i = 0; i < data[0].length; i++) {
         for (let j = 0; j < data.length; j++) {
@@ -42,11 +42,29 @@ export default {
             const rangedValue = newValue * (maxRange * 2) + minRange;
             output[j].push(rangedValue);
           }
-          let statisticIndex = Math.floor(newValue * 10);
-          if (statisticIndex > 10 || statisticIndex < 0) {
-            statisticIndex = 11;
+          if (newValue >= 0 && newValue < 0.1) {
+            statistic[0]++;
+          } else if (newValue >= 0.1 && newValue < 0.2) {
+            statistic[1]++;
+          } else if (newValue >= 0.2 && newValue < 0.3) {
+            statistic[2]++;
+          } else if (newValue >= 0.3 && newValue < 0.4) {
+            statistic[3]++;
+          } else if (newValue >= 0.4 && newValue < 0.5) {
+            statistic[4]++;
+          } else if (newValue >= 0.5 && newValue < 0.6) {
+            statistic[5]++;
+          } else if (newValue >= 0.6 && newValue < 0.7) {
+            statistic[6]++;
+          } else if (newValue >= 0.7 && newValue < 0.8) {
+            statistic[7]++;
+          } else if (newValue >= 0.8 && newValue < 0.9) {
+            statistic[8]++;
+          } else if (newValue >= 0.9 && newValue <= 1.0) {
+            statistic[9]++;
+          } else if (newValue < 0 && newValue > 1.0) {
+            statistic[10]++;
           }
-          statistic[statisticIndex]++;
         }
       }
       resolve({
