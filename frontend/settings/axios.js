@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_SERVER } from "../settings/constants";
+import {API_SERVER} from "../settings/constants";
 import Vue from "vue";
 import router from "../src/router/vue-router";
 import store from "../src/store/vue-store";
@@ -28,7 +28,7 @@ axios.interceptors.response.use(
   response => response,
   async error => {
     const status = error.response ? error.response.status : null;
-    const text = error.response ? error.response.data : null;
+    const text = error.response ? error.response.data.message : null;
     console.log("[axios.js]interceptors. : status", status);
     if (status === 401) {
       // will loop if refreshToken returns 401
@@ -52,23 +52,25 @@ axios.interceptors.response.use(
       }
     }
 
-    if (status === 406 || status === 400) {
+    if (status === 406) {
       await store.dispatch("auth/logout");
       Vue.$toast.open({
         message: `${Vue.$t("YOU_WERE_LOGGED_OUT")}`,
         type: "error",
-        position: "bottom-right"
+        position: "bottom-right",
+        duration: 10000
       });
       await router.push("/login");
-    } else if (status) {
-      console.log("[Axios]. status text:", status, text);
-      Vue.$toast.open({
-        message: `${Vue.$t(text)} (${status})`,
-        type: "error",
-        position: "bottom-right"
-      });
-      /* await store.dispatch({ type:'error/setError', status, text} )*/
     }
+
+    console.log("[Axios]. status text:", status, text);
+    Vue.$toast.open({
+      message: `${text} (${status})`,
+      type: "error",
+      position: "bottom-right",
+      duration: 10000
+    });
+    /* await store.dispatch({ type:'error/setError', status, text} )*/
 
     return Promise.reject(error);
   }

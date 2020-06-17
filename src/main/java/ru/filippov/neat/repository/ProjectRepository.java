@@ -1,13 +1,15 @@
 package ru.filippov.neat.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.filippov.neat.domain.Auth;
+import org.springframework.data.jpa.repository.Query;
 import ru.filippov.neat.domain.Project;
-import ru.filippov.neat.domain.User;
 
 import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     Optional<Project> findById(Long id);
-    Optional<Project> findByUser(User user);
+    @Query("SELECT pr FROM Project pr WHERE pr.user.id = ?1")
+    Page<Project> findAllByUserId(Long userId, Pageable pageable);
 }
