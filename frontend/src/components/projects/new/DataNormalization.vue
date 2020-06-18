@@ -2,7 +2,7 @@
   <v-row>
     <v-col cols="12">
       <v-row align="center" justify="center">
-        <v-col>
+        <v-col sm="12" xs="12" md="4" lg="4" xl="4">
           <v-select
             :items="normalizationMethods"
             :label="$t('Normalization_Method')"
@@ -18,11 +18,11 @@
           </v-select>
         </v-col>
 
-        <v-col>
-          <v-text-field v-model="minRange" :label="$t('Min')" class="ma-3" />
+        <v-col sm="12" xs="12" md="4" lg="4" xl="4">
+          <v-text-field v-model="minRange" :label="$t('Min')" class="ma-3" type="number"/>
         </v-col>
-        <v-col>
-          <v-text-field v-model="maxRange" :label="$t('Max')" class="ma-3" />
+        <v-col sm="12" xs="12" md="4" lg="4" xl="4">
+          <v-text-field v-model="maxRange" :label="$t('Max')" class="ma-3" type="number"/>
         </v-col>
       </v-row>
     </v-col>
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-  import NormalizationMethodsContainer from "../services/NormalizationMethods";
+  import NormalizationMethodsContainer from "../../../services/NormalizationMethods";
   import Plotly from "plotly.js-dist";
 
   export default {
@@ -111,16 +111,6 @@
     }
   },
   computed: {
-    separatedData() {
-      if (!this.parsedData) return [];
-      if (!this.parsedData.data) return [];
-      if (!this.parsedData.data[0]) return [];
-
-      const data = this.parsedData.data[0].map((col, i) =>
-        this.parsedData.data.map(row => row[i])
-      );
-      return data;
-    }
   },
   mounted() {
     this.normalizationMethods = Object.keys(NormalizationMethodsContainer);

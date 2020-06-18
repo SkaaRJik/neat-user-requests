@@ -17,7 +17,15 @@
 
       <v-divider></v-divider>
 
-      <v-stepper-step step="4">{{ $t("Data_Normalization") }}</v-stepper-step>
+      <v-stepper-step :complete="step > 4" step="4">{{
+        $t("Data_Normalization")
+      }}</v-stepper-step>
+
+      <v-divider></v-divider>
+
+      <v-stepper-step :complete="step > 5" step="5">{{
+        $t("Data_Separation")
+      }}</v-stepper-step>
     </v-stepper-header>
 
     <v-stepper-items>
@@ -106,13 +114,18 @@
                   {{ $t("Back") }}
                 </v-btn>
                 <v-btn
-                  :disabled="projectName.length === 0"
+                  :disabled="projectName.length === 0 || excelUploading"
                   @click="handleSaveProject"
                   class="ma-3"
                   color="primary"
                 >
                   {{ $t("Continue") }}
-                  <v-icon> mdi-arrow-right</v-icon>
+                  <v-progress-circular
+                    v-if="excelUploading"
+                    color="primary"
+                    indeterminate
+                  ></v-progress-circular>
+                  <v-icon v-else right> mdi-arrow-right</v-icon>
                 </v-btn>
                 <!--<v-btn
                   :disabled="projectName.length === 0"
@@ -154,6 +167,36 @@
                 </v-btn>
                 <v-btn
                   :disabled="!normalizedData && !normalizedData.output"
+                  @click="step = 5"
+                  class="ma-3"
+                  color="primary"
+                >
+                  {{ $t("Continue") }}
+                  <v-icon> mdi-arrow-right</v-icon>
+                </v-btn>
+              </v-card-actions>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-stepper-content>
+
+      <v-stepper-content step="5">
+        <v-container>
+          <data-separation v-model="normalizedData" :parsed-data="parsedData"/>
+          <v-row>
+            <v-col class="mr-auto" cols="auto" xs="12">
+              <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                >{{ $t("Cancel") }}
+              </v-btn>
+            </v-col>
+            <v-col cols="auto" xs="12">
+              <v-card-actions>
+                <v-btn @click="step = 4" class="ma-3">
+                  <v-icon left> mdi-arrow-left</v-icon>
+                  {{ $t("Back") }}
+                </v-btn>
+                <v-btn
+                  :disabled="!normalizedData.inputs && !normalizedData.outputs"
                   class="ma-3"
                   color="primary"
                 >
@@ -175,11 +218,13 @@ import Vue from "vue";
 import ProjectsAPI from "../../services/api/ProjectsAPI";
 import UploadProjectData from "../../components/projects/new/UploadProjectData";
 import ProjectDetails from "../../components/projects/new/ProjectDetails";
-import DataNormalization from "../../components/DataNormalization";
+import DataNormalization from "../../components/projects/new/DataNormalization";
+import DataSeparation from "../../components/projects/new/DataSeparation";
 
 export default {
   name: "NewProject",
   components: {
+    DataSeparation,
     ProjectDetails,
     UploadProjectData,
     DataNormalization
@@ -193,23 +238,26 @@ export default {
       parsedData: { increment: 0 },
       step: 1,
       normalizedData: {},
-      projectId: null,
+      projectId: null
     };
   },
   methods: {
     async handleSaveProject() {
-      const data = {
-        ...this.parsedData,
-        name: this.projectName
-      };
+      this.excelUploading = true;
       try {
+        const data = {
+          ...this.parsedData,
+          name: this.projectName
+        };
         const res = await ProjectsAPI.saveProject(data);
-        if(res && res.data) {
+        if (res && res.data) {
           this.step = 4;
           this.projectId = res.data;
         }
       } catch (e) {
-        console.error('[NewProject].handleSaveProject error:', e);
+        console.error("[NewProject].handleSaveProject error:", e);
+      } finally {
+        this.excelUploading = false;
       }
     },
 
