@@ -21,16 +21,23 @@ const projects_routes = [
   {
     path: "/projects/new",
     name: "new-project",
+    props: (route) => ({ step:route.query.step ?  Number( route.query.step ) : 1 }),
     component: () =>
       import(
         /* webpackChunkName: "about" */ "../views/projects/NewProject.vue"
       ),
+    watch: {
+      '$route.query.step'(to, from) {
+        console.log('[ProjectsRoutes].$route to, from:', to, from);
+
+      }
+    },
     meta: {
       requiresAuth: true
     }
   },
   {
-    path: "/projects/:id",
+    path: "/project/:id",
     name: "project-page",
     component: () =>
       import(
