@@ -17,7 +17,15 @@
 
       <v-divider></v-divider>
 
-      <v-stepper-step step="4">{{ $t("Data_Normalization") }}</v-stepper-step>
+      <v-stepper-step :complete="step > 4" step="4">{{
+        $t("Data_Normalization")
+      }}</v-stepper-step>
+
+      <v-divider></v-divider>
+
+      <v-stepper-step :complete="step > 5" step="5">{{
+        $t("Data_Separation")
+      }}</v-stepper-step>
     </v-stepper-header>
 
     <v-stepper-items>
@@ -32,7 +40,7 @@
             </v-col>
             <v-col cols="auto">
               <v-btn
-                :disabled="nextPageDisabled"
+                :disabled="!file || excelUploading"
                 @click="uploadXLSX"
                 class="ma-3"
                 color="primary"
@@ -61,13 +69,17 @@
             </v-col>
             <v-col cols="auto" xs="12">
               <v-card-actions>
-                <v-btn @click="step = 1" class="ma-3">
+                <v-btn @click="back" class="ma-3">
                   <v-icon left> mdi-arrow-left</v-icon>
                   {{ $t("Back") }}
                 </v-btn>
                 <v-btn
                   :disabled="shouldRenderDataErrors || !parsedData.increment"
-                  @click="step = 3"
+                  @click="
+                    () => {
+                      $router.push({ name: 'new-project', query: { step: 3 } });
+                    }
+                  "
                   class="ma-3"
                   color="primary"
                 >
@@ -101,18 +113,25 @@
             </v-col>
             <v-col cols="auto">
               <v-card-actions>
-                <v-btn @click="back()" class="ma-3">
+                <v-btn @click="back" class="ma-3">
                   <v-icon left> mdi-arrow-left</v-icon>
                   {{ $t("Back") }}
                 </v-btn>
                 <v-btn
-                  :disabled="projectName.length === 0"
+                  :disabled="
+                    !projectName || !projectName.trim() || excelUploading
+                  "
                   @click="handleSaveProject"
                   class="ma-3"
                   color="primary"
                 >
                   {{ $t("Continue") }}
-                  <v-icon> mdi-arrow-right</v-icon>
+                  <v-progress-circular
+                    v-if="excelUploading"
+                    color="primary"
+                    indeterminate
+                  ></v-progress-circular>
+                  <v-icon v-else right> mdi-arrow-right</v-icon>
                 </v-btn>
                 <!--<v-btn
                   :disabled="projectName.length === 0"
@@ -148,12 +167,46 @@
             </v-col>
             <v-col cols="auto" xs="12">
               <v-card-actions>
-                <v-btn @click="step = 3" class="ma-3">
+                <v-btn @click="back" class="ma-3">
                   <v-icon left> mdi-arrow-left</v-icon>
                   {{ $t("Back") }}
                 </v-btn>
                 <v-btn
                   :disabled="!normalizedData && !normalizedData.output"
+                  @click="
+                    () => {
+                      $router.push({ name: 'new-project', query: { step: 5 } });
+                    }
+                  "
+                  class="ma-3"
+                  color="primary"
+                >
+                  {{ $t("Continue") }}
+                  <v-icon> mdi-arrow-right</v-icon>
+                </v-btn>
+              </v-card-actions>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-stepper-content>
+
+      <v-stepper-content step="5">
+        <v-container>
+          <data-separation v-model="normalizedData" :parsed-data="parsedData" />
+          <v-row>
+            <v-col class="mr-auto" cols="auto" xs="12">
+              <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                >{{ $t("Cancel") }}
+              </v-btn>
+            </v-col>
+            <v-col cols="auto" xs="12">
+              <v-card-actions>
+                <v-btn @click="back" class="ma-3">
+                  <v-icon left> mdi-arrow-left</v-icon>
+                  {{ $t("Back") }}
+                </v-btn>
+                <v-btn
+                  :disabled="!normalizedData.inputs && !normalizedData.outputs"
                   class="ma-3"
                   color="primary"
                 >
@@ -175,41 +228,48 @@ import Vue from "vue";
 import ProjectsAPI from "../../services/api/ProjectsAPI";
 import UploadProjectData from "../../components/projects/new/UploadProjectData";
 import ProjectDetails from "../../components/projects/new/ProjectDetails";
-import DataNormalization from "../../components/DataNormalization";
+import DataNormalization from "../../components/projects/new/DataNormalization";
+import DataSeparation from "../../components/projects/new/DataSeparation";
 
 export default {
   name: "NewProject",
+  props: {
+    step: Number
+  },
   components: {
+    DataSeparation,
     ProjectDetails,
     UploadProjectData,
     DataNormalization
   },
   data() {
     return {
-      projectName: "",
+      projectName: null,
       file: null,
       excelUploading: false,
       legendError: false,
       parsedData: { increment: 0 },
-      step: 1,
       normalizedData: {},
-      projectId: null,
+      projectId: null
     };
   },
   methods: {
     async handleSaveProject() {
-      const data = {
-        ...this.parsedData,
-        name: this.projectName
-      };
+      this.excelUploading = true;
       try {
+        const data = {
+          ...this.parsedData,
+          name: this.projectName
+        };
         const res = await ProjectsAPI.saveProject(data);
-        if(res && res.data) {
-          this.step = 4;
+        if (res && res.data) {
           this.projectId = res.data;
+          this.$router.push({ name: "new-project", query: { step: 4 } });
         }
       } catch (e) {
-        console.error('[NewProject].handleSaveProject error:', e);
+        console.error("[NewProject].handleSaveProject error:", e);
+      } finally {
+        this.excelUploading = false;
       }
     },
 
@@ -223,7 +283,7 @@ export default {
         console.log("[NewProject].uploadXLSX this.file:", this.file);
         this.parsedData = await parseExcel(this.file);
         //this.parsedData = (await ProjectsApi.parseExcelFile(this.file)).data
-        this.step = 2;
+        this.$router.push({ name: "new-project", query: { step: 2 } });
       } catch (e) {
         console.error("[NewProject].uploadXLSX() EXCEPTION:", e);
         await Vue.$toast.open({
@@ -238,19 +298,53 @@ export default {
     },
 
     async back() {
-      this.step--;
+      this.$router.go(-1);
     }
   },
   computed: {
-    nextPageDisabled: function() {
-      console.log("[NewProjectVue].nextPageDisabled this.file:", this.file);
-      return !this.file || this.excelUploading;
-    },
     shouldRenderDataErrors() {
       if (this.parsedData.dataErrors) {
         return this.parsedData.dataErrors.length > 0;
       }
       return false;
+    }
+  },
+  mounted() {
+    if (this.step !== 1)
+      this.$router.replace({ name: "new-project", query: { step: 1 } });
+  },
+  watch: {
+    step: function(newVal, oldVal) {
+      if (newVal === oldVal) {
+        return;
+      }
+
+      if (!newVal) {
+        return this.$router.replace({
+          name: "new-project",
+          query: { step: 1 }
+        });
+      }
+
+      if (newVal === 2) {
+        if (!this.parsedData.data) {
+          return this.$router.replace({
+            name: "new-project",
+            query: { step: 1 }
+          });
+        }
+      }
+      if (newVal === 3) {
+        if (!this.parsedData.data && !this.parsedData.increment) {
+          this.$router.replace({ name: "new-project", query: { step: 1 } });
+        }
+      }
+      if (newVal === 4) {
+        console.log('[NewProject].step this.projectName:', !this.projectName);
+        (!this.projectName ||
+          !this.projectName.trim()) &&
+          this.$router.replace({ name: "new-project", query: { step: 3 } });
+      }
     }
   }
 };
