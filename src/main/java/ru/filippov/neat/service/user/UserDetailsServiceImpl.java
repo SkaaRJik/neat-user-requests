@@ -68,7 +68,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .lastName(signUpRequest.getLastName())
                 .active(true)
                 .password(encoder.encode(signUpRequest.getPassword()))
-                .roles( new HashSet<Role>(1) {{add(Role.USER);}})
+                .roles( new HashSet<Role>(1) {{add(Role.ROLE_USER);}})
                 .avatar( null )
                 .creationDate(LocalDateTime.now())
                 .lastPasswordUpdate(LocalDateTime.now())
