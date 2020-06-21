@@ -7,13 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.filippov.neat.config.jwt.JwtProvider;
 import ru.filippov.neat.domain.Project;
+import ru.filippov.neat.domain.User;
 import ru.filippov.neat.exceptions.PermissionException;
 import ru.filippov.neat.parser.excel.ExcelParser;
 import ru.filippov.neat.service.project.ProjectServiceImpl;
+import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 import ru.filippov.neat.service.user.UserPrincipal;
 
 import java.util.Map;
@@ -35,10 +37,10 @@ public class ProjectController {
     private ExcelParser excelParser;
 
     @Autowired
-    private JwtProvider tokenProvider;
+    private ProjectServiceImpl projectService;
 
     @Autowired
-    private ProjectServiceImpl projectService;
+    private UserDetailsServiceImpl userDetailsService;
 
     @PostMapping("/parse")
     public ResponseEntity<?> parseExcel(@RequestBody MultipartFile file){
@@ -70,10 +72,30 @@ public class ProjectController {
         return projectsByUser;
     }
 
+    @GetMapping("/find")
+    public ResponseEntity<?> findProject(@AuthenticationPrincipal UserPrincipal user, @RequestParam MultiValueMap<String, String> allParams) throws PermissionException {
+
+
+        String projectName = allParams.getFirst("projectName");
+
+        String userName = allParams.getFirst("user");
+
+        User userForQuery = user.toUser();
+
+        if (userName != null){
+            userForQuery = userDetailsService.loadUserByUsername(userName).toUser();
+        }
+
+        Project projectsByNameAndUser = projectService.getProjectsByNameAndUser(projectName, userForQuery);
+
+        return ResponseEntity.ok(projectsByNameAndUser);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getProjectInfo(@AuthenticationPrincipal UserPrincipal user, @PathVariable("id") Long id) throws PermissionException {
         try{
-            Project projectsByUser = projectService.getProjectsById(id, user.toUser());
+            Project projectsByUser = projectService.getProjectById(id, user.toUser());
             return new ResponseEntity<Project>(projectsByUser, HttpStatus.OK);
         } catch (NoSuchElementException ex) {
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.NOT_FOUND);
@@ -82,9 +104,23 @@ public class ProjectController {
         } catch (Exception ex) {
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-
     }
+
+    @GetMapping("/{id}/data")
+    public ResponseEntity<?> getProjectData(@AuthenticationPrincipal UserPrincipal user, @PathVariable("id") Long id) throws PermissionException {
+        try{
+            Map projectData = projectService.getProjectData(id, user.toUser());
+            return new ResponseEntity<Map>(projectData, HttpStatus.OK);
+        } catch (NoSuchElementException ex) {
+            return new ResponseEntity<String>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (PermissionException ex) {
+            return new ResponseEntity<String>(ex.getMessage(), HttpStatus.FORBIDDEN);
+        } catch (Exception ex) {
+            return new ResponseEntity<String>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
 
 

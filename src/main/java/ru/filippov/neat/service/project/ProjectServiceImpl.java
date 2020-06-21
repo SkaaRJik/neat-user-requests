@@ -11,10 +11,7 @@ import ru.filippov.neat.domain.User;
 import ru.filippov.neat.exceptions.PermissionException;
 import ru.filippov.neat.repository.ProjectRepository;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -82,11 +79,9 @@ public class ProjectServiceImpl {
         Page<Project> projects = projectRepository.findAllByUserId(user.getId(), pageable);
 
         return projects;
-
-
     }
 
-    public Project getProjectsById(Long id, User user) throws PermissionException, NoSuchElementException {
+    public Project getProjectById(Long id, User user) throws PermissionException, NoSuchElementException {
 
         Project project = projectRepository.findById(id).orElseThrow(() -> new NoSuchElementException("ERROR_PROJECT_DOES_NOT_EXISTS"));
 
@@ -95,8 +90,43 @@ public class ProjectServiceImpl {
         }
 
         return project;
+    }
+
+    public Project getProjectsByNameAndUser(String name, User user) throws PermissionException, NoSuchElementException {
+
+        Project project = projectRepository.findOneByNameAndUserId(name, user.getId()).orElse(null);
+
+        /*if(project.getUser().getId() != user.getId()){
+            throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
+        }*/
+
+        File file = new File(String.format("%s/%s/data.ser", projectsLocation, user.getUsername()));
+
+        if (file.getParentFile().exists()) {
+            //TODO add directory check
+        }
+
+        return project;
+    }
+
+    public Map getProjectData(Long id, User user) throws IOException, ClassNotFoundException, PermissionException {
+
+        Project project = projectRepository.findById(id).orElse(null);
+
+        User projectUser = project.getUser();
+
+        if(projectUser.getId() != user.getId()){
+            throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
+        }
+
+        File file = new File(String.format("%s/%s/data.ser", projectsLocation, projectUser.getUsername()));
+        FileInputStream fileInputStream = new FileInputStream(file);
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
 
+        Map data = (Map) objectInputStream.readObject();
+
+        return data;
     }
 
 }

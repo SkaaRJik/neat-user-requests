@@ -69,7 +69,7 @@ export default {
       resolve({
         minRange,
         maxRange,
-        output,
+        data: output,
         mins,
         maxs,
         statistic

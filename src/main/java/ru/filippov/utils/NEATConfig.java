@@ -5,8 +5,9 @@
 package ru.filippov.utils;
 
 
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,12 +31,12 @@ public class NEATConfig implements AIConfig {
 		this.settings = new HashMap(originalConfig.settings);
 	}
 
-	
+
 	public NEATConfig(Map config) {
 		this.settings = new HashMap(config);
 
-	}	
-		
+	}
+
 	// default
 	public NEATConfig() {
 		this.settings = new HashMap(50);
@@ -85,47 +86,428 @@ public class NEATConfig implements AIConfig {
 
 	}
 
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	private static class GUIAIConfig {
+		private String name;
+		private Object value;
+		private Boolean allowedToChangeByUser;
+		private Boolean showInGui;
+		private Boolean isAdvanced;
 
-	public static AIConfig getDefaultConfig(){
-		Map<String, Object> config = new HashMap<>(50);
-		config.put("PROBABILITY_MUTATION",0.25);
-		config.put("PROBABILITY_CROSSOVER",0.5);
-		config.put("PROBABILITY_ADDLINK",0.1);
-		config.put("PROBABILITY_ADDNODE",0.03);
-		config.put("PROBABILITY_NEWACTIVATIONFUNCTION",0.1);
-		config.put("PROBABILITY_MUTATEBIAS",0.3);
-		config.put("PROBABILITY_TOGGLELINK",0.1);
-		config.put("PROBABILITY_WEIGHT_REPLACED",0.5);
-		config.put("GENERATOR_SEED",1548235723799L);
-		config.put("EXCESS_COEFFICIENT",1);
-		config.put("DISJOINT_COEFFICIENT",1);
-		config.put("WEIGHT_COEFFICIENT",0.4);
-		config.put("COMPATABILITY_THRESHOLD",0.5);
-		config.put("COMPATABILITY_CHANGE",0.1);
-		config.put("SPECIE_COUNT",3);
-		config.put("SURVIVAL_THRESHOLD",0.2);
-		config.put("SPECIE_AGE_THRESHOLD",80);
-		config.put("SPECIE_YOUTH_THRESHOLD",10);
-		config.put("SPECIE_OLD_PENALTY",1.2);
-		config.put("SPECIE_YOUTH_BOOST",0.7);
-		config.put("SPECIE_FITNESS_MAX",15);
-		config.put("MAX_PERTURB",0.5);
-		config.put("MAX_BIAS_PERTURB",0.1);
-		config.put("FEATURE_SELECTION",false);
-		config.put("RECURRENCY_ALLOWED",false);
-		config.put("INPUT_ACTIVATIONFUNCTIONS","org.neat4j.neat.nn.core.functions.LinearFunction;;");
-		config.put("OUTPUT_ACTIVATIONFUNCTIONS",";org.neat4j.neat.nn.core.functions.SigmoidFunction;");
-		config.put("HIDDEN_ACTIVATIONFUNCTIONS",";;org.neat4j.neat.nn.core.functions.TanhFunction");
-		config.put("ELE_EVENTS",false);
-		config.put("ELE_SURVIVAL_COUNT",0.1);
-		config.put("ELE_EVENT_TIME",1000);
-		config.put("KEEP_BEST_EVER",true);
-		config.put("EXTRA_FEATURE_COUNT",0);
-		config.put("POP_SIZE",150);
-		config.put("NUMBER_EPOCHS",100);
-		config.put("TERMINATION_VALUE_TOGGLE",false);
-		config.put("TERMINATION_VALUE",0.00001);
-		config.put("NATURAL_ORDER_STRATEGY",true);
-		return new NEATConfig(config);
+	}
+
+	public static List<Map> getDefaultConfig(){
+
+		List<Map> config = new ArrayList<>();
+
+		Map<String, Object> section = new HashMap<>();
+		config.add(section);
+		section.put("header", "HEADER_GENETIC_ALGORITHM");
+		section.put("show", true);
+		List<GUIAIConfig> params = new ArrayList<>(9);
+		section.put("params", params);
+		params.add(new GUIAIConfig(
+				"GENERATOR.SEED",
+				1548235723799L,
+				true,
+				true,
+				false
+		));
+
+		params.add(new GUIAIConfig(
+				"PROBABILITY.MUTATION",
+				0.25,
+				true,
+				true,
+				false
+		));
+		params.add(new GUIAIConfig(
+				"PROBABILITY.CROSSOVER",
+				0.5,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+				"PROBABILITY.ADDLINK",
+				0.1,
+				true,
+				true,
+				false
+		));
+		params.add(new GUIAIConfig(
+				"PROBABILITY.ADDNODE",
+				0.03,
+				true,
+				true,
+				false
+		));
+		params.add(new GUIAIConfig(
+				"PROBABILITY.NEWACTIVATIONFUNCTION",
+				0.1,
+				true,
+				true,
+				false
+		));
+		params.add(new GUIAIConfig(
+				"PROBABILITY.MUTATEBIAS",
+				0.3,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+				"PROBABILITY.TOGGLELINK",
+				0.1,
+				true,
+				true,
+				false
+		));
+		params.add(new GUIAIConfig(
+				"PROBABILITY.WEIGHT.REPLACED",
+				0.5,
+				true,
+				true,
+				false
+		));
+
+		section = new HashMap<>();
+		config.add(section);
+		section.put("header", "HEADER_NICHE_SETTING");
+		section.put("show", true);
+		params = new ArrayList<>();
+		section.put("params", params);
+
+		params.add(new GUIAIConfig(
+        "EXCESS.COEFFICIENT",
+				1,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "DISJOINT.COEFFICIENT",
+				1,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "WEIGHT.COEFFICIENT",
+				0.4,
+				true,
+				true,
+				true
+		));
+
+		section = new HashMap<>();
+		config.add(section);
+		section.put("header", "HEADER_SPECIES_CONTROL");
+		section.put("show", true);
+		params = new ArrayList<>();
+		section.put("params", params);
+
+		params.add(new GUIAIConfig(
+        "COMPATABILITY.THRESHOLD",
+				0.5,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "COMPATABILITY.CHANGE",
+				0.1,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "SPECIE.COUNT",3,
+				true,
+				true,
+				false
+		));
+		params.add(new GUIAIConfig(
+        "SURVIVAL.THRESHOLD",
+				0.2,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "SPECIE.AGE.THRESHOLD",
+				80,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "SPECIE.YOUTH.THRESHOLD",
+				10,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "SPECIE.OLD.PENALTY",
+				1.2,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "SPECIE.YOUTH.BOOST",
+				0.7,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "SPECIE.FITNESS.MAX",
+				15,
+				true,
+				true,
+				true
+		));
+
+		section = new HashMap<>();
+		config.add(section);
+		section.put("header", "HEADER_NETWORK_SETTING");
+		section.put("show", true);
+		params = new ArrayList<>();
+		section.put("params", params);
+
+
+		params.add(new GUIAIConfig(
+        "MAX.PERTURB",
+				0.5,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "MAX.BIAS.PERTURB",
+				0.1,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "FEATURE.SELECTION",
+				false,
+				true,
+				true,
+				false
+		));
+		params.add(new GUIAIConfig(
+        "RECURRENCY.ALLOWED",
+				false,
+				true,
+				true,
+				false
+		));
+
+
+
+		section = new HashMap<>();
+		config.add(section);
+		section.put("header", "HEADER_ACTIVATION_FUNCTIONS");
+		section.put("show", true);
+		params = new ArrayList<>();
+		section.put("params", params);
+
+		params.add(new GUIAIConfig(
+        "INPUT.ACTIVATIONFUNCTIONS",
+				List.of("org.neat4j.neat.nn.core.functions.LinearFunction","",""),
+				true,
+				true,
+				false
+		));
+		params.add(new GUIAIConfig(
+        "OUTPUT.ACTIVATIONFUNCTIONS",
+				List.of("","org.neat4j.neat.nn.core.functions.SigmoidFunction",""),
+				true,
+				true,
+				false
+		));
+		params.add(new GUIAIConfig(
+        "HIDDEN.ACTIVATIONFUNCTIONS",
+				List.of("","","org.neat4j.neat.nn.core.functions.TanhFunction"),
+				true,
+				true,
+				false
+		));
+
+		section = new HashMap<>();
+		config.add(section);
+		section.put("header", "HEADER_LIFE_CONTROL");
+		section.put("show", true);
+		params = new ArrayList<>();
+		section.put("params", params);
+
+		params.add(new GUIAIConfig(
+        "ELE.EVENTS",
+				false,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "ELE.SURVIVAL.COUNT",
+				0.1,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "ELE.EVENT.TIME",
+				1000,
+				true,
+				true,
+				true
+		));
+
+		section = new HashMap<>();
+		config.add(section);
+		section.put("header", "HEADER_EPOCH_CONTROL");
+		section.put("show", true);
+		params = new ArrayList<>();
+		section.put("params", params);
+
+		params.add(new GUIAIConfig(
+        "KEEP.BEST.EVER",
+				true,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "EXTRA.FEATURE.COUNT",
+				0,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "POP.SIZE",
+				150,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "NUMBER.EPOCHS",
+				100,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "TERMINATION.VALUE.TOGGLE",
+				false,
+				true,
+				true,
+				true
+		));
+		params.add(new GUIAIConfig(
+        "TERMINATION.VALUE",
+				0.00001,
+				true,
+				true,
+				true
+		));
+
+
+		section = new HashMap<>();
+		config.add(section);
+		section.put("header", "SERVICE");
+		section.put("show", false);
+		params = new ArrayList<>();
+		section.put("params", params);
+
+		params.add(new GUIAIConfig(
+				"OPERATOR.XOVER",
+				"org.neat4j.neat.core.xover.NEATCrossover",
+				false,
+				false,
+				true
+		));
+
+		params.add(new GUIAIConfig(
+				"OPERATOR.FUNCTION",
+				"org.neat4j.neat.core.fitness.MSENEATFitnessFunction",
+				false,
+				false,
+				true
+		));
+
+		params.add(new GUIAIConfig(
+				"OPERATOR.PSELECTOR",
+				"org.neat4j.neat.core.pselectors.TournamentSelector",
+				false,
+				false,
+				true
+		));
+
+		params.add(new GUIAIConfig(
+				"OPERATOR.MUTATOR",
+				"org.neat4j.neat.core.mutators.NEATMutator",
+				false,
+				false,
+				true
+		));
+
+		params.add(new GUIAIConfig(
+				"NATURAL.ORDER.STRATEGY",
+				"true",
+				false,
+				false,
+				true
+		));
+
+		params.add(new GUIAIConfig(
+				"LEARNABLE",
+				"org.neat4j.neat.nn.core.learning.GALearnable",
+				false,
+				false,
+				true
+		));
+
+		params.add(new GUIAIConfig(
+				"AI.TYPE",
+				"GA",
+				false,
+				false,
+				true
+		));
+
+		section = new HashMap<>();
+		config.add(section);
+		section.put("header", "NODE.COUNTERS");
+		section.put("show", false);
+		params = new ArrayList<>();
+		section.put("params", params);
+
+		params.add(new GUIAIConfig(
+				"INPUT.NODES",
+				0,
+				false,
+				false,
+				true
+		));
+
+		params.add(new GUIAIConfig(
+				"OUTPUT.NODES",
+				0,
+				false,
+				false,
+				true
+		));
+
+
+
+		return config;
 	}
 }

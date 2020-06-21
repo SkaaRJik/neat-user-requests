@@ -12,4 +12,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Optional<Project> findById(Long id);
     @Query("SELECT pr FROM Project pr WHERE pr.user.id = ?1")
     Page<Project> findAllByUserId(Long userId, Pageable pageable);
+
+    @Query("SELECT pr FROM Project pr WHERE pr.name = ?1 AND pr.user.id = ?2")
+    Optional<Project> findOneByNameAndUserId(String name, Long userId);
+
 }

@@ -11,9 +11,9 @@
       <avatar />
     </v-app-bar>
 
-    <v-content>
+    <v-main>
       <router-view />
-    </v-content>
+    </v-main>
 
     <v-footer app>
       <span>&copy; 2019</span>
@@ -22,10 +22,10 @@
 </template>
 
 <script>
-import Avatar from "./components/avatar/Avatar";
-import NavBarBody from "./components/navigation/NavBarBody";
+    import Avatar from "./components/avatar/Avatar";
+    import NavBarBody from "./components/navigation/NavBarBody";
 
-export default {
+    export default {
   components: {
     NavBarBody,
     Avatar

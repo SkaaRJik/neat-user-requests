@@ -1,16 +1,14 @@
 package ru.filippov.neat.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -40,6 +38,7 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @JsonIgnore
     @Column(name = "password", nullable = false)
     private String password;
 

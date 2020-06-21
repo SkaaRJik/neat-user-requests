@@ -119,7 +119,7 @@
       this.pageCount = projects.data.totalPages;
     },
     openProject(id) {
-      this.$router.push({ name: "project-page", params: { id } });
+      this.$router.push({ name: "project-page", params: { id: `${id}` } });
     }
   },
   data() {

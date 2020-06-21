@@ -34,6 +34,12 @@
       try {
         const res = await ProjectsAPI.getProjectDetails(projectId);
         this.projectInfo = res.data;
+        if (this.projectInfo.status === "NEW") {
+          await this.$router.push({
+            name: "project-configure",
+            params: { id: this.projectId }
+          });
+        }
       } catch (e) {
         console.log("[ProjectPageVue].loadProjectInfo e:", e);
       }

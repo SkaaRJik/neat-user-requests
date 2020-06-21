@@ -25,5 +25,16 @@ export default {
 
   getProjectDetails: id => {
     return Vue.prototype.$http.get(`${controllerPath}/${id}`);
+  },
+
+  getProjectData: id => {
+    return Vue.prototype.$http.get(`${controllerPath}/${id}/data`);
+  },
+
+  findProject: params => {
+    console.log("[ProjectsAPI.js].findProject query:", params);
+    return Vue.prototype.$http.get(`${controllerPath}/find`, {
+      params
+    });
   }
 };

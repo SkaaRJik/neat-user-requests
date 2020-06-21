@@ -40,7 +40,7 @@
             ${$t("Test_Elements", { elements: testEndIndex + 1 })},
             ${$t("Total", {
               elements: `${trainEndIndex + testEndIndex + 2} / ${
-                value.output.length
+                value.data.length
               }`
             })}`
           }}</span>
@@ -53,7 +53,7 @@
         <v-list width="100%">
           <v-list-item
             two-line
-            v-for="(item, index) in dataTypes"
+            v-for="(item, index) in headerTypes"
             :key="`list-${index}`"
           >
             <v-list-item-content>
@@ -66,17 +66,17 @@
                     <v-col sm="12" xs="12" md="3" lg="3" xl="3">
                       <v-select
                         :value="item.type"
-                        :items="headerTypes"
+                        :items="nodeTypes"
                         :label="$t('Type_node')"
                         @change="handleDataType(item, $event)"
                         dense
                         outlined
                       >
-                        <template v-slot:selection="{ item: dataType }">
-                          <span>{{ $t(dataType) }}</span>
+                        <template v-slot:selection="{ item: headerType }">
+                          <span>{{ $t(headerType) }}</span>
                         </template>
-                        <template v-slot:item="{ item: dataType }">
-                          <span>{{ $t(dataType) }}</span>
+                        <template v-slot:item="{ item: headerType }">
+                          <span>{{ $t(headerType) }}</span>
                         </template>
                       </v-select>
                     </v-col>
@@ -96,7 +96,7 @@ export default {
   name: "DataSeparation",
   props: {
     value: Object,
-    parsedData: Object
+    headers: Array
   },
   data: () => {
     return {
@@ -105,55 +105,36 @@ export default {
       trainEndIndex: null,
       testEndIndex: null,
       outputsIndex: [],
-      dataTypes: [],
       inputs: 0,
       outputs: 0,
-      headerTypes: ["Input", "Output", "Unused"]
+      headerTypes: [],
+      nodeTypes: ["Input", "Output", "Unused"]
     };
   },
   methods: {
     handleDataType(item, newValue) {
-      console.log(
-        "[DataSeparation].handleDataType oldValue, newValue:",
-        item.type,
-        newValue
-      );
       if (item.type !== newValue) {
-        console.log(
-          "[DataSeparation].handleDataType BEFORE this.inputs, this.outputs:",
-          this.inputs,
-          this.outputs
-        );
         if (newValue === "Input") {
           this.inputs++;
         } else if (newValue === "Output") {
           this.outputs++;
         }
-        console.log(
-          "[DataSeparation].handleDataType after ++ this.inputs, this.outputs:",
-          this.inputs,
-          this.outputs
-        );
 
         if (item.type === "Input") {
           this.inputs--;
         } else if (item.type === "Output") {
           this.outputs--;
         }
-        console.log(
-          "[DataSeparation].handleDataType after -- this.inputs, this.outputs:",
-          this.inputs,
-          this.outputs
-        );
 
         item.type = newValue;
-        if (this.value.output) {
+        if (this.value.data) {
           const newValue = {
             ...this.value,
             trainEndIndex: this.trainEndIndex,
             testEndIndex: this.trainEndIndex + this.testEndIndex,
             inputs: this.inputs,
-            outputs: this.outputs
+            outputs: this.outputs,
+            headers: this.headerTypes
           };
           console.log("[DataSeparation].handleDataType newValue:", newValue);
           this.$emit("input", newValue);
@@ -177,38 +158,41 @@ export default {
           duration: 5000
         });
       }
+      console.log(
+        "[DataSeparation.vue].calculatePercentage this.value:",
+        this.value
+      );
       this.trainEndIndex = Math.round(
-        (this.value.output.length - 1) * (this.trainPercentage / 100)
+        (this.value.data.length - 1) * (this.trainPercentage / 100)
       );
       this.testEndIndex = Math.floor(
-        (this.value.output.length - 1) * (this.testPercentage / 100)
+        (this.value.data.length - 1) * (this.testPercentage / 100)
       );
 
-      if (this.value.output) {
+      if (this.value.data) {
         const newValue = {
           ...this.value,
           trainEndIndex: this.trainEndIndex,
           testEndIndex: this.trainEndIndex + this.testEndIndex,
           inputs: this.inputs,
-          outputs: this.outputs
+          outputs: this.outputs,
+          headers: this.headerTypes
         };
         this.$emit("input", newValue);
       }
     }
   },
   watch: {
-    parsedData: function(newValue) {
+    headers: function(newValue) {
       if (newValue) {
-        if (newValue.headers) {
-          this.dataTypes = newValue.headers.map((val, index) => {
-            return {
-              name: val,
-              type: newValue.headers.length - 1 === index ? "Output" : "Input"
-            };
-          });
-          this.inputs = newValue.headers.length - 1;
-          this.outputs = 1;
-        }
+        this.headerTypes = newValue.map((val, index) => {
+          return {
+            name: val,
+            type: newValue.length - 1 === index ? "Output" : "Input"
+          };
+        });
+        this.inputs = newValue.length - 1;
+        this.outputs = 1;
       }
     }
   }

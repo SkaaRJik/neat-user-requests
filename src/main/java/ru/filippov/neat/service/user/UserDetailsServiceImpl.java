@@ -3,7 +3,6 @@ package ru.filippov.neat.service.user;
 import lombok.extern.log4j.Log4j2;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.filippov.neat.domain.Role;
 import ru.filippov.neat.domain.User;
 import ru.filippov.neat.dto.SignUpDto;
+import ru.filippov.neat.exceptions.UserNotFoundException;
 import ru.filippov.neat.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username)
+    public UserPrincipal loadUserByUsername(String username)
             throws UsernameNotFoundException {
         User user = null;
         if(username.indexOf('@') != -1){
@@ -78,4 +78,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     }
 
+    public User getUserById(Long id) throws UserNotFoundException {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(String.format("User with id %d not found", id)) );
+    }
 }

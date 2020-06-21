@@ -1,11 +1,11 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <div>
     <!-- Full screen template       -->
-    <div class="d-none d-lg-block">
+    <div class="d-none d-sm-block">
       <projects-view-full-screen />
     </div>
     <!-- Mobile version  -->
-    <div class="d-md-none">
+    <div class="d-sm-none">
       <projects-view-mobile />
     </div>
   </div>

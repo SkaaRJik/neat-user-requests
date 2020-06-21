@@ -21,15 +21,14 @@ const projects_routes = [
   {
     path: "/projects/new",
     name: "new-project",
-    props: (route) => ({ step:route.query.step ?  Number( route.query.step ) : 1 }),
+    props: route => ({ step: route.query.step ? Number(route.query.step) : 1 }),
     component: () =>
       import(
         /* webpackChunkName: "about" */ "../views/projects/NewProject.vue"
       ),
     watch: {
-      '$route.query.step'(to, from) {
-        console.log('[ProjectsRoutes].$route to, from:', to, from);
-
+      "$route.query.step"(to, from) {
+        console.log("[ProjectsRoutes].$route to, from:", to, from);
       }
     },
     meta: {
@@ -44,6 +43,21 @@ const projects_routes = [
         /* webpackChunkName: "about" */ "../views/projects/ProjectPage.vue"
       ),
     props: route => ({ projectId: route.params.id }),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/project/:id/configure",
+    name: "project-configure",
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ "../views/projects/ProjectConfigure.vue"
+      ),
+    props: route => ({
+      step: route.query.step ? Number(route.query.step) : 1,
+      projectId: Number(route.params.id)
+    }),
     meta: {
       requiresAuth: true
     }

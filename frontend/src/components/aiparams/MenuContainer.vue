@@ -411,34 +411,34 @@ export default {
               console.log(this.defaultConfig);
               this.items[0].fields[0].model = this.defaultConfig.settings.GENERATOR_SEED;
               this.items[0].fields[1].model = this.defaultConfig.settings.PROBABILITY_MUTATION;
-              this.items[0].fields[2].model = this.defaultConfig.settings.PROBABILITY_NEWACTIVATIONFUNCTION;
+              this.items[0].fields[2].model = this.defaultConfig.settings.PROBABILITY.NEWACTIVATIONFUNCTION;
               this.items[0].fields[3].model = this.defaultConfig.settings.PROBABILITY_ADDLINK;
-              this.items[0].fields[4].model = this.defaultConfig.settings.PROBABILITY_ADDNODE;
-              this.items[0].fields[5].model = this.defaultConfig.settings.PROBABILITY_MUTATEBIAS;
-              this.items[0].fields[6].model = this.defaultConfig.settings.PROBABILITY_TOGGLELINK;
-              this.items[0].fields[7].model = this.defaultConfig.settings.PROBABILITY_WEIGHT_REPLACED;
+              this.items[0].fields[4].model = this.defaultConfig.settings.PROBABILITY.ADDNODE;
+              this.items[0].fields[5].model = this.defaultConfig.settings.PROBABILITY.MUTATEBIAS;
+              this.items[0].fields[6].model = this.defaultConfig.settings.PROBABILITY.TOGGLELINK;
+              this.items[0].fields[7].model = this.defaultConfig.settings.PROBABILITY.WEIGHT.REPLACED;
 
-              this.items[1].fields[0].model = this.defaultConfig.settings.POP_SIZE;
-              this.items[1].fields[1].model = this.defaultConfig.settings.NUMBER_EPOCHS;
-              this.items[1].fields[2].model = this.defaultConfig.settings.EXTRA_FEATURE_COUNT;
-              this.items[1].fields[3].model = this.defaultConfig.settings.KEEP_BEST_EVER;
-              this.items[1].fields[4].model = this.defaultConfig.settings.TERMINATION_VALUE_TOGGLE;
-              this.items[1].fields[5].model = this.defaultConfig.settings.TERMINATION_VALUE;
+              this.items[1].fields[0].model = this.defaultConfig.settings.POP.SIZE;
+              this.items[1].fields[1].model = this.defaultConfig.settings.NUMBER.EPOCHS;
+              this.items[1].fields[2].model = this.defaultConfig.settings.EXTRA.FEATURE.COUNT;
+              this.items[1].fields[3].model = this.defaultConfig.settings.KEEP.BEST.EVER;
+              this.items[1].fields[4].model = this.defaultConfig.settings.TERMINATION.VALUE.TOGGLE;
+              this.items[1].fields[5].model = this.defaultConfig.settings.TERMINATION.VALUE;
 
               let newArr = [];
               for (var i = 0; i < this.items[2].layers.length; i++) {
                 if (i === 0) {
-                  newArr = this.defaultConfig.settings.INPUT_ACTIVATIONFUNCTIONS.split(
+                  newArr = this.defaultConfig.settings.INPUT.ACTIVATIONFUNCTIONS.split(
                     ";"
                   );
                 }
                 if (i === 1) {
-                  newArr = this.defaultConfig.settings.HIDDEN_ACTIVATIONFUNCTIONS.split(
+                  newArr = this.defaultConfig.settings.HIDDEN.ACTIVATIONFUNCTIONS.split(
                     ";"
                   );
                 }
                 if (i === 2) {
-                  newArr = this.defaultConfig.settings.OUTPUT_ACTIVATIONFUNCTIONS.split(
+                  newArr = this.defaultConfig.settings.OUTPUT.ACTIVATIONFUNCTIONS.split(
                     ";"
                   );
                 }
@@ -449,28 +449,28 @@ export default {
 
               this.items[3].fields[0].model = this.defaultConfig.settings.INPUT_NODES;
               this.items[3].fields[1].model = this.defaultConfig.settings.OUTPUT_NODES;
-              this.items[3].fields[2].model = this.defaultConfig.settings.MAX_PERTURB;
-              this.items[3].fields[3].model = this.defaultConfig.settings.MAX_BIAS_PERTURB;
-              this.items[3].fields[4].model = this.defaultConfig.settings.FEATURE_SELECTION;
-              this.items[3].fields[5].model = this.defaultConfig.settings.RECURRENCY_ALLOWED;
+              this.items[3].fields[2].model = this.defaultConfig.settings.MAX.PERTURB;
+              this.items[3].fields[3].model = this.defaultConfig.settings.MAX.BIAS.PERTURB;
+              this.items[3].fields[4].model = this.defaultConfig.settings.FEATURE.SELECTION;
+              this.items[3].fields[5].model = this.defaultConfig.settings.RECURRENCY.ALLOWED;
 
-              this.items[4].fields[0].model = this.defaultConfig.settings.EXCESS_COEFFICIENT;
-              this.items[4].fields[1].model = this.defaultConfig.settings.DISJOINT_COEFFICIENT;
-              this.items[4].fields[2].model = this.defaultConfig.settings.WEIGHT_COEFFICIENT;
+              this.items[4].fields[0].model = this.defaultConfig.settings.EXCESS.COEFFICIENT;
+              this.items[4].fields[1].model = this.defaultConfig.settings.DISJOINT.COEFFICIENT;
+              this.items[4].fields[2].model = this.defaultConfig.settings.WEIGHT.COEFFICIENT;
 
-              this.items[5].fields[0].model = this.defaultConfig.settings.COMPATABILITY_THRESHOLD;
-              this.items[5].fields[1].model = this.defaultConfig.settings.COMPATABILITY_CHANGE;
-              this.items[5].fields[2].model = this.defaultConfig.settings.SPECIE_COUNT;
-              this.items[5].fields[3].model = this.defaultConfig.settings.SURVIVAL_THRESHOLD;
-              this.items[5].fields[4].model = this.defaultConfig.settings.SPECIE_AGE_THRESHOLD;
-              this.items[5].fields[5].model = this.defaultConfig.settings.SPECIE_YOUTH_THRESHOLD;
-              this.items[5].fields[6].model = this.defaultConfig.settings.SPECIE_OLD_PENALTY;
-              this.items[5].fields[7].model = this.defaultConfig.settings.SPECIE_YOUTH_BOOST;
-              this.items[5].fields[8].model = this.defaultConfig.settings.SPECIE_FITNESS_MAX;
+              this.items[5].fields[0].model = this.defaultConfig.settings.COMPATABILITY.THRESHOLD;
+              this.items[5].fields[1].model = this.defaultConfig.settings.COMPATABILITY.CHANGE;
+              this.items[5].fields[2].model = this.defaultConfig.settings.SPECIE.COUNT;
+              this.items[5].fields[3].model = this.defaultConfig.settings.SURVIVAL.THRESHOLD;
+              this.items[5].fields[4].model = this.defaultConfig.settings.SPECIE.AGE.THRESHOLD;
+              this.items[5].fields[5].model = this.defaultConfig.settings.SPECIE.YOUTH.THRESHOLD;
+              this.items[5].fields[6].model = this.defaultConfig.settings.SPECIE.OLD.PENALTY;
+              this.items[5].fields[7].model = this.defaultConfig.settings.SPECIE.YOUTH.BOOST;
+              this.items[5].fields[8].model = this.defaultConfig.settings.SPECIE.FITNESS.MAX;
 
-              this.items[6].fields[0].model = this.defaultConfig.settings.ELE_EVENTS;
-              this.items[6].fields[1].model = this.defaultConfig.settings.ELE_SURVIVAL_COUNT;
-              this.items[6].fields[2].model = this.defaultConfig.settings.ELE_EVENT_TIME;
+              this.items[6].fields[0].model = this.defaultConfig.settings.ELE.EVENTS;
+              this.items[6].fields[1].model = this.defaultConfig.settings.ELE.SURVIVAL.COUNT;
+              this.items[6].fields[2].model = this.defaultConfig.settings.ELE.EVENT.TIME;
             });
           }
         });
@@ -478,33 +478,33 @@ export default {
     send() {
       this.defaultConfig.settings.GENERATOR_SEED = this.items[0].fields[0].model;
       this.defaultConfig.settings.PROBABILITY_MUTATION = this.items[0].fields[1].model;
-      this.defaultConfig.settings.PROBABILITY_NEWACTIVATIONFUNCTION = this.items[0].fields[2].model;
+      this.defaultConfig.settings.PROBABILITY.NEWACTIVATIONFUNCTION = this.items[0].fields[2].model;
       this.defaultConfig.settings.PROBABILITY_ADDLINK = this.items[0].fields[3].model;
-      this.defaultConfig.settings.PROBABILITY_ADDNODE = this.items[0].fields[4].model;
-      this.defaultConfig.settings.PROBABILITY_MUTATEBIAS = this.items[0].fields[5].model;
-      this.defaultConfig.settings.PROBABILITY_TOGGLELINK = this.items[0].fields[6].model;
-      this.defaultConfig.settings.PROBABILITY_WEIGHT_REPLACED = this.items[0].fields[7].model;
+      this.defaultConfig.settings.PROBABILITY.ADDNODE = this.items[0].fields[4].model;
+      this.defaultConfig.settings.PROBABILITY.MUTATEBIAS = this.items[0].fields[5].model;
+      this.defaultConfig.settings.PROBABILITY.TOGGLELINK = this.items[0].fields[6].model;
+      this.defaultConfig.settings.PROBABILITY.WEIGHT.REPLACED = this.items[0].fields[7].model;
 
-      this.defaultConfig.settings.POP_SIZE = this.items[1].fields[0].model;
-      this.defaultConfig.settings.NUMBER_EPOCHS = this.items[1].fields[1].model;
-      this.defaultConfig.settings.EXTRA_FEATURE_COUNT = this.items[1].fields[2].model;
-      this.defaultConfig.settings.KEEP_BEST_EVER = this.items[1].fields[3].model;
-      this.defaultConfig.settings.TERMINATION_VALUE_TOGGLE = this.items[1].fields[4].model;
-      this.defaultConfig.settings.TERMINATION_VALUE = this.items[1].fields[5].model;
+      this.defaultConfig.settings.POP.SIZE = this.items[1].fields[0].model;
+      this.defaultConfig.settings.NUMBER.EPOCHS = this.items[1].fields[1].model;
+      this.defaultConfig.settings.EXTRA.FEATURE.COUNT = this.items[1].fields[2].model;
+      this.defaultConfig.settings.KEEP.BEST.EVER = this.items[1].fields[3].model;
+      this.defaultConfig.settings.TERMINATION.VALUE.TOGGLE = this.items[1].fields[4].model;
+      this.defaultConfig.settings.TERMINATION.VALUE = this.items[1].fields[5].model;
 
-      this.defaultConfig.settings.INPUT_ACTIVATIONFUNCTIONS =
+      this.defaultConfig.settings.INPUT.ACTIVATIONFUNCTIONS =
         this.items[2].layers[0].fields[0].model +
         ";" +
         this.items[2].layers[0].fields[1].model +
         ";" +
         this.items[2].layers[0].fields[2].model;
-      this.defaultConfig.settings.OUTPUT_ACTIVATIONFUNCTIONS =
+      this.defaultConfig.settings.OUTPUT.ACTIVATIONFUNCTIONS =
         this.items[2].layers[2].fields[0].model +
         ";" +
         this.items[2].layers[2].fields[1].model +
         ";" +
         this.items[2].layers[2].fields[2].model;
-      this.defaultConfig.settings.HIDDEN_ACTIVATIONFUNCTIONS =
+      this.defaultConfig.settings.HIDDEN.ACTIVATIONFUNCTIONS =
         this.items[2].layers[1].fields[0].model +
         ";" +
         this.items[2].layers[1].fields[1].model +
@@ -513,28 +513,28 @@ export default {
 
       this.defaultConfig.settings.INPUT_NODES = this.items[3].fields[0].model;
       this.defaultConfig.settings.OUTPUT_NODES = this.items[3].fields[1].model;
-      this.defaultConfig.settings.MAX_PERTURB = this.items[3].fields[2].model;
-      this.defaultConfig.settings.MAX_BIAS_PERTURB = this.items[3].fields[3].model;
-      this.defaultConfig.settings.FEATURE_SELECTION = this.items[3].fields[4].model;
-      this.defaultConfig.settings.RECURRENCY_ALLOWED = this.items[3].fields[5].model;
+      this.defaultConfig.settings.MAX.PERTURB = this.items[3].fields[2].model;
+      this.defaultConfig.settings.MAX.BIAS.PERTURB = this.items[3].fields[3].model;
+      this.defaultConfig.settings.FEATURE.SELECTION = this.items[3].fields[4].model;
+      this.defaultConfig.settings.RECURRENCY.ALLOWED = this.items[3].fields[5].model;
 
-      this.defaultConfig.settings.EXCESS_COEFFICIENT = this.items[4].fields[0].model;
-      this.defaultConfig.settings.DISJOINT_COEFFICIENT = this.items[4].fields[1].model;
-      this.defaultConfig.settings.WEIGHT_COEFFICIENT = this.items[4].fields[2].model;
+      this.defaultConfig.settings.EXCESS.COEFFICIENT = this.items[4].fields[0].model;
+      this.defaultConfig.settings.DISJOINT.COEFFICIENT = this.items[4].fields[1].model;
+      this.defaultConfig.settings.WEIGHT.COEFFICIENT = this.items[4].fields[2].model;
 
-      this.defaultConfig.settings.COMPATABILITY_THRESHOLD = this.items[5].fields[0].model;
-      this.defaultConfig.settings.COMPATABILITY_CHANGE = this.items[5].fields[1].model;
-      this.defaultConfig.settings.SPECIE_COUNT = this.items[5].fields[2].model;
-      this.defaultConfig.settings.SURVIVAL_THRESHOLD = this.items[5].fields[3].model;
-      this.defaultConfig.settings.SPECIE_AGE_THRESHOLD = this.items[5].fields[4].model;
-      this.defaultConfig.settings.SPECIE_YOUTH_THRESHOLD = this.items[5].fields[5].model;
-      this.defaultConfig.settings.SPECIE_OLD_PENALTY = this.items[5].fields[6].model;
-      this.defaultConfig.settings.SPECIE_YOUTH_BOOST = this.items[5].fields[7].model;
-      this.defaultConfig.settings.SPECIE_FITNESS_MAX = this.items[5].fields[8].model;
+      this.defaultConfig.settings.COMPATABILITY.THRESHOLD = this.items[5].fields[0].model;
+      this.defaultConfig.settings.COMPATABILITY.CHANGE = this.items[5].fields[1].model;
+      this.defaultConfig.settings.SPECIE.COUNT = this.items[5].fields[2].model;
+      this.defaultConfig.settings.SURVIVAL.THRESHOLD = this.items[5].fields[3].model;
+      this.defaultConfig.settings.SPECIE.AGE.THRESHOLD = this.items[5].fields[4].model;
+      this.defaultConfig.settings.SPECIE.YOUTH.THRESHOLD = this.items[5].fields[5].model;
+      this.defaultConfig.settings.SPECIE.OLD.PENALTY = this.items[5].fields[6].model;
+      this.defaultConfig.settings.SPECIE.YOUTH.BOOST = this.items[5].fields[7].model;
+      this.defaultConfig.settings.SPECIE.FITNESS.MAX = this.items[5].fields[8].model;
 
-      this.defaultConfig.settings.ELE_EVENTS = this.items[6].fields[0].model;
-      this.defaultConfig.settings.ELE_SURVIVAL_COUNT = this.items[6].fields[1].model;
-      this.defaultConfig.settings.ELE_EVENT_TIME = this.items[6].fields[2].model;
+      this.defaultConfig.settings.ELE.EVENTS = this.items[6].fields[0].model;
+      this.defaultConfig.settings.ELE.SURVIVAL.COUNT = this.items[6].fields[1].model;
+      this.defaultConfig.settings.ELE.EVENT.TIME = this.items[6].fields[2].model;
 
       console.log(this.defaultConfig);
 
