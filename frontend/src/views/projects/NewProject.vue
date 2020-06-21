@@ -143,13 +143,13 @@
 </template>
 
 <script>
-    import parseExcel from "../../parser/ExcelParser";
-    import Vue from "vue";
-    import ProjectsAPI from "../../services/api/ProjectsAPI";
-    import UploadProjectData from "../../components/projects/new/UploadProjectData";
-    import ProjectDetails from "../../components/projects/new/ProjectDetails";
+  import parseExcel from "../../parser/ExcelParser";
+  import Vue from "vue";
+  import ProjectsAPI from "../../services/api/ProjectsAPI";
+  import UploadProjectData from "../../components/projects/new/UploadProjectData";
+  import ProjectDetails from "../../components/projects/new/ProjectDetails";
 
-    export default {
+  export default {
   name: "NewProject",
   props: {
     step: Number

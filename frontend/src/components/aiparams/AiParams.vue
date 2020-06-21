@@ -34,10 +34,6 @@
                 v-model="param.value"
               >
               </v-text-field>
-
-
-
-
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
@@ -59,12 +55,11 @@
     return {
       aiConfig: [],
       isAdvanced: false,
-      functions: [],
+      functions: []
     };
   },
   methods: {
-
-    async loadFunctions(){
+    async loadFunctions() {
       try {
         const res = await AIAPI.getActivationFunctions();
         this.functions = res.data;
@@ -126,7 +121,7 @@
     }
   },
   mounted() {
-    this.loadFunctions()
+    this.loadFunctions();
     this.loadDefaultConfig();
   }
 };
