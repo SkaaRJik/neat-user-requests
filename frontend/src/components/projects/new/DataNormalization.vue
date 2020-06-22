@@ -19,10 +19,26 @@
         </v-col>
 
         <v-col sm="12" xs="12" md="4" lg="4" xl="4">
-          <v-text-field v-model="minRange" :label="$t('Min')" class="ma-3" type="number"/>
+          <v-text-field
+            v-model="minRange"
+            :label="$t('Min')"
+            min="0"
+            max="0.9"
+            step="0.1"
+            class="ma-3"
+            type="number"
+          />
         </v-col>
         <v-col sm="12" xs="12" md="4" lg="4" xl="4">
-          <v-text-field v-model="maxRange" :label="$t('Max')" class="ma-3" type="number"/>
+          <v-text-field
+            v-model="maxRange"
+            :label="$t('Max')"
+            min="0.1"
+            max="1.0"
+            step="0.1"
+            class="ma-3"
+            type="number"
+          />
         </v-col>
       </v-row>
     </v-col>
@@ -44,10 +60,10 @@
 </template>
 
 <script>
-  import NormalizationMethodsContainer from "../../../services/NormalizationMethods";
-  import Plotly from "plotly.js-dist";
+import NormalizationMethodsContainer from "../../../services/NormalizationMethods";
+import Plotly from "plotly.js-dist";
 
-  export default {
+export default {
   name: "DataNormalization",
   props: {
     parsedData: Object,
@@ -75,7 +91,7 @@
         const newValue = {
           ...this.value,
           ...data
-        }
+        };
 
         this.$emit("input", newValue);
         const chartLabels = [];
@@ -116,8 +132,7 @@
       }
     }
   },
-  computed: {
-  },
+  computed: {},
   mounted() {
     this.normalizationMethods = Object.keys(NormalizationMethodsContainer);
     this.normalizationMethod = this.normalizationMethods[0];
