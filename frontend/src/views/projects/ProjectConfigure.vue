@@ -40,7 +40,7 @@
             <v-col cols="auto" xs="12">
               <v-card-actions>
                 <v-btn
-                  :disabled="!normalizedData && !normalizedData.data"
+                  :disabled="goToStep2IsDisabled"
                   @click="goToStep(2)"
                   class="ma-3"
                   color="primary"
@@ -153,13 +153,13 @@
 </template>
 
 <script>
-import DataNormalization from "../../components/projects/new/DataNormalization";
-import DataSeparation from "../../components/projects/new/DataSeparation";
-import ProjectsAPI from "../../services/api/ProjectsAPI";
-import AiParams from "../../components/aiparams/AiParams";
-import ColumnsChooser from "../../components/projects/new/ColumnsChooser";
+  import DataNormalization from "../../components/projects/new/DataNormalization";
+  import DataSeparation from "../../components/projects/new/DataSeparation";
+  import ProjectsAPI from "../../services/api/ProjectsAPI";
+  import AiParams from "../../components/aiparams/AiParams";
+  import ColumnsChooser from "../../components/projects/new/ColumnsChooser";
 
-export default {
+  export default {
   name: "ProjectEdit",
   props: {
     step: Number,
@@ -185,7 +185,7 @@ export default {
       } finally {
         this.loading = false;
       }
-      if (!this.normalizedData.data) {
+      if (!this.normalizedData.data && this.step !== 1) {
         return this.$router.replace({
           name: "project-configure",
           params: { id: this.$route.params.id },
@@ -203,9 +203,15 @@ export default {
         query: { step },
         params: { id: this.projectId }
       });
+      window.scrollTo(0, 0);
     },
     back() {
-      this.$router.go(-1);
+      this.$router.replace({
+        name: "project-configure",
+        query: { step: this.step - 1 },
+        params: { id: this.projectId }
+      });
+      window.scrollTo(0, 0);
     }
   },
   mounted() {
@@ -213,12 +219,7 @@ export default {
   },
   computed: {
     nodesAreNotChosen() {
-      console.log(
-        "[ProjectConfigure].nodesAreNotChosen this.normalizedData.inputs, this.normalizedData.outputs:",
-        this.normalizedData.inputs,
-        this.normalizedData.outputs
-      );
-      if (!this.normalizedData.inputs && !this.normalizedData.outputs) {
+      if (!this.normalizedData.inputs || !this.normalizedData.outputs) {
         return true;
       } else if (
         !!this.normalizedData.outputs &&
@@ -227,6 +228,9 @@ export default {
         return true;
       }
       return false;
+    },
+    goToStep2IsDisabled() {
+      return !this.normalizedData || !this.normalizedData.data;
     }
   },
   watch: {

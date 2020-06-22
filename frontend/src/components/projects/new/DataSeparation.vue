@@ -2,7 +2,7 @@
   <v-row>
     <v-col cols="12">
       <v-row align="center" justify="center">
-        <v-col sm="12" xs="12" md="4" lg="4" xl="4">
+        <v-col sm="12" xs="12" md="12" lg="4" xl="4">
           <v-text-field
             v-model="trainPercentage"
             @change="testPercentage = 100 - trainPercentage"
@@ -14,7 +14,7 @@
             max="100"
           />
         </v-col>
-        <v-col sm="12" xs="12" md="4" lg="4" xl="4">
+        <v-col sm="12" xs="12" md="12" lg="4" xl="4">
           <v-text-field
             v-model="testPercentage"
             :label="$t('Test_Percentage')"
@@ -25,7 +25,7 @@
             max="100"
           />
         </v-col>
-        <v-col sm="12" xs="12" md="4" lg="4" xl="4">
+        <v-col sm="12" xs="12" md="12" lg="4" xl="4">
           <v-btn @click="calculatePercentage">{{ $t("Submit") }}</v-btn>
         </v-col>
       </v-row>
@@ -47,8 +47,6 @@
         </v-col>
       </v-row>
     </v-col>
-
-
   </v-row>
 </template>
 
@@ -56,14 +54,14 @@
 export default {
   name: "DataSeparation",
   props: {
-    value: Object,
+    value: Object
   },
   data: () => {
     return {
       trainPercentage: 70,
       testPercentage: 30,
       trainEndIndex: null,
-      testEndIndex: null,
+      testEndIndex: null
     };
   },
   methods: {
@@ -99,12 +97,12 @@ export default {
         const newValue = {
           ...this.value,
           trainEndIndex: this.trainEndIndex,
-          testEndIndex: this.trainEndIndex + this.testEndIndex,
+          testEndIndex: this.trainEndIndex + this.testEndIndex
         };
         this.$emit("input", newValue);
       }
     }
-  },
+  }
 };
 </script>
 

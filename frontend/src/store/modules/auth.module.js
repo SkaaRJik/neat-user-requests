@@ -34,15 +34,12 @@ export const auth = {
       }
     },
     async refreshTokens({ commit, state }) {
-      console.log("[AuthModule].refreshTokens state:", state);
       try {
         if (state.user) {
           const tokens = await AuthService.refreshTokens(state.user);
-
           commit("refreshTokenSuccess", tokens);
           return Promise.resolve(tokens);
         }
-        console.log("[AuthModule].refreshTokens REJECT:");
         return Promise.reject(new Error("User is not present in vuex store"));
       } catch (error) {
         //commit('refreshTokenFailure');

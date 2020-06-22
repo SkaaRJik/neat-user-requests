@@ -1,73 +1,105 @@
 <template>
   <v-container>
-    <v-switch
-      :label="$t('Advanced_mode')"
-      :true-value="true"
-      :false-value="false"
-      v-model="isAdvanced"
-    ></v-switch>
-    <v-list class="pa-1">
-      <div v-for="item in aiConfig" :key="item.header">
-        <v-subheader v-if="item.show && showSublist(item.params)">{{
-          $t(item.header)
-        }}</v-subheader>
-
-        <v-list-item-group v-if="item.show && showSublist(item.params)">
-          <v-list-item
-            v-for="(param, i) in item.params"
-            :key="i"
-            v-show="!isHidden(param)"
-          >
-            <v-list-item-content>
-              <v-switch
-                v-if="isFieldBoolean(param.value)"
-                :label="$t(param.name)"
-                :true-value="true"
-                :false-value="false"
-                v-model="param.value"
-              ></v-switch>
-
-              <v-text-field
-                v-if="isFieldString(param.value) || isFieldNumber(param.value)"
-                :type="isFieldNumber(param.value) ? 'number' : 'text'"
-                :label="$t(param.name)"
-                v-model="param.value"
-              >
-              </v-text-field>
-
-              <v-expansion-panels
-                :multiple="true"
-                v-if="isFieldArray(param.value)"
-              >
-                <v-expansion-panel>
-                  <v-expansion-panel-header>{{
-                    $t(param.name)
-                  }}</v-expansion-panel-header>
-                  <v-expansion-panel-content>
+    <v-row>
+      <v-col cols="12">
+        <v-switch
+          :label="$t('Advanced_mode')"
+          :true-value="true"
+          :false-value="false"
+          v-model="isAdvanced"
+        ></v-switch>
+      </v-col>
+    </v-row>
+    <v-row>
+      <template v-for="item in aiConfig">
+        <v-col
+          sm="12"
+          xs="12"
+          md="4"
+          lg="4"
+          xl="4"
+          :key="item.header"
+          v-if="item.show && showSublist(item.params)"
+        >
+          <v-card>
+            <v-card-title>
+              {{ $t(item.header) }}
+            </v-card-title>
+            <v-card-title>
+              <v-list>
+                <v-list-item
+                  v-for="(param, i) in item.params"
+                  :key="i"
+                  v-show="!isHidden(param)"
+                >
+                  <v-list-item-content>
                     <v-switch
-                      :label="$t(func)"
-                      :true-value="func"
-                      false-value=""
-                      v-model="param.value[index]"
-                      v-for="(func, index) in functions"
-                      :key="index"
+                      v-if="isFieldBoolean(param.value)"
+                      :label="$t(param.name)"
+                      :true-value="true"
+                      :false-value="false"
+                      v-model="param.value"
                     ></v-switch>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
-      </div>
-    </v-list>
+
+                    <v-text-field
+                      v-if="
+                        isFieldString(param.value) || isFieldNumber(param.value)
+                      "
+                      type="number"
+                      :label="$t(param.name)"
+                      v-model="param.value"
+                      :max="param.maxValue ? param.maxValue : undefined"
+                      :min="param.maxValue ? param.minValue : undefined"
+                      :step="param.maxValue && param.maxValue > 1 ? 1 : 0.1"
+                      :append-icon="
+                        param.name === 'GENERATOR.SEED'
+                          ? 'mdi-refresh'
+                          : undefined
+                      "
+                      @click:append="
+                        param.name === 'GENERATOR.SEED'
+                          ? generateNewSeed(param)
+                          : undefined
+                      "
+                    >
+                    </v-text-field>
+
+                    <v-expansion-panels
+                      :multiple="true"
+                      v-if="isFieldArray(param.value)"
+                    >
+                      <v-expansion-panel>
+                        <v-expansion-panel-header>{{
+                          $t(param.name)
+                        }}</v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                          <v-switch
+                            :label="$t(func)"
+                            :true-value="func"
+                            false-value=""
+                            v-model="param.value[index]"
+                            v-for="(func, index) in functions"
+                            :key="index"
+                          ></v-switch>
+                        </v-expansion-panel-content>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </v-card-title>
+          </v-card>
+        </v-col>
+      </template>
+    </v-row>
   </v-container>
 </template>
 
 <script>
-import AIAPI from "../../services/api/AIAPI";
-import _ from "lodash";
+  import AIAPI from "../../services/api/AIAPI";
+  import _ from "lodash";
 
-export default {
+  export default {
   name: "AiParams",
   props: {
     config: Object,
@@ -116,7 +148,9 @@ export default {
     },
 
     isFieldNumber(value) {
-      return _.isNumber(value);
+      if (_.isNumber(value)) {
+        return true;
+      }
     },
 
     isFieldArray(value) {
@@ -141,6 +175,10 @@ export default {
       }
 
       return true;
+    },
+
+    generateNewSeed(item) {
+      item.value = new Date().getTime();
     }
   },
   mounted() {

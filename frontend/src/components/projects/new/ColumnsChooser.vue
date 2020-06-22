@@ -23,6 +23,12 @@
                         @change="handleDataType(item, $event)"
                         dense
                         outlined
+                        :append-icon="
+                          item.type === 'Output' && outputs > 1
+                            ? 'mdi-alert'
+                            : 'mdi-menu-down'
+                        "
+                        :error="item.type === 'Output' && outputs > 1"
                       >
                         <template v-slot:selection="{ item: headerType }">
                           <span>{{ $t(headerType) }}</span>
@@ -60,7 +66,6 @@ export default {
     };
   },
   methods: {
-
     handleDataType(item, newValue) {
       if (item.type !== newValue) {
         if (newValue === "Input") {
@@ -75,6 +80,33 @@ export default {
           this.outputs--;
         }
 
+        if (this.outputs > 1) {
+          this.$toast.open({
+            message: `${this.$t("ERROR_OUTPUTS_MUST_BE_ONLY_1")}`,
+            type: "error",
+            position: "bottom-right",
+            duration: 3000
+          });
+        }
+
+        if (this.outputs === 0) {
+          this.$toast.open({
+            message: `${this.$t("ERROR_OUTPUTS_NODE_CANT_BE_0")}`,
+            type: "error",
+            position: "bottom-right",
+            duration: 3000
+          });
+        }
+
+        if (this.inputs === 0) {
+          this.$toast.open({
+            message: `${this.$t("ERROR_INPUTS_NODE_CANT_BE_0")}`,
+            type: "error",
+            position: "bottom-right",
+            duration: 3000
+          });
+        }
+
         item.type = newValue;
 
         const newNormalizedData = {
@@ -83,16 +115,17 @@ export default {
           outputs: this.outputs,
           headers: this.headerTypes
         };
-        console.log("[DataSeparation].handleDataType newValue:", newNormalizedData);
+        console.log(
+          "[DataSeparation].handleDataType newValue:",
+          newNormalizedData
+        );
         this.$emit("input", newNormalizedData);
-
       }
     }
   },
-  mounted() {
-  },
+  mounted() {},
   watch: {
-    headers: function (newValue) {
+    headers: function(newValue) {
       if (newValue) {
         this.headerTypes = newValue.map((val, index) => {
           return {
@@ -108,11 +141,11 @@ export default {
           outputs: this.outputs,
           headers: this.headerTypes
         };
-        console.log('[ColumnsChooser].watch headers:', newNormalizedData);
+        console.log("[ColumnsChooser].watch headers:", newNormalizedData);
         this.$emit("input", newNormalizedData);
       }
     },
-    normalizedData: function (newVal) {
+    normalizedData: function(newVal) {
       if (newVal) {
         const newNormalizedData = {
           ...newVal,
@@ -120,9 +153,11 @@ export default {
           outputs: this.outputs,
           headers: this.headerTypes
         };
-        console.log('[ColumnsChooser].watch normalizedData:', newNormalizedData);
+        console.log(
+          "[ColumnsChooser].watch normalizedData:",
+          newNormalizedData
+        );
         this.$emit("input", newNormalizedData);
-
       }
     }
   }

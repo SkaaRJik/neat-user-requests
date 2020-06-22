@@ -33,18 +33,10 @@ axios.interceptors.response.use(
     if (status === 401) {
       // will loop if refreshToken returns 401
       try {
-        console.log(
-          "[axios].refreshTokens OLD error.config.headers[Authorization]:",
-          error.config.headers["Authorization"]
-        );
-        const tokens = await store.dispatch("auth/refreshTokens");
+        const tokens = await store.dispatch("auth/" + "refreshTokens");
         Vue.prototype.$http.defaults.headers.common["Authorization"] =
           tokens.accessToken;
         error.config.headers["Authorization"] = tokens.accessToken;
-        console.log(
-          "[axios].refreshTokens new error.config.headers[Authorization]:",
-          error.config.headers["Authorization"]
-        );
         return Vue.prototype.$http.request(error.config);
       } catch (e) {
         console.log("[axios.js]. status === 401 error:", e);
@@ -55,7 +47,7 @@ axios.interceptors.response.use(
     if (status === 406) {
       await store.dispatch("auth/logout");
       Vue.$toast.open({
-        message: `${Vue.$t("YOU_WERE_LOGGED_OUT")}`,
+        message: "YOU_WERE_LOGGED_OUT",
         type: "error",
         position: "bottom-right",
         duration: 10000
