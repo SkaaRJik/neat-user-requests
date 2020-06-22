@@ -95,6 +95,8 @@ public class NEATConfig implements AIConfig {
 		private Boolean allowedToChangeByUser;
 		private Boolean showInGui;
 		private Boolean isAdvanced;
+		private Object maxValue;
+		private Object minValue;
 
 	}
 
@@ -113,7 +115,9 @@ public class NEATConfig implements AIConfig {
 				1548235723799L,
 				true,
 				true,
-				false
+				false,
+				null,
+				null
 		));
 
 		params.add(new GUIAIConfig(
@@ -121,56 +125,73 @@ public class NEATConfig implements AIConfig {
 				0.25,
 				true,
 				true,
-				false
+				false,
+				1,
+				0
+
 		));
 		params.add(new GUIAIConfig(
 				"PROBABILITY.CROSSOVER",
 				0.5,
 				true,
 				true,
-				true
+				true,
+				1,
+				0
 		));
 		params.add(new GUIAIConfig(
 				"PROBABILITY.ADDLINK",
 				0.1,
 				true,
 				true,
-				false
+				false,
+				1,
+				0
 		));
 		params.add(new GUIAIConfig(
 				"PROBABILITY.ADDNODE",
 				0.03,
 				true,
 				true,
-				false
+				false,
+				1,
+				0
 		));
 		params.add(new GUIAIConfig(
 				"PROBABILITY.NEWACTIVATIONFUNCTION",
 				0.1,
 				true,
 				true,
-				false
+				false,
+				1,
+				0
 		));
 		params.add(new GUIAIConfig(
 				"PROBABILITY.MUTATEBIAS",
 				0.3,
 				true,
 				true,
-				true
+				true,
+				1,
+				0
 		));
 		params.add(new GUIAIConfig(
 				"PROBABILITY.TOGGLELINK",
 				0.1,
 				true,
 				true,
-				false
+				false,
+				1,
+				0
 		));
 		params.add(new GUIAIConfig(
 				"PROBABILITY.WEIGHT.REPLACED",
 				0.5,
 				true,
 				true,
-				false
+				false,
+				1,
+				0
 		));
 
 		section = new HashMap<>();
@@ -185,21 +206,27 @@ public class NEATConfig implements AIConfig {
 				1,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "DISJOINT.COEFFICIENT",
 				1,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "WEIGHT.COEFFICIENT",
 				0.4,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 
 		section = new HashMap<>();
@@ -214,62 +241,80 @@ public class NEATConfig implements AIConfig {
 				0.5,
 				true,
 				true,
-				true
+				true,
+				1,
+				0
 		));
 		params.add(new GUIAIConfig(
         "COMPATABILITY.CHANGE",
 				0.1,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "SPECIE.COUNT",3,
 				true,
 				true,
-				false
+				true,
+				5,
+				1
 		));
 		params.add(new GUIAIConfig(
         "SURVIVAL.THRESHOLD",
 				0.2,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "SPECIE.AGE.THRESHOLD",
 				80,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "SPECIE.YOUTH.THRESHOLD",
 				10,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "SPECIE.OLD.PENALTY",
 				1.2,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "SPECIE.YOUTH.BOOST",
 				0.7,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "SPECIE.FITNESS.MAX",
 				15,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 
 		section = new HashMap<>();
@@ -285,28 +330,36 @@ public class NEATConfig implements AIConfig {
 				0.5,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "MAX.BIAS.PERTURB",
 				0.1,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "FEATURE.SELECTION",
 				false,
 				true,
 				true,
-				false
+				false,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "RECURRENCY.ALLOWED",
 				false,
 				true,
 				true,
-				false
+				false,
+				null,
+				null
 		));
 
 
@@ -323,21 +376,27 @@ public class NEATConfig implements AIConfig {
 				List.of("org.neat4j.neat.nn.core.functions.LinearFunction","",""),
 				true,
 				true,
-				false
+				false,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "OUTPUT.ACTIVATIONFUNCTIONS",
 				List.of("","org.neat4j.neat.nn.core.functions.SigmoidFunction",""),
 				true,
 				true,
-				false
+				false,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "HIDDEN.ACTIVATIONFUNCTIONS",
 				List.of("","","org.neat4j.neat.nn.core.functions.TanhFunction"),
 				true,
 				true,
-				false
+				false,
+				null,
+				null
 		));
 
 		section = new HashMap<>();
@@ -352,21 +411,27 @@ public class NEATConfig implements AIConfig {
 				false,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "ELE.SURVIVAL.COUNT",
 				0.1,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "ELE.EVENT.TIME",
 				1000,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 
 		section = new HashMap<>();
@@ -379,44 +444,57 @@ public class NEATConfig implements AIConfig {
 		params.add(new GUIAIConfig(
         "KEEP.BEST.EVER",
 				true,
+				false,
+				false,
 				true,
-				true,
-				true
+				null,
+				null
 		));
+
 		params.add(new GUIAIConfig(
         "EXTRA.FEATURE.COUNT",
 				0,
 				true,
 				true,
-				true
+				false,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "POP.SIZE",
 				150,
 				true,
 				true,
-				true
+				true,
+				300,
+				1
 		));
 		params.add(new GUIAIConfig(
         "NUMBER.EPOCHS",
 				100,
 				true,
 				true,
-				true
+				false,
+				1000,
+				1
 		));
 		params.add(new GUIAIConfig(
         "TERMINATION.VALUE.TOGGLE",
 				false,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 		params.add(new GUIAIConfig(
         "TERMINATION.VALUE",
 				0.00001,
 				true,
 				true,
-				true
+				true,
+				null,
+				null
 		));
 
 
@@ -432,7 +510,9 @@ public class NEATConfig implements AIConfig {
 				"org.neat4j.neat.core.xover.NEATCrossover",
 				false,
 				false,
-				true
+				true,
+				null,
+				null
 		));
 
 		params.add(new GUIAIConfig(
@@ -440,7 +520,9 @@ public class NEATConfig implements AIConfig {
 				"org.neat4j.neat.core.fitness.MSENEATFitnessFunction",
 				false,
 				false,
-				true
+				true,
+				null,
+				null
 		));
 
 		params.add(new GUIAIConfig(
@@ -448,7 +530,9 @@ public class NEATConfig implements AIConfig {
 				"org.neat4j.neat.core.pselectors.TournamentSelector",
 				false,
 				false,
-				true
+				true,
+				null,
+				null
 		));
 
 		params.add(new GUIAIConfig(
@@ -456,7 +540,9 @@ public class NEATConfig implements AIConfig {
 				"org.neat4j.neat.core.mutators.NEATMutator",
 				false,
 				false,
-				true
+				true,
+				null,
+				null
 		));
 
 		params.add(new GUIAIConfig(
@@ -464,7 +550,9 @@ public class NEATConfig implements AIConfig {
 				"true",
 				false,
 				false,
-				true
+				true,
+				null,
+				null
 		));
 
 		params.add(new GUIAIConfig(
@@ -472,7 +560,9 @@ public class NEATConfig implements AIConfig {
 				"org.neat4j.neat.nn.core.learning.GALearnable",
 				false,
 				false,
-				true
+				true,
+				null,
+				null
 		));
 
 		params.add(new GUIAIConfig(
@@ -480,7 +570,9 @@ public class NEATConfig implements AIConfig {
 				"GA",
 				false,
 				false,
-				true
+				true,
+				null,
+				null
 		));
 
 		section = new HashMap<>();
@@ -495,7 +587,9 @@ public class NEATConfig implements AIConfig {
 				0,
 				false,
 				false,
-				true
+				true,
+				null,
+				null
 		));
 
 		params.add(new GUIAIConfig(
@@ -503,7 +597,9 @@ public class NEATConfig implements AIConfig {
 				0,
 				false,
 				false,
-				true
+				true,
+				null,
+				null
 		));
 
 

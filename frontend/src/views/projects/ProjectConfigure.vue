@@ -14,6 +14,12 @@
       <v-divider></v-divider>
 
       <v-stepper-step :complete="step > 3" step="3">{{
+        $t("Choose_params")
+      }}</v-stepper-step>
+
+      <v-divider></v-divider>
+
+      <v-stepper-step :complete="step > 4" step="4">{{
         $t("AI_Config")
       }}</v-stepper-step>
     </v-stepper-header>
@@ -50,7 +56,40 @@
 
       <v-stepper-content step="2">
         <v-container>
-          <data-separation
+          <data-separation v-model="normalizedData" />
+          <v-row>
+            <v-col class="mr-auto" cols="auto" xs="12">
+              <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                >{{ $t("Cancel") }}
+              </v-btn>
+            </v-col>
+            <v-col cols="auto" xs="12">
+              <v-card-actions>
+                <v-btn @click="back" class="ma-3">
+                  <v-icon left> mdi-arrow-left</v-icon>
+                  {{ $t("Back") }}
+                </v-btn>
+                <v-btn
+                  @click="goToStep(3)"
+                  :disabled="
+                    !normalizedData.trainEndIndex &&
+                      !normalizedData.testEndIndex
+                  "
+                  class="ma-3"
+                  color="primary"
+                >
+                  {{ $t("Continue") }}
+                  <v-icon> mdi-arrow-right</v-icon>
+                </v-btn>
+              </v-card-actions>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-stepper-content>
+
+      <v-stepper-content step="3">
+        <v-container>
+          <columns-chooser
             v-model="normalizedData"
             :headers="parsedData.headers"
           />
@@ -67,11 +106,8 @@
                   {{ $t("Back") }}
                 </v-btn>
                 <v-btn
-                  @click="goToStep(3)"
-                  :disabled="
-                    (!normalizedData.inputs && !normalizedData.outputs) ||
-                      (normalizedData.outputs && normalizedData.outputs > 1)
-                  "
+                  @click="goToStep(4)"
+                  :disabled="nodesAreNotChosen"
                   class="ma-3"
                   color="primary"
                 >
@@ -84,9 +120,13 @@
         </v-container>
       </v-stepper-content>
 
-      <v-stepper-content step="3">
+      <v-stepper-content step="4">
         <v-container>
-          <ai-params v-model="settings" :inputs="normalizedData.inputs" :outputs="normalizedData.outputs"/>
+          <ai-params
+            v-model="settings"
+            :inputs="normalizedData.inputs"
+            :outputs="normalizedData.outputs"
+          />
           <v-row>
             <v-col class="mr-auto" cols="auto" xs="12">
               <v-btn @click="redirectToProjectsPage" class="ma-3" text
@@ -113,18 +153,19 @@
 </template>
 
 <script>
-  import DataNormalization from "../../components/projects/new/DataNormalization";
-  import DataSeparation from "../../components/projects/new/DataSeparation";
-  import ProjectsAPI from "../../services/api/ProjectsAPI";
-  import AiParams from "../../components/aiparams/AiParams";
+import DataNormalization from "../../components/projects/new/DataNormalization";
+import DataSeparation from "../../components/projects/new/DataSeparation";
+import ProjectsAPI from "../../services/api/ProjectsAPI";
+import AiParams from "../../components/aiparams/AiParams";
+import ColumnsChooser from "../../components/projects/new/ColumnsChooser";
 
-  export default {
+export default {
   name: "ProjectEdit",
   props: {
     step: Number,
     projectId: Number
   },
-  components: { AiParams, DataNormalization, DataSeparation },
+  components: { ColumnsChooser, AiParams, DataNormalization, DataSeparation },
   data() {
     return {
       parsedData: { headers: [] },
@@ -170,6 +211,24 @@
   mounted() {
     this.loadProjectData();
   },
+  computed: {
+    nodesAreNotChosen() {
+      console.log(
+        "[ProjectConfigure].nodesAreNotChosen this.normalizedData.inputs, this.normalizedData.outputs:",
+        this.normalizedData.inputs,
+        this.normalizedData.outputs
+      );
+      if (!this.normalizedData.inputs && !this.normalizedData.outputs) {
+        return true;
+      } else if (
+        !!this.normalizedData.outputs &&
+        this.normalizedData.outputs > 1
+      ) {
+        return true;
+      }
+      return false;
+    }
+  },
   watch: {
     projectId: function(newVal) {
       if (newVal) {
@@ -190,11 +249,40 @@
       }
 
       if (newVal === 2) {
-        if (!this.normalizedData.data) {
+        if (
+          !this.normalizedData.data &&
+          this.normalizedData.data.length === 0
+        ) {
           return this.$router.replace({
             name: "project-configure",
             params: { id: this.$route.params.id },
             query: { step: 1 }
+          });
+        }
+      }
+
+      if (newVal === 3) {
+        if (
+          !this.normalizedData.trainEndIndex &&
+          !this.normalizedData.testEndIndex
+        ) {
+          return this.$router.replace({
+            name: "project-configure",
+            params: { id: this.$route.params.id },
+            query: { step: 2 }
+          });
+        }
+      }
+
+      if (newVal === 4) {
+        if (
+          (!this.normalizedData.inputs && !this.normalizedData.outputs) ||
+          (this.normalizedData.outputs && this.normalizedData.outputs > 1)
+        ) {
+          return this.$router.replace({
+            name: "project-configure",
+            params: { id: this.$route.params.id },
+            query: { step: 3 }
           });
         }
       }

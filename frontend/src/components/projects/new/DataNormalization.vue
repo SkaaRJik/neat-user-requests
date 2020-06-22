@@ -71,7 +71,13 @@
           this.normalizationMethod
         ](this.parsedData.data, this.minRange, this.maxRange);
         console.log("[DataNormalizationVue].normalize data:", data);
-        this.$emit("input", data);
+
+        const newValue = {
+          ...this.value,
+          ...data
+        }
+
+        this.$emit("input", newValue);
         const chartLabels = [];
 
         const chartXInterval = (this.maxRange - this.minRange) / 10;

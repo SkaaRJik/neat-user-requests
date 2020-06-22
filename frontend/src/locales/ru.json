@@ -124,5 +124,6 @@
   "org.neat4j.neat.nn.core.functions.SigmoidFunction": "sigmoid(x)",
   "org.neat4j.neat.nn.core.functions.TanhFunction": "tg(x)",
   "TERMINATION.VALUE.TOGGLE": "Включить прерывание",
-  "TERMINATION.VALUE": "Значение остановки"
+  "TERMINATION.VALUE": "Значение остановки",
+  "Choose_params": "Выбор прогнозируемых параметров"
 }
