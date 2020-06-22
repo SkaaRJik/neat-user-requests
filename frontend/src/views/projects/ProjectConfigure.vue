@@ -86,7 +86,7 @@
 
       <v-stepper-content step="3">
         <v-container>
-          <ai-params v-model="settings" />
+          <ai-params v-model="settings" :inputs="normalizedData.inputs" :outputs="normalizedData.outputs"/>
           <v-row>
             <v-col class="mr-auto" cols="auto" xs="12">
               <v-btn @click="redirectToProjectsPage" class="ma-3" text

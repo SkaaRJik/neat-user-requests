@@ -9,8 +9,7 @@
         elevation="2"
         style="width: 100%"
         transition="scale-transition"
-        v-if="alert.message"
-        v-model="alert.message"
+        v-model="showAlert"
       >
         {{ alert.message }}
       </v-alert>
@@ -196,7 +195,11 @@ export default {
     }
   },
   computed: {
-    passwordError: function() {
+    showAlert() {
+      return !!alert.message;
+    },
+
+    passwordError() {
       if (
         this.repeatPassword &&
         this.repeatPassword.length !== 0 &&

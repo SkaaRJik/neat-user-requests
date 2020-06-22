@@ -120,6 +120,9 @@
   "EXTRA.FEATURE.COUNT": "Дополнительные аллели",
   "POP.SIZE": "Размер популяции",
   "NUMBER.EPOCHS": "Количество эпох",
+  "org.neat4j.neat.nn.core.functions.LinearFunction": "y = x",
+  "org.neat4j.neat.nn.core.functions.SigmoidFunction": "sigmoid(x)",
+  "org.neat4j.neat.nn.core.functions.TanhFunction": "tg(x)",
   "TERMINATION.VALUE.TOGGLE": "Включить прерывание",
   "TERMINATION.VALUE": "Значение остановки"
 }

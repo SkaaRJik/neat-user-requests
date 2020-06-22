@@ -79,7 +79,7 @@ export default {
   computed: {
     showAlert: function() {
       console.log("[Login].showAlert() :");
-      return this.dataToLogin.message !== "";
+      return !!this.dataToLogin.message;
     }
   },
 

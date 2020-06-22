@@ -34,6 +34,27 @@
                 v-model="param.value"
               >
               </v-text-field>
+
+              <v-expansion-panels
+                :multiple="true"
+                v-if="isFieldArray(param.value)"
+              >
+                <v-expansion-panel>
+                  <v-expansion-panel-header>{{
+                    $t(param.name)
+                  }}</v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-switch
+                      :label="$t(func)"
+                      :true-value="func"
+                      false-value=""
+                      v-model="param.value[index]"
+                      v-for="(func, index) in functions"
+                      :key="index"
+                    ></v-switch>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
@@ -43,13 +64,15 @@
 </template>
 
 <script>
-  import AIAPI from "../../services/api/AIAPI";
-  import _ from "lodash";
+import AIAPI from "../../services/api/AIAPI";
+import _ from "lodash";
 
-  export default {
+export default {
   name: "AiParams",
   props: {
-    config: Object
+    config: Object,
+    inputs: Number,
+    outputs: Number
   },
   data: function() {
     return {
@@ -123,6 +146,26 @@
   mounted() {
     this.loadFunctions();
     this.loadDefaultConfig();
+  },
+  watch: {
+    inputs: function(newVal) {
+      if (newVal) {
+        const nodesConfig = this.aiConfig[this.aiConfig.length - 1].params;
+        const inputsConfig = nodesConfig.filter(
+          val => val.name === "INPUT.NODES"
+        );
+        inputsConfig.value = newVal;
+      }
+    },
+    outputs: function(newVal) {
+      if (newVal) {
+        const nodesConfig = this.aiConfig[this.aiConfig.length - 1].params;
+        const outputsConfig = nodesConfig.filter(
+          val => val.name === "OUTPUT.NODES"
+        );
+        outputsConfig.value = newVal;
+      }
+    }
   }
 };
 </script>
