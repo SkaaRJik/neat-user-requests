@@ -53,7 +53,7 @@
       >
     </v-col>
 
-    <v-col cols="12">
+    <v-col cols="12" v-if="chartData.length > 0">
       <reactive-chart :data="chartData" :layout="chartLayout"></reactive-chart>
     </v-col>
   </v-row>
@@ -133,7 +133,6 @@
             type: "bar"
           }
         ];
-
       } catch (e) {
         console.error("[DataNormalizationVue].normalize error:", e);
       }

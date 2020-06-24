@@ -52,12 +52,30 @@
           </v-col>
           <v-col sm="12" xs="12" md="12" lg="6" xl="6">
             <v-card>
-              <v-card-title>Ошибка прогнозирования</v-card-title>
+              <v-card-title>Ошибка тестирования</v-card-title>
               <v-card-text>
                 <reactive-chart
                   :data="testErrorChartData"
                   :layout="errorLayout"
                 ></reactive-chart>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-card>
+              <v-card-title>
+                Спрогнозированные значения
+              </v-card-title>
+              <v-card-text>
+                <v-data-table
+                  :width="'100%'"
+                  :headers="headers"
+                  :items="predictDataTable"
+                  hide-default-footer
+                  class="elevation-1"
+                ></v-data-table>
               </v-card-text>
             </v-card>
           </v-col>
@@ -85,10 +103,10 @@
       chartsData: [],
       errorLayout: {
         xaxis: {
-          title: this.$t('Epoch')
+          title: this.$t("Epoch")
         },
         yaxis: {
-          title: this.$t('Error')
+          title: this.$t("Error")
         }
       },
       testErrorChartData: [],
@@ -96,12 +114,22 @@
       predictionData: [],
       predictionLayout: {
         xaxis: {
-          title: this.$t('Values')
+          title: this.$t("Values")
         },
         yaxis: {
-          title: this.$t('Years')
+          title: this.$t("Years")
         }
-      }
+      },
+      headers: [
+        {
+          text: "Год",
+          align: "start",
+          value: "legend"
+        },
+        { text: "Факт", value: "fact" },
+        { text: "Прогноз", value: "predict" }
+      ],
+      predictDataTable: []
     };
   },
   watch: {
@@ -131,12 +159,19 @@
 
       for (let i = 0; i < years; i++) {
         const val = getRandomValue(50, 300);
+
         if (i <= years - 10) {
           trace1.x.push(1990 + i);
           trace1.y.push(val);
         }
         trace2.x.push(1990 + i);
-        trace2.y.push(val + getRandomValue(0, 50));
+        const predData = val + getRandomValue(0, 50);
+        trace2.y.push(predData);
+        this.predictDataTable.push({
+          legend: 1990 + i,
+          fact: val,
+          predict: predData
+        });
       }
 
       this.predictionData = [trace1, trace2];
