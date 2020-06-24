@@ -1,5 +1,5 @@
 export default {
-  Linear_method: (data, minRange, maxRange) =>
+  Linear_Method: (data, minRange, maxRange) =>
     new Promise((resolve, reject) => {
       if (!data) reject("Data is null");
       if (!data[0]) reject("Data is empty");

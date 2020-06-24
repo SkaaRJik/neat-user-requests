@@ -51,9 +51,10 @@
 </template>
 
 <script>
-import { alphabet, getRandomValue } from "../../../utils/alphabet.util";
+  import {alphabet} from "../../../utils/alphabet.util";
+  import {getRandomValue} from "../../../utils/generate.utils";
 
-const statuses = ["In_Queue", "Done", "In_Progress"];
+  const statuses = ["In_Queue", "Done", "In_Progress"];
 
 export default {
   name: "ProjectsViewMobile",

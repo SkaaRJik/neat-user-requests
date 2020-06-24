@@ -63,10 +63,10 @@
 </template>
 
 <script>
-import Auth from "../auth/Auth";
-import { getShortNameForAvatar } from "../../services/utils/AvatarUtil";
+  import Auth from "../auth/Auth";
+  import {getShortNameForAvatar} from "../../services/utils/AvatarUtil";
 
-export default {
+  export default {
   name: "avatar",
 
   components: {

@@ -19,7 +19,7 @@
                       <v-select
                         :value="item.type"
                         :items="nodeTypes"
-                        :label="$t('Type_node')"
+                        :label="$t('Type_Node')"
                         @change="handleDataType(item, $event)"
                         dense
                         outlined
@@ -121,28 +121,34 @@ export default {
         );
         this.$emit("input", newNormalizedData);
       }
+    },
+    initHeaders(headers){
+      this.headerTypes = headers.map((val, index) => {
+        return {
+          name: val,
+          type: headers.length - 1 === index ? "Output" : "Input"
+        };
+      });
+      this.inputs = headers.length - 1;
+      this.outputs = 1;
+      const newNormalizedData = {
+        ...this.value,
+        inputs: this.inputs,
+        outputs: this.outputs,
+        headers: this.headerTypes
+      };
+      console.log("[ColumnsChooser].watch headers:", newNormalizedData);
+      this.$emit("input", newNormalizedData);
     }
   },
-  mounted() {},
+  mounted() {
+    this.initHeaders(this.headers)
+  },
   watch: {
     headers: function(newValue) {
+      console.log('[ColumnsChooser].headers watch newValue:', newValue);
       if (newValue) {
-        this.headerTypes = newValue.map((val, index) => {
-          return {
-            name: val,
-            type: newValue.length - 1 === index ? "Output" : "Input"
-          };
-        });
-        this.inputs = newValue.length - 1;
-        this.outputs = 1;
-        const newNormalizedData = {
-          ...this.value,
-          inputs: this.inputs,
-          outputs: this.outputs,
-          headers: this.headerTypes
-        };
-        console.log("[ColumnsChooser].watch headers:", newNormalizedData);
-        this.$emit("input", newNormalizedData);
+        this.initHeaders(newValue)
       }
     },
     normalizedData: function(newVal) {

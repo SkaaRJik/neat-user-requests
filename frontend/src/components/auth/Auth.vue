@@ -31,10 +31,10 @@
 </template>
 
 <script>
-import Registration from "./Registration";
-import Login from "./Login";
+  import Registration from "./Registration";
+  import Login from "./Login";
 
-export default {
+  export default {
   data() {
     return {
       dialog: false,

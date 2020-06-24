@@ -54,17 +54,18 @@
     </v-col>
 
     <v-col cols="12">
-      <div id="normalizationChart"></div>
+      <reactive-chart :data="chartData" :layout="chartLayout"></reactive-chart>
     </v-col>
   </v-row>
 </template>
 
 <script>
-import NormalizationMethodsContainer from "../../../services/NormalizationMethods";
-import Plotly from "plotly.js-dist";
+  import NormalizationMethodsContainer from "../../../services/NormalizationMethods";
+  import ReactiveChart from "../../charts/ReactiveChart";
 
-export default {
+  export default {
   name: "DataNormalization",
+  components: { ReactiveChart },
   props: {
     parsedData: Object,
     value: Object
@@ -73,6 +74,16 @@ export default {
     return {
       normalizationMethods: [],
       normalizationMethod: "",
+      chartData: [],
+      chartLayout: {
+        xaxis: {
+          title: this.$t("Range")
+        },
+        yaxis: {
+          title: this.$t("Amount")
+        }
+      },
+
       minRange: 0.3,
       maxRange: 0.7
     };
@@ -82,11 +93,14 @@ export default {
       if (!this.parsedData) return [];
       if (!this.parsedData.data) return [];
       if (!this.parsedData.data[0]) return [];
+
+      this.minRange = Number(this.minRange);
+      this.maxRange = Number(this.maxRange);
+
       try {
         const data = await NormalizationMethodsContainer[
           this.normalizationMethod
         ](this.parsedData.data, this.minRange, this.maxRange);
-        console.log("[DataNormalizationVue].normalize data:", data);
 
         const newValue = {
           ...this.value,
@@ -112,21 +126,14 @@ export default {
         );
         chartLabels.push(`${this.minRange} < || > ${this.maxRange}`);
 
-        const chartOptions = [
+        this.chartData = [
           {
             x: chartLabels,
             y: data.statistic,
             type: "bar"
           }
         ];
-        const layout = {
-          plot_bgcolor: "#303030",
-          paper_bgcolor: "#303030",
-          font: {
-            color: "#FFF"
-          }
-        };
-        Plotly.newPlot("normalizationChart", chartOptions, layout);
+
       } catch (e) {
         console.error("[DataNormalizationVue].normalize error:", e);
       }

@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { auth } from "./modules/auth.module";
-import { error } from "./modules/error-from-server.module";
+import {auth} from "./modules/auth.module";
+import {error} from "./modules/error-from-server.module";
 
 Vue.use(Vuex);
 

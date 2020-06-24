@@ -13,9 +13,5 @@ function getAlphabet() {
   return alphabet;
 }
 
-export function getRandomValue(min, max) {
-  const val = min + Math.random() * max;
-  return Math.floor(val);
-}
 
 export const alphabet = getAlphabet();

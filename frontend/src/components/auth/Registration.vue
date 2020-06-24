@@ -86,14 +86,9 @@
 </template>
 
 <script>
-import {
-  checkEmailExist,
-  checkUsernameExist,
-  isEmailValid,
-  isUsernameValid
-} from "../../services/utils/validators";
+  import {checkEmailExist, checkUsernameExist, isEmailValid, isUsernameValid} from "../../services/utils/validators";
 
-export default {
+  export default {
   name: "Registration",
 
   data() {
@@ -157,7 +152,7 @@ export default {
           this.emailError = this.$t("Email_Already_Taken_Info");
         }
       } else {
-        this.emailError = this.$t("Email_Is_Not_Valid");
+        this.emailError = this.$t("ERROR_Email_Is_Not_Valid");
       }
     },
     async checkUsername() {
@@ -170,7 +165,7 @@ export default {
           this.usernameError = this.$t("Login_Already_Taken_Info");
         }
       } else {
-        this.usernameError = this.$t("Login_is_not_valid", {
+        this.usernameError = this.$t("ERROR_Login_Is_Not_Valid", {
           symbols: "@ , ."
         });
       }

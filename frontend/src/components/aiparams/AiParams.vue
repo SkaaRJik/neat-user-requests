@@ -39,6 +39,7 @@
                       :true-value="true"
                       :false-value="false"
                       v-model="param.value"
+                      @blur="updateVModel"
                     ></v-switch>
 
                     <v-text-field
@@ -51,6 +52,7 @@
                       :max="param.maxValue ? param.maxValue : undefined"
                       :min="param.maxValue ? param.minValue : undefined"
                       :step="param.maxValue && param.maxValue > 1 ? 1 : 0.1"
+                      @blur="updateVModel"
                       :append-icon="
                         param.name === 'GENERATOR.SEED'
                           ? 'mdi-refresh'
@@ -80,6 +82,7 @@
                             v-model="param.value[index]"
                             v-for="(func, index) in functions"
                             :key="index"
+                            @blur="updateVModel"
                           ></v-switch>
                         </v-expansion-panel-content>
                       </v-expansion-panel>
@@ -102,7 +105,7 @@
   export default {
   name: "AiParams",
   props: {
-    config: Object,
+    value: undefined,
     inputs: Number,
     outputs: Number
   },
@@ -128,10 +131,7 @@
       try {
         const res = await AIAPI.getDefaultConfig();
         this.aiConfig = res.data;
-        console.log(
-          "[AiParams.vue].loadDefaultConfig this.aiConfig:",
-          this.aiConfig
-        );
+        this.updateVModel();
       } catch (e) {
         console.error("[AiParams.vue].loadDefaultConfig error:", e);
       } finally {
@@ -179,6 +179,10 @@
 
     generateNewSeed(item) {
       item.value = new Date().getTime();
+    },
+
+    updateVModel() {
+      this.$emit("input", this.aiConfig);
     }
   },
   mounted() {

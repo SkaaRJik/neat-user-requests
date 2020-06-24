@@ -52,7 +52,7 @@ const projects_routes = [
     name: "project-configure",
     component: () =>
       import(
-        /* webpackChunkName: "about" */ "../views/projects/ProjectConfigure.vue"
+        /* webpackChunkName: "about" */ "../views/projects/ProjectConfiguration.vue"
       ),
     props: route => ({
       step: route.query.step ? Number(route.query.step) : 1,

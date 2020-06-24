@@ -11,7 +11,7 @@
           transition="scale-transition"
           type="info"
         >
-          {{ $t("Legend_column_as_date_info") }}
+          {{ $t("Legend_Column_As_Date_Info") }}
         </v-alert>
       </v-row>
     </v-col>

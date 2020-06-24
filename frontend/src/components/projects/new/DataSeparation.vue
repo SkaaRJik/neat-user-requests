@@ -6,12 +6,12 @@
           <v-text-field
             v-model="trainPercentage"
             @change="testPercentage = 100 - trainPercentage"
+            min="1"
+            max="99"
             :label="$t('Train_Percentage')"
             suffix="%"
             class="ma-3"
             type="number"
-            min="1"
-            max="100"
           />
         </v-col>
         <v-col sm="12" xs="12" md="12" lg="4" xl="4">
@@ -22,7 +22,7 @@
             type="number"
             suffix="%"
             min="1"
-            max="100"
+            max="99"
           />
         </v-col>
         <v-col sm="12" xs="12" md="12" lg="4" xl="4">
@@ -36,11 +36,11 @@
       >
         <v-col>
           <span>{{
-            `${$t("Train_Elements", { elements: trainEndIndex + 1 })},
-            ${$t("Test_Elements", { elements: testEndIndex + 1 })},
+            `${$t("Train_Elements", { elements: trainEndIndex })},
+            ${$t("Test_Elements", { elements: testEndIndex - trainEndIndex })},
             ${$t("Total", {
-              elements: `${trainEndIndex + testEndIndex + 2} / ${
-                value.data.length
+              elements: `${trainEndIndex + testEndIndex - trainEndIndex} / ${
+                data.length
               }`
             })}`
           }}</span>
@@ -54,7 +54,8 @@
 export default {
   name: "DataSeparation",
   props: {
-    value: Object
+    value: Object,
+    data: Array
   },
   data: () => {
     return {
@@ -66,6 +67,10 @@ export default {
   },
   methods: {
     calculatePercentage() {
+
+      this.trainPercentage = Number(this.trainPercentage);
+      this.testPercentage = Number(this.testPercentage);
+
       if (this.trainPercentage + this.testPercentage > 100) {
         this.$toast.open({
           message: `${this.$t("ERROR_SUM_OF_PERCENTAGE_GREATER_100")}`,
@@ -87,19 +92,26 @@ export default {
         this.value
       );
       this.trainEndIndex = Math.round(
-        (this.value.data.length - 1) * (this.trainPercentage / 100)
+        this.data.length * (this.trainPercentage / 100)
       );
       this.testEndIndex = Math.floor(
-        (this.value.data.length - 1) * (this.testPercentage / 100)
+        this.data.length * (this.testPercentage / 100)
       );
 
-      if (this.value.data) {
-        const newValue = {
-          ...this.value,
-          trainEndIndex: this.trainEndIndex,
-          testEndIndex: this.trainEndIndex + this.testEndIndex
-        };
-        this.$emit("input", newValue);
+      const newValue = {
+        trainEndIndex: this.trainEndIndex,
+        testEndIndex: this.trainEndIndex + this.testEndIndex
+      };
+      this.$emit("input", newValue);
+    }
+  },
+  watch: {
+    value: function(newVal, oldVal) {
+      if (newVal) {
+        if (newVal !== oldVal) {
+          this.trainEndIndex = newVal.trainEndIndex;
+          this.testEndIndex = newVal.testEndIndex;
+        }
       }
     }
   }

@@ -19,7 +19,7 @@
             </v-list-tile>
           </template>
 
-          <v-list-tile :key="k" v-for="(field, k) in layer.fields">
+          <v-list-tile v-for="(field, k) in layer.fields" :key="k" >
             <v-switch
               :label="field.placeholderText"
               :true-value="field.selected"

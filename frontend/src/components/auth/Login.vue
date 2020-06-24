@@ -62,14 +62,9 @@
 </template>
 
 <script>
-import {
-  checkEmailExist,
-  checkUsernameExist,
-  isEmailValid,
-  isUsernameValid
-} from "../../services/utils/validators";
+  import {checkEmailExist, checkUsernameExist, isEmailValid, isUsernameValid} from "../../services/utils/validators";
 
-export default {
+  export default {
   name: "Login",
 
   props: {
@@ -147,7 +142,7 @@ export default {
           }
         } else {
           this.alertType = "error";
-          this.dataToLogin.message = this.$t("Email_Is_Not_Valid");
+          this.dataToLogin.message = this.$t("ERROR_Email_Is_Not_Valid");
         }
       }
     },

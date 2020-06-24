@@ -9,9 +9,9 @@
 </template>
 
 <script>
-import AuthAPI from "../services/api/AuthAPI";
+  import AuthAPI from "../services/api/AuthAPI";
 
-export default {
+  export default {
   data() {
     return {
       isLoading: false
