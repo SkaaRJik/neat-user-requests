@@ -18,10 +18,11 @@ import java.util.Date;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "auth")
+@Table(name = "auth", schema = "public")
 public class Auth {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "AUTH_ID_GEN", sequenceName = "auth_id_sequence", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "AUTH_ID_GEN")
     private Long id;
 
 

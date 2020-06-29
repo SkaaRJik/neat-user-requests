@@ -10,13 +10,16 @@ spring:
   resources:
     static-locations: /home/victor/IdeaProjects/neatvue/public
   jpa:
-    generate-ddl: true
+    generate-ddl: false
+    open-in-view: true
     properties:
       hibernate:
+        ddl-auto: validate
         jdbc:
           lob:
             non_contextual_creation: true
       database-platform: org.hibernate.dialect.PostgreSQL11Dialect
+    show-sql: false
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false

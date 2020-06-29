@@ -16,14 +16,17 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@Table(name = "usr", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "email"
-        })
-})
+@Table(name = "usr",
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = {
+                "email", "username"
+            }),
+        },
+        schema = "public")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "USER_ID_GEN", sequenceName = "user_id_sequence", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_ID_GEN")
     private Long id;
 
     @Column(name = "email", nullable = false)
