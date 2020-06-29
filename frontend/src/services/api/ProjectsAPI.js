@@ -36,5 +36,8 @@ export default {
     return Vue.prototype.$http.get(`${controllerPath}/find`, {
       params
     });
+  },
+  saveProjectConfiguration(projectId, config) {
+    return Vue.prototype.$http.put(`${controllerPath}/${projectId}/config`, config);
   }
 };

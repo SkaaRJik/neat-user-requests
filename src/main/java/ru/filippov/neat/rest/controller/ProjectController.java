@@ -1,5 +1,6 @@
 package ru.filippov.neat.rest.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,8 @@ import ru.filippov.neat.service.project.ProjectServiceImpl;
 import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 import ru.filippov.neat.service.user.UserPrincipal;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -120,6 +123,18 @@ public class ProjectController {
         }
     }
 
+    @RequestMapping(path = "/{id}/config",method = RequestMethod.PUT)
+    public ResponseEntity<?> saveProjectConfiguration(@AuthenticationPrincipal UserPrincipal user, @PathVariable("id") Long id, @RequestBody Map<String,Object> params){
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            final File file = new File("neat.json");
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, params);
+            System.out.println(file.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().build();
+    };
 
 
 

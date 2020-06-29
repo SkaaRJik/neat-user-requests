@@ -195,7 +195,7 @@
                     :disabled="!settings"
                     class="ma-3"
                     color="primary"
-                    @click="goToStep(5)"
+                    @click="saveConfig"
                   >
                     {{ $t("Continue") }}
                     <v-icon> mdi-arrow-right</v-icon>
@@ -262,7 +262,26 @@
         });
       }
     },
+    async saveConfig (){
+      const config = {
+        normalizedData: this.normalizedData,
+        settings: this.settings,
+        dataIndexes: this.dataIndexes,
+        selectedColumns: this.selectedColumns,
+        predictionParams: {
+          windowSize: this.windowSize,
+          predictionPeriod: this.predictionPeriod,
+        },
+      }
+      try{
+        const res = await ProjectsAPI.saveProjectConfiguration(this.projectId,config);
+        console.log('[ProjectConfiguration].saveConfig res.status:', res.status);
+      } catch (e) {
+        console.error('[ProjectConfiguration].saveConfig e:', e);
+      }
 
+
+    },
     redirectToProjectsPage() {
       this.$router.push({ name: "projects" });
     },
