@@ -1,18 +1,28 @@
 package ru.filippov.neat.service.project;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.filippov.neat.domain.Project;
-import ru.filippov.neat.domain.ProjectStatus;
-import ru.filippov.neat.domain.User;
-import ru.filippov.neat.exceptions.PermissionException;
+import ru.filippov.neat.dto.ProjectConfigDto;
+import ru.filippov.neat.entity.NeatConfig;
+import ru.filippov.neat.entity.Project;
+import ru.filippov.neat.entity.ProjectStatus;
+import ru.filippov.neat.entity.User;
+import ru.filippov.neat.entity.view.ProjectView;
+import ru.filippov.neat.exception.NeatConfigurationNotFoundException;
+import ru.filippov.neat.exception.PermissionException;
+import ru.filippov.neat.exception.ProjectNotFoundException;
+import ru.filippov.neat.repository.NeatConfigRepository;
 import ru.filippov.neat.repository.ProjectRepository;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -21,15 +31,19 @@ public class ProjectServiceImpl {
     private final ProjectRepository projectRepository;
 
     @Value("${path.projects.data:./public/projects}")
-    String projectsLocation;
+    private String projectsLocation;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository) {
+    @Value("${app.project.restrictions.max_allowed_neat_config:5}")
+    private int max_allowed_neat_config;
+
+    private final NeatConfigRepository neatConfigRepository;
+
+    public ProjectServiceImpl(ProjectRepository projectRepository, NeatConfigRepository neatConfigRepository) {
         this.projectRepository = projectRepository;
+        this.neatConfigRepository = neatConfigRepository;
     }
 
     public Project saveProject(User user, Map<String, Object> projectParams) throws IOException {
-
-        this.saveProjectDataToFile(projectParams, user.getUsername());
 
         Project project = null;
 
@@ -49,28 +63,13 @@ public class ProjectServiceImpl {
 
 
         project.setUpdatedDate(LocalDateTime.now());
-        this.saveProjectDataToFile(projectParams, user.getUsername());
+        project.setData(projectParams);
 
 
         project = projectRepository.save(project);
 
 
         return project;
-    }
-
-
-    protected File saveProjectDataToFile(Map<String, Object> projectParams, String username) throws IOException {
-        File file = new File(String.format("%s/%s/data.ser", projectsLocation, username));
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        FileOutputStream fos = new FileOutputStream(file);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(projectParams);
-        oos.close();
-        fos.close();
-        return file;
     }
 
     public Page<Project> getProjectsByUser(User user, int curPage, int itemsPerPage) {
@@ -80,6 +79,7 @@ public class ProjectServiceImpl {
 
         return projects;
     }
+
 
     public Project getProjectById(Long id, User user) throws PermissionException, NoSuchElementException {
 
@@ -100,11 +100,7 @@ public class ProjectServiceImpl {
             throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
         }*/
 
-        File file = new File(String.format("%s/%s/data.ser", projectsLocation, user.getUsername()));
 
-        if (file.getParentFile().exists()) {
-            //TODO add directory check
-        }
 
         return project;
     }
@@ -119,14 +115,75 @@ public class ProjectServiceImpl {
             throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
         }
 
-        File file = new File(String.format("%s/%s/data.ser", projectsLocation, projectUser.getUsername()));
-        FileInputStream fileInputStream = new FileInputStream(file);
-        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-
-
-        Map data = (Map) objectInputStream.readObject();
+        Map data = project.getData();;
 
         return data;
+    }
+
+    public boolean saveNeatConfig(Long projectId, Long userId, ProjectConfigDto params, Long configId) throws ProjectNotFoundException, PermissionException, NeatConfigurationNotFoundException {
+
+        final Project project = projectRepository
+                .findById(projectId)
+                .orElseThrow(ProjectNotFoundException::new);
+
+        if(project.getUser().getId() != userId) {
+            throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
+        }
+
+        project.setStatus(ProjectStatus.IN_QUEUE);
+        projectRepository.save(project);
+
+        NeatConfig neatConfig = null;
+
+        if(configId != null) {
+            neatConfig = neatConfigRepository
+                    .findById(configId)
+                    .orElseThrow(NeatConfigurationNotFoundException::new);
+
+            neatConfig = updateNeatConfig(params, neatConfig);
+        } else {
+            final List<NeatConfig> neatConfigs = project.getNeatConfigs();
+
+            if(neatConfigs.size() >= max_allowed_neat_config) {
+                neatConfigs.sort(Comparator.comparing(NeatConfig::getCreationDate).reversed());
+                neatConfig = neatConfigs.get(0);
+                neatConfig = updateNeatConfig(params, neatConfig);
+            } else {
+                neatConfig = new NeatConfig(
+                        null,
+                        params.getNormalizedData(),
+                        params.getSettings(),
+                        params.getSelectedColumns(),
+                        params.getDataIndexes().getTrainEndIndex(),
+                        params.getDataIndexes().getTestEndIndex(),
+                        params.getPredictionParams().getWindowSize(),
+                        params.getPredictionParams().getPredictionPeriod(),
+                        LocalDateTime.now(),
+                        project,
+                        null,
+                        null,
+                        null
+                );
+                neatConfig = neatConfigRepository.save(neatConfig);
+            }
+        }
+
+
+
+        return true;
+    }
+
+    private NeatConfig updateNeatConfig(ProjectConfigDto params, NeatConfig neatConfig) {
+        neatConfig.setCreationDate(LocalDateTime.now());
+        neatConfig.setNormalizedData(params.getNormalizedData());
+        neatConfig.setNeatSettings(params.getSettings());
+        neatConfig.setSelectedColumns(params.getSelectedColumns());
+        neatConfig.setTrainIndexEnd(params.getDataIndexes().getTrainEndIndex());
+        neatConfig.setTestIndexEnd(params.getDataIndexes().getTestEndIndex());
+        neatConfig.setPredictionWindowSize(params.getPredictionParams().getWindowSize());
+        neatConfig.setPredictionPeriod(params.getPredictionParams().getPredictionPeriod());
+
+        return neatConfigRepository.save(neatConfig);
     }
 
 }

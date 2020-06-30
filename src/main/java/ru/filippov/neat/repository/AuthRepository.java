@@ -1,8 +1,8 @@
 package ru.filippov.neat.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.filippov.neat.domain.Auth;
-import ru.filippov.neat.domain.User;
+import ru.filippov.neat.entity.Auth;
+import ru.filippov.neat.entity.User;
 
 import java.util.Optional;
 

@@ -7,11 +7,9 @@ import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.filippov.neat.domain.Role;
-import ru.filippov.neat.domain.User;
+import ru.filippov.neat.entity.Role;
+import ru.filippov.neat.entity.User;
 
-import javax.security.auth.Subject;
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;

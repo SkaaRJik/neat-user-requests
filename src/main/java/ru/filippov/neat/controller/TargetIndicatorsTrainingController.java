@@ -1,4 +1,4 @@
-package ru.filippov.neat.rest.controller;
+package ru.filippov.neat.controller;
 
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

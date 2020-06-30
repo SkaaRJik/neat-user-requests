@@ -25,6 +25,9 @@ spring:
       FAIL_ON_EMPTY_BEANS: false
 # App Properties
 app:
+  project:
+    restrictions:
+      max_allowed_neat_config: 5
   jwt:
     secret: SECRET
     access:

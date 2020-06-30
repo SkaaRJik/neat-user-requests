@@ -1,4 +1,4 @@
-package ru.filippov.neat.rest.controller;
+package ru.filippov.neat.controller;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
@@ -12,13 +12,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.filippov.neat.config.jwt.TokenProvider;
-import ru.filippov.neat.domain.Auth;
-import ru.filippov.neat.domain.User;
+import ru.filippov.neat.entity.Auth;
+import ru.filippov.neat.entity.User;
 import ru.filippov.neat.dto.UserAuthDetailsResponse;
 import ru.filippov.neat.dto.SignInDto;
 import ru.filippov.neat.dto.SignUpDto;
 import ru.filippov.neat.dto.TokenDto;
-import ru.filippov.neat.exceptions.RefreshTokenNotExists;
+import ru.filippov.neat.exception.RefreshTokenNotExists;
 import ru.filippov.neat.service.auth.AuthServiceImpl;
 import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 import ru.filippov.neat.service.user.UserPrincipal;

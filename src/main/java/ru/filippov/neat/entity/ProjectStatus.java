@@ -1,4 +1,4 @@
-package ru.filippov.neat.domain;
+package ru.filippov.neat.entity;
 
 public enum ProjectStatus {
     NEW,

@@ -1,4 +1,4 @@
-package ru.filippov.neat.domain;
+package ru.filippov.neat.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -8,9 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -27,7 +24,7 @@ public class Auth {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name="fk_user_id", nullable = false)
     private User user;
 
     @Column(name = "refresh_token", nullable = false)

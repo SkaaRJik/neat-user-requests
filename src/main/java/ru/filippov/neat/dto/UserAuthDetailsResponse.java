@@ -2,7 +2,7 @@ package ru.filippov.neat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.filippov.neat.domain.Role;
+import ru.filippov.neat.entity.Role;
 import ru.filippov.neat.service.user.UserPrincipal;
 
 

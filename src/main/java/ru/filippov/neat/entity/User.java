@@ -1,4 +1,4 @@
-package ru.filippov.neat.domain;
+package ru.filippov.neat.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;

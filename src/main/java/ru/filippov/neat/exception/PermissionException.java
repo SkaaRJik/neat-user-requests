@@ -1,4 +1,4 @@
-package ru.filippov.neat.exceptions;
+package ru.filippov.neat.exception;
 
 public class PermissionException extends Exception{
     public PermissionException() {

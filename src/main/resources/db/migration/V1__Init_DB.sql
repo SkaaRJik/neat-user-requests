@@ -38,15 +38,14 @@ CREATE TABLE projects (
     id int8 NOT NULL,
     created_date timestamp NOT NULL,
     name varchar(255) NOT NULL,
-    prediction_error float8,
     status int2 NOT NULL,
-    training_error float8,
     updated_date timestamp NOT NULL,
-    user_id int8 NOT NULL,
+    data jsonb not null,
+    fk_user_id int8 NOT NULL,
     PRIMARY KEY (id)
 );
 
-ALTER TABLE if EXISTS projects add CONSTRAINT user_project_fk FOREIGN KEY (user_id) references usr;
+ALTER TABLE if EXISTS projects add CONSTRAINT user_project_fk FOREIGN KEY (fk_user_id) references usr;
 
 CREATE sequence auth_id_sequence
     START WITH 1
@@ -60,8 +59,8 @@ CREATE TABLE auth (
     expiration_date timestamp NOT NULL,
     previous_refresh_token varchar(255),
     refresh_token varchar(255) NOT NULL,
-    user_id int8 NOT NULL,
+    fk_user_id int8 NOT NULL,
     PRIMARY KEY (id)
 );
 
-ALTER TABLE if EXISTS auth add CONSTRAINT user_auth_fk FOREIGN KEY (user_id) references usr;
+ALTER TABLE if EXISTS auth add CONSTRAINT user_auth_fk FOREIGN KEY (fk_user_id) references usr;

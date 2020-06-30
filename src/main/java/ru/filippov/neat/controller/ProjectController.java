@@ -1,5 +1,6 @@
-package ru.filippov.neat.rest.controller;
+package ru.filippov.neat.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.filippov.neat.domain.Project;
-import ru.filippov.neat.domain.User;
-import ru.filippov.neat.exceptions.PermissionException;
+import ru.filippov.neat.dto.ProjectConfigDto;
+import ru.filippov.neat.entity.Project;
+import ru.filippov.neat.entity.User;
+import ru.filippov.neat.entity.view.ProjectView;
+import ru.filippov.neat.exception.PermissionException;
+import ru.filippov.neat.exception.ProjectNotFoundException;
 import ru.filippov.neat.parser.excel.ExcelParser;
 import ru.filippov.neat.service.project.ProjectServiceImpl;
 import ru.filippov.neat.service.user.UserDetailsServiceImpl;
@@ -51,7 +55,7 @@ public class ProjectController {
         try {
             return ResponseEntity.ok(excelParser.parseFile(file));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("ProjectController.parseExcel", e);
             return new ResponseEntity<String>("ERROR_CANT_PROCESS_FILE", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -62,7 +66,7 @@ public class ProjectController {
         try{
             project = projectService.saveProject(user.toUser(), params);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("ProjectController.saveProject", ex);
             return new ResponseEntity<String>("ERROR_CANT_SAVE", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -105,6 +109,7 @@ public class ProjectController {
         } catch (PermissionException ex) {
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception ex) {
+            log.error("ProjectController.getProjectInfo", ex);
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -119,21 +124,24 @@ public class ProjectController {
         } catch (PermissionException ex) {
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception ex) {
+            log.error("ProjectController.getProjectData", ex);
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @RequestMapping(path = "/{id}/config",method = RequestMethod.PUT)
-    public ResponseEntity<?> saveProjectConfiguration(@AuthenticationPrincipal UserPrincipal user, @PathVariable("id") Long id, @RequestBody Map<String,Object> params){
-        ObjectMapper objectMapper = new ObjectMapper();
+    @RequestMapping(value = {"/{id}/config", "/{id}/config/{config_id}"},method = RequestMethod.PUT)
+    public ResponseEntity<?> saveProjectConfiguration(@AuthenticationPrincipal UserPrincipal user, @PathVariable("id") Long id, @PathVariable(name = "config_id", required = false) Long configId, @RequestBody ProjectConfigDto projectConfig){
         try {
-            final File file = new File("neat.json");
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, params);
-            System.out.println(file.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
+            final boolean b = projectService.saveNeatConfig(id, user.getId(), projectConfig, configId);
+            return ResponseEntity.ok().build();
+        } catch (ProjectNotFoundException e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (PermissionException e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            log.error("ProjectController.getProjectData", e);
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return ResponseEntity.ok().build();
     };
 
 

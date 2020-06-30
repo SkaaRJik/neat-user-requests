@@ -8,10 +8,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.filippov.neat.domain.Role;
-import ru.filippov.neat.domain.User;
+import ru.filippov.neat.entity.Role;
+import ru.filippov.neat.entity.User;
 import ru.filippov.neat.dto.SignUpDto;
-import ru.filippov.neat.exceptions.UserNotFoundException;
+import ru.filippov.neat.exception.UserNotFoundException;
 import ru.filippov.neat.repository.UserRepository;
 
 import java.time.LocalDateTime;

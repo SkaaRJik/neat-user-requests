@@ -1,4 +1,4 @@
-package ru.filippov.neat.rest;
+package ru.filippov.neat.exception;
 
 
 import com.auth0.jwt.exceptions.TokenExpiredException;

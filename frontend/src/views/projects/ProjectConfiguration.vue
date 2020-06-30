@@ -274,8 +274,8 @@
         },
       }
       try{
-        const res = await ProjectsAPI.saveProjectConfiguration(this.projectId,config);
-        console.log('[ProjectConfiguration].saveConfig res.status:', res.status);
+        await ProjectsAPI.saveProjectConfiguration(this.projectId,config);
+        this.$router.push({ name: "projects" });
       } catch (e) {
         console.error('[ProjectConfiguration].saveConfig e:', e);
       }
