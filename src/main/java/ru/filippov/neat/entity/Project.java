@@ -1,14 +1,14 @@
 package ru.filippov.neat.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
-import ru.filippov.neat.dto.ProjectConfigDto;
-import ru.filippov.neat.entity.view.NeatConfigView;
 import ru.filippov.neat.entity.view.ProjectView;
 
 import javax.persistence.*;
@@ -22,6 +22,10 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "projects", schema = "public")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 public class Project {
     @Id
     @SequenceGenerator(name = "PROJECT_ID_GEN", sequenceName = "project_id_sequence", allocationSize = 1, schema = "public")
@@ -49,6 +53,7 @@ public class Project {
     @JsonView(ProjectView.Info.class)
     private LocalDateTime updatedDate;
 
+    @JsonView(ProjectView.FullInfo.class)
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<NeatConfig> neatConfigs;
 

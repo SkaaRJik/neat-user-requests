@@ -14,6 +14,7 @@ export const auth = {
       try {
         const userData = await AuthService.login(user);
         commit("loginSuccess", userData);
+
         return Promise.resolve(userData);
       } catch (error) {
         commit("loginFailure");

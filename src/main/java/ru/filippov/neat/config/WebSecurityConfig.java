@@ -76,7 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/login", "/signup", "/email-exist", "/username-exist", "/refresh-tokens").permitAll()
+                .antMatchers("/login", "/signup", "/email-exist", "/username-exist", "/refresh-tokens", "/public/**").permitAll()
                 .antMatchers("/api/trainer/default-config").hasRole(Role.ROLE_USER.name().replace("ROLE_",""))
                 .anyRequest().authenticated()
                 .and()

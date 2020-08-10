@@ -74,6 +74,7 @@ public class ProjectController {
     }
 
     @GetMapping("/my")
+    @JsonView(ProjectView.Info.class)
     public Page<Project> getProjects(@AuthenticationPrincipal UserPrincipal user, @RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "itemsPerPage", defaultValue = "10") Integer itemsPerPage){
         Page<Project> projectsByUser = projectService.getProjectsByUser(user.toUser(), page, itemsPerPage);
         return projectsByUser;

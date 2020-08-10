@@ -17,6 +17,7 @@
     "plotly.js-dist": "^1.54.3",
     "read-excel-file": "^4.0.6",
     "roboto-fontface": "*",
+    "ucavatar": "^1.0.4",
     "vue": "^2.6.10",
     "vue-i18n": "^8.17.3",
     "vue-router": "^3.1.3",

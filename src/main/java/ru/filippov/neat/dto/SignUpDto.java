@@ -33,12 +33,15 @@ public class SignUpDto {
     @Size(min = 3, max = 50)
     private String lastName;
 
-    public SignUpDto(@NotBlank @Size(min = 2, max = 60) String username, @NotBlank @Size(max = 60) @Email String email, @NotBlank @Size(min = 3, max = 40) String password, @NotBlank @Size(min = 3, max = 50) String firstName, @NotBlank @Size(min = 3, max = 50) String lastName) {
+    private String avatar;
+
+    public SignUpDto(@NotBlank @Size(min = 2, max = 60) String username, @NotBlank @Size(max = 60) @Email String email, @NotBlank @Size(min = 3, max = 40) String password, @NotBlank @Size(min = 3, max = 50) String firstName, @NotBlank @Size(min = 3, max = 50) String lastName, String avatar) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.avatar = avatar;
     }
 
     public String getEmail() {
@@ -79,5 +82,13 @@ public class SignUpDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

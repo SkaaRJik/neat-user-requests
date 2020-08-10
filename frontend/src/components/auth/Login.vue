@@ -28,7 +28,7 @@
                   this.dataToLogin.message = '';
                 }
               "
-              v-on:focusout="checkUsername"
+              v-on:focusout="checkUsernameWithTimeout"
             />
           </v-flex>
           <v-flex xs12>
@@ -62,9 +62,14 @@
 </template>
 
 <script>
-  import {checkEmailExist, checkUsernameExist, isEmailValid, isUsernameValid} from "../../services/utils/validators";
+import {
+  checkEmailExist,
+  checkUsernameExist,
+  isEmailValid,
+  isUsernameValid
+} from "../../services/utils/validators";
 
-  export default {
+export default {
   name: "Login",
 
   props: {
@@ -82,7 +87,9 @@
     return {
       isLoading: false,
       alertType: "error",
-      alert_timer: null
+      alert_timer: null,
+      checkUsernameTimerId: null,
+      checkedUser: ""
     };
   },
 
@@ -114,6 +121,16 @@
         }
       }
     },
+
+    checkUsernameWithTimeout() {
+      if (this.checkedUser === this.dataToLogin.username) return;
+
+      if (this.checkUsernameTimerId) {
+        clearTimeout(this.checkUsernameTimerId);
+      }
+      this.checkUsernameTimerId = setTimeout(this.checkUsername, 1);
+    },
+
     async checkUsername() {
       if (isUsernameValid(this.dataToLogin.username)) {
         const usernameExist = await checkUsernameExist(
@@ -145,6 +162,7 @@
           this.dataToLogin.message = this.$t("ERROR_Email_Is_Not_Valid");
         }
       }
+      this.checkedUser = this.dataToLogin.username
     },
     validateFields() {
       if (!this.dataToLogin.username)

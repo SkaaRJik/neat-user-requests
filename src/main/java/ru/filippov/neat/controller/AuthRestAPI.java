@@ -3,14 +3,19 @@ package ru.filippov.neat.controller;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PSQLException;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.filippov.neat.config.jwt.TokenProvider;
 import ru.filippov.neat.entity.Auth;
 import ru.filippov.neat.entity.User;
@@ -18,12 +23,17 @@ import ru.filippov.neat.dto.UserAuthDetailsResponse;
 import ru.filippov.neat.dto.SignInDto;
 import ru.filippov.neat.dto.SignUpDto;
 import ru.filippov.neat.dto.TokenDto;
+import ru.filippov.neat.exception.AvatarUploadException;
 import ru.filippov.neat.exception.RefreshTokenNotExists;
+import ru.filippov.neat.exception.UserNotFoundException;
 import ru.filippov.neat.service.auth.AuthServiceImpl;
 import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 import ru.filippov.neat.service.user.UserPrincipal;
 
 import javax.validation.Valid;
+import java.awt.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Date;
 
 @RestController
@@ -45,6 +55,47 @@ public class AuthRestAPI {
         this.jwtProvider = jwtProvider;
     }
 
+    @PostMapping("/avatar")
+    public ResponseEntity uploadAvatar(@AuthenticationPrincipal UserPrincipal user, @RequestParam("file") MultipartFile file){
+        try {
+            userService.saveAvatar(user.getId(), file);
+            return ResponseEntity.ok("UPLOADED");
+        } catch (UserNotFoundException e) {
+            log.error("AuthRestAPI.uploadAvatar", e);
+            return new ResponseEntity("USER_NOT_EXISTS", HttpStatus.NOT_FOUND);
+        } catch (AvatarUploadException e) {
+            log.error("AuthRestAPI.uploadAvatar", e);
+            return new ResponseEntity("CANT_UPLOAD_THE_FILE", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value="/avatar/{username}", method=RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity downloadFile(@PathVariable String username) {
+
+        UrlResource resource = null;
+        try {
+            resource = userService.getAvatar(username);
+            final String[] split = resource.getFilename().split(".");
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(resource);
+
+
+
+        } catch (UserNotFoundException e) {
+            log.error("AuthRestAPI.downloadFile", e);
+            return new ResponseEntity( HttpStatus.OK);
+        } catch (MalformedURLException e) {
+            log.error("AuthRestAPI.downloadFile", e);
+            return new ResponseEntity( HttpStatus.OK);
+        }
+
+
+
+
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SignInDto loginRequest) {
@@ -129,7 +180,7 @@ public class AuthRestAPI {
         try {
             userService.registrate(signUpRequest);
         } catch (PSQLException e) {
-            e.printStackTrace();
+            log.error("AuthRestAPI.registerUser", e);
         }
 
         return ResponseEntity.ok().body("Ползователь зарегистрирован успешно. На ваш e-mail отправлено письмо с подтверждением регистрации.");
@@ -186,7 +237,7 @@ public class AuthRestAPI {
             log.warn(e.getMessage());
             return ResponseEntity.badRequest().body("Токена не существует в базе");
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("AuthRestAPI.refreshTokens", e);
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Невозможно обновить токен");
         }
 

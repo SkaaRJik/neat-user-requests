@@ -34,5 +34,9 @@ export default {
     return Vue.prototype.$http.get(
       `${controllerPath}/refresh-tokens?refreshToken=${refreshToken}`
     );
+  },
+
+  uploadAvatar(avatar) {
+    return Vue.prototype.$http.post(`${controllerPath}/avatar`, {file: avatar})
   }
 };

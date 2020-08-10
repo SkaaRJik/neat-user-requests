@@ -31,7 +31,19 @@ class AuthService {
         user.tokens.accessToken;
       return Promise.resolve(tokens);
     } catch (e) {
+      console.log('[AuthService].uploadAvatar e:', e);
       this.logout();
+      return Promise.reject(e);
+    }
+  }
+
+  async uploadAvatar(avatar) {
+    try {
+
+      await AuthAPI.uploadAvatar(avatar);
+      return Promise.resolve(true);
+    } catch (e) {
+      console.log('[AuthService].uploadAvatar e:', e);
       return Promise.reject(e);
     }
   }
