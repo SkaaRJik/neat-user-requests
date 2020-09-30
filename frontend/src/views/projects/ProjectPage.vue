@@ -1,5 +1,8 @@
 <template>
   <v-card>
+    <v-btn @click="configureProject" bottom color="primary" fab fixed right small>
+      <v-icon>mdi-settings</v-icon>
+    </v-btn>
     <v-card-title
       >{{ $t("Project") }}:
       {{ projectInfo.name ? projectInfo.name : "" }}</v-card-title
@@ -209,6 +212,13 @@
       }
 
       this.chartsData = newChartData;
+    },
+
+    configureProject() {
+      this.$router.push({
+        name: "project-configure",
+        params: { id: this.projectId }
+      });
     },
 
     async loadProjectInfo() {

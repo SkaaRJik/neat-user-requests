@@ -23,6 +23,11 @@ spring:
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: 1512
 # App Properties
 app:
   project:
@@ -46,3 +51,14 @@ path:
   avatars: /home/victor/IdeaProjects/neatvue/public/avatars
   projects:
     data: /home/victor/IdeaProjects/neatvue/public/projects
+
+
+rabbitmq:
+  input:
+    exchange: database-server
+    queue: result-queue
+    routingkey: result
+  output:
+    exchange: experiment-server
+    queue: experiment
+    routingkey: data

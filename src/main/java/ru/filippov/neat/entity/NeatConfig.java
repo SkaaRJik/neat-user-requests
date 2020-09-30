@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+import ru.filippov.neat.dto.ExperimentData;
 import ru.filippov.neat.dto.ProjectConfigDto;
 import ru.filippov.neat.entity.view.NeatConfigView;
 
@@ -90,5 +91,19 @@ public class NeatConfig {
     @Column(name = "test_error")
     @JsonView(NeatConfigView.Errors.class)
     private Double testError;
+
+    public ExperimentData toExperimentData() {
+        return new ExperimentData(
+                id,
+                normalizedData,
+                neatSettings,
+                selectedColumns,
+                trainIndexEnd,
+                testIndexEnd,
+                predictionWindowSize,
+                predictionPeriod
+        );
+    }
+
 
 }

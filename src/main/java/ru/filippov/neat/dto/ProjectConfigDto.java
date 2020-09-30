@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +14,11 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectConfigDto {
+public class ProjectConfigDto implements Serializable {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class NormalizedDataDto {
+    public static class NormalizedDataDto implements Serializable {
         @NotNull
         Double minRange;
 
@@ -40,7 +41,7 @@ public class ProjectConfigDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DataIndexesDto {
+    public static class DataIndexesDto implements Serializable {
         @NotNull
         Integer trainEndIndex;
 
@@ -51,7 +52,7 @@ public class ProjectConfigDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SelectedColumnsDto {
+    public static class SelectedColumnsDto implements Serializable {
         @NotNull
         Integer inputs;
 
@@ -66,7 +67,7 @@ public class ProjectConfigDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PredictionParamsDto {
+    public static class PredictionParamsDto implements Serializable {
         @NotNull
         Short windowSize;
 

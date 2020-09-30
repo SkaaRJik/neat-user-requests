@@ -1,6 +1,7 @@
 package ru.filippov.neat.service.project;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import ru.filippov.neat.entity.view.ProjectView;
 import ru.filippov.neat.exception.NeatConfigurationNotFoundException;
 import ru.filippov.neat.exception.PermissionException;
 import ru.filippov.neat.exception.ProjectNotFoundException;
+import ru.filippov.neat.rabbitmq.RabbitMQWriter;
 import ru.filippov.neat.repository.NeatConfigRepository;
 import ru.filippov.neat.repository.ProjectRepository;
 
@@ -35,6 +37,9 @@ public class ProjectServiceImpl {
 
     @Value("${app.project.restrictions.max_allowed_neat_config:5}")
     private int max_allowed_neat_config;
+
+    @Autowired
+    private RabbitMQWriter rabbitMQWriter;
 
     private final NeatConfigRepository neatConfigRepository;
 
@@ -120,7 +125,7 @@ public class ProjectServiceImpl {
         return data;
     }
 
-    public boolean saveNeatConfig(Long projectId, Long userId, ProjectConfigDto params, Long configId) throws ProjectNotFoundException, PermissionException, NeatConfigurationNotFoundException {
+    public boolean saveNeatConfig(Long projectId, Long userId, ProjectConfigDto params, Long configId) throws ProjectNotFoundException, PermissionException, NeatConfigurationNotFoundException, JsonProcessingException {
 
         final Project project = projectRepository
                 .findById(projectId)
@@ -167,6 +172,8 @@ public class ProjectServiceImpl {
                 neatConfig = neatConfigRepository.save(neatConfig);
             }
         }
+
+        rabbitMQWriter.writeIntoExperimentServerQueue(neatConfig.toExperimentData());
 
 
 
