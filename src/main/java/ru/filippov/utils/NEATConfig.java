@@ -34,7 +34,6 @@ public class NEATConfig implements AIConfig {
 
 	public NEATConfig(Map config) {
 		this.settings = new HashMap(config);
-
 	}
 
 	// default
@@ -547,7 +546,7 @@ public class NEATConfig implements AIConfig {
 
 		params.add(new GUIAIConfig(
 				"NATURAL.ORDER.STRATEGY",
-				"true",
+				true,
 				false,
 				false,
 				true,
