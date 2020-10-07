@@ -75,15 +75,16 @@
                           $t(param.name)
                         }}</v-expansion-panel-header>
                         <v-expansion-panel-content>
-                          <v-switch
-                            :label="$t(func)"
-                            :true-value="func"
-                            false-value=""
-                            v-model="param.value[index]"
-                            v-for="(func, index) in functions"
-                            :key="index"
-                            @blur="updateVModel"
-                          ></v-switch>
+                          <template v-for="(func, index) in functions">
+                            <v-switch
+                              :label="$t(func)"
+                              :true-value="func"
+                              false-value=""
+                              v-model="param.value[index]"
+                              :key="index"
+                              @blur="updateVModel"
+                            ></v-switch>
+                          </template>
                         </v-expansion-panel-content>
                       </v-expansion-panel>
                     </v-expansion-panels>

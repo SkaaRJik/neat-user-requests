@@ -202,21 +202,21 @@ public class NEATConfig implements AIConfig {
 
 		params.add(new GUIAIConfig(
         "EXCESS.COEFFICIENT",
-				1,
+				1.0,
 				true,
 				true,
 				true,
-				null,
-				null
+				1.0,
+				0.0
 		));
 		params.add(new GUIAIConfig(
         "DISJOINT.COEFFICIENT",
-				1,
+				1.0,
 				true,
 				true,
 				true,
-				null,
-				null
+				1.0,
+				0.0
 		));
 		params.add(new GUIAIConfig(
         "WEIGHT.COEFFICIENT",
@@ -224,8 +224,8 @@ public class NEATConfig implements AIConfig {
 				true,
 				true,
 				true,
-				null,
-				null
+				1.0,
+				0.0
 		));
 
 		section = new HashMap<>();
@@ -254,7 +254,8 @@ public class NEATConfig implements AIConfig {
 				null
 		));
 		params.add(new GUIAIConfig(
-        "SPECIE.COUNT",3,
+        "SPECIE.COUNT",
+				3,
 				true,
 				true,
 				true,

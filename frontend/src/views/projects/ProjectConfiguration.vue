@@ -67,7 +67,8 @@
           <v-container>
             <data-separation
               v-model="dataIndexes"
-              :data="normalizedData.data"
+              :data="
+              "
             />
             <v-row>
               <v-col class="mr-auto" cols="auto" xs="12">
@@ -103,7 +104,7 @@
         <v-stepper-content step="3">
           <v-container>
             <columns-chooser
-              v-model="selectedColumns"
+              v-model="normalizedData"
               :headers="parsedData.headers"
             />
             <v-row>
@@ -234,7 +235,7 @@
   data() {
     return {
       parsedData: { headers: [] },
-      normalizedData: {},
+      normalizedData: [],
       settings: null,
       loading: false,
       dataIndexes: {},
@@ -249,6 +250,19 @@
       try {
         const res = await ProjectsAPI.getProjectData(this.projectId);
         this.parsedData = res.data;
+
+        this.normalizedData = [];
+
+        this.parsedData.headers.forEach(value, index => {
+          this.normalizedData.push({
+            data: [],
+            columnName: value,
+            columnType: index <= this.parsedData.headers.length ? "Input" : "Output"
+          })
+        })
+
+
+
       } catch (e) {
         console.error("[ProjectConfiguration.vue].loadProjectData error:", e);
       } finally {
