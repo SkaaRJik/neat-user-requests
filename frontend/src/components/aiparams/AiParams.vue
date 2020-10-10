@@ -1,5 +1,21 @@
 <template>
   <v-container>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn @click="setAiConfigWithDeafultValues"
+               bottom color="primary"
+               fab
+               fixed
+               right
+               small
+               v-bind="attrs"
+               v-on="on">
+          <v-icon>mdi-reset</v-icon>
+        </v-btn>
+      </template>
+      <span>{{ $t('Reset_to_default_configuration') }}</span>
+    </v-tooltip>
+
     <v-row>
       <v-col cols="12">
         <v-switch
@@ -113,7 +129,8 @@
     return {
       aiConfig: [],
       isAdvanced: false,
-      functions: []
+      functions: [],
+      defaultConfig: []
     };
   },
   methods: {
@@ -130,14 +147,21 @@
       this.loading = true;
       try {
         const res = await AIAPI.getDefaultConfig();
-        this.aiConfig = res.data;
-        this.updateVModel();
+        this.defaultConfig = res.data;
+        this.setAiConfigWithDeafultValues();
       } catch (e) {
         console.error("[AiParams.vue].loadDefaultConfig error:", e);
       } finally {
         this.loading = false;
       }
     },
+
+    setAiConfigWithDeafultValues(){
+      this.aiConfig = this.defaultConfig;
+      this.updateVModel();
+    },
+
+
 
     isFieldBoolean(value) {
       return _.isBoolean(value);
