@@ -60,10 +60,10 @@
 </template>
 
 <script>
-  import NormalizationMethodsContainer from "../../../services/NormalizationMethods";
-  import ReactiveChart from "../../charts/ReactiveChart";
+import NormalizationMethodsContainer from "../../../services/NormalizationMethods";
+import ReactiveChart from "../../charts/ReactiveChart";
 
-  export default {
+export default {
   name: "DataNormalization",
   components: { ReactiveChart },
   props: {
@@ -100,11 +100,12 @@
       try {
         const data = await NormalizationMethodsContainer[
           this.normalizationMethod
-        ](this.parsedData.data, this.minRange, this.maxRange);
-
+        ](this.parsedData, this.minRange, this.maxRange);
+        console.log("[DataNormalization].normalize data:", data);
         const newValue = {
           ...this.value,
-          ...data
+          normalizationServiceData: data.normalizationServiceData,
+          columns: data.columns
         };
 
         this.$emit("input", newValue);

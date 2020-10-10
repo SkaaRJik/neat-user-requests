@@ -67,7 +67,7 @@
           <v-container>
             <data-separation
               v-model="dataIndexes"
-              :data="normalizedData.data"
+              :data="normalizedData"
             />
             <v-row>
               <v-col class="mr-auto" cols="auto" xs="12">
@@ -100,125 +100,123 @@
           </v-container>
         </v-stepper-content>
 
-        <v-stepper-content step="3">
-          <v-container>
-            <columns-chooser
-              v-model="selectedColumns"
-              :headers="parsedData.headers"
-            />
-            <v-row>
-              <v-col class="mr-auto" cols="auto" xs="12">
-                <v-btn @click="redirectToProjectsPage" class="ma-3" text
-                  >{{ $t("Cancel") }}
-                </v-btn>
-              </v-col>
-              <v-col cols="auto" xs="12">
-                <v-card-actions>
-                  <v-btn @click="back" class="ma-3">
-                    <v-icon left> mdi-arrow-left</v-icon>
-                    {{ $t("Back") }}
-                  </v-btn>
-                  <v-btn
-                    @click="goToStep(4)"
-                    :disabled="nodesAreNotChosen"
-                    class="ma-3"
-                    color="primary"
-                  >
-                    {{ $t("Continue") }}
-                    <v-icon> mdi-arrow-right</v-icon>
-                  </v-btn>
-                </v-card-actions>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-stepper-content>
+        <!-- <v-stepper-content step="3">
+           <v-container>
+             <columns-chooser
+               v-model="normalizedData"
+               :headers="parsedData.headers"
+             />
+             <v-row>
+               <v-col class="mr-auto" cols="auto" xs="12">
+                 <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                   >{{ $t("Cancel") }}
+                 </v-btn>
+               </v-col>
+               <v-col cols="auto" xs="12">
+                 <v-card-actions>
+                   <v-btn @click="back" class="ma-3">
+                     <v-icon left> mdi-arrow-left</v-icon>
+                     {{ $t("Back") }}
+                   </v-btn>
+                   <v-btn
+                     @click="goToStep(4)"
+                     :disabled="nodesAreNotChosen"
+                     class="ma-3"
+                     color="primary"
+                   >
+                     {{ $t("Continue") }}
+                     <v-icon> mdi-arrow-right</v-icon>
+                   </v-btn>
+                 </v-card-actions>
+               </v-col>
+             </v-row>
+           </v-container>
+         </v-stepper-content>
 
-        <v-stepper-content step="4">
-          <v-container>
-            <ai-params
-              v-model="settings"
-              :inputs="normalizedData.inputs"
-              :outputs="normalizedData.outputs"
-            />
-            <v-row>
-              <v-col class="mr-auto" cols="auto" xs="12">
-                <v-btn @click="redirectToProjectsPage" class="ma-3" text
-                  >{{ $t("Cancel") }}
-                </v-btn>
-              </v-col>
-              <v-col cols="auto" xs="12">
-                <v-card-actions>
-                  <v-btn @click="back" class="ma-3">
-                    <v-icon left> mdi-arrow-left</v-icon>
-                    {{ $t("Back") }}
-                  </v-btn>
-                  <v-btn
-                    :disabled="!settings"
-                    class="ma-3"
-                    color="primary"
-                    @click="goToStep(5)"
-                  >
-                    {{ $t("Continue") }}
-                    <v-icon> mdi-arrow-right</v-icon>
-                  </v-btn>
-                </v-card-actions>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-stepper-content>
+         <v-stepper-content step="4">
+           <v-container>
+             <ai-params
+               v-model="settings"
+               :inputs="normalizedData.inputs"
+               :outputs="normalizedData.outputs"
+             />
+             <v-row>
+               <v-col class="mr-auto" cols="auto" xs="12">
+                 <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                   >{{ $t("Cancel") }}
+                 </v-btn>
+               </v-col>
+               <v-col cols="auto" xs="12">
+                 <v-card-actions>
+                   <v-btn @click="back" class="ma-3">
+                     <v-icon left> mdi-arrow-left</v-icon>
+                     {{ $t("Back") }}
+                   </v-btn>
+                   <v-btn
+                     :disabled="!settings"
+                     class="ma-3"
+                     color="primary"
+                     @click="goToStep(5)"
+                   >
+                     {{ $t("Continue") }}
+                     <v-icon> mdi-arrow-right</v-icon>
+                   </v-btn>
+                 </v-card-actions>
+               </v-col>
+             </v-row>
+           </v-container>
+         </v-stepper-content>
 
-        <v-stepper-content step="5">
-          <v-container>
-            <v-row>
-              <v-col cols="12">
-                <v-row align="center" justify="center">
+         <v-stepper-content step="5">
+           <v-container>
+             <v-row>
+               <v-col cols="12">
+                 <v-row align="center" justify="center">
 
-                <v-text-field :label="$t('Window_Size')" class="ma-3" v-model="windowSize"></v-text-field>
+                 <v-text-field :label="$t('Window_Size')" class="ma-3" v-model="windowSize"></v-text-field>
 
-                <v-text-field :label="$t('Prediction_Period')" class="ma-3" v-model="predictionPeriod"></v-text-field>
-                </v-row>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="mr-auto" cols="auto" xs="12">
-                <v-btn @click="redirectToProjectsPage" class="ma-3" text
-                  >{{ $t("Cancel") }}
-                </v-btn>
-              </v-col>
-              <v-col cols="auto" xs="12">
-                <v-card-actions>
-                  <v-btn @click="back" class="ma-3">
-                    <v-icon left> mdi-arrow-left</v-icon>
-                    {{ $t("Back") }}
-                  </v-btn>
-                  <v-btn
-                    :disabled="!settings"
-                    class="ma-3"
-                    color="primary"
-                    @click="saveConfig"
-                  >
-                    {{ $t("Continue") }}
-                    <v-icon> mdi-arrow-right</v-icon>
-                  </v-btn>
-                </v-card-actions>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-stepper-content>
+                 <v-text-field :label="$t('Prediction_Period')" class="ma-3" v-model="predictionPeriod"></v-text-field>
+                 </v-row>
+               </v-col>
+             </v-row>
+             <v-row>
+               <v-col class="mr-auto" cols="auto" xs="12">
+                 <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                   >{{ $t("Cancel") }}
+                 </v-btn>
+               </v-col>
+               <v-col cols="auto" xs="12">
+                 <v-card-actions>
+                   <v-btn @click="back" class="ma-3">
+                     <v-icon left> mdi-arrow-left</v-icon>
+                     {{ $t("Back") }}
+                   </v-btn>
+                   <v-btn
+                     :disabled="!settings"
+                     class="ma-3"
+                     color="primary"
+                     @click="saveConfig"
+                   >
+                     {{ $t("Continue") }}
+                     <v-icon> mdi-arrow-right</v-icon>
+                   </v-btn>
+                 </v-card-actions>
+               </v-col>
+             </v-row>
+           </v-container>
+         </v-stepper-content>-->
       </v-stepper-items>
     </v-stepper>
   </v-container>
 </template>
 
 <script>
-  import DataNormalization from "../../components/projects/new/DataNormalization";
-  import DataSeparation from "../../components/projects/new/DataSeparation";
-  import ProjectsAPI from "../../services/api/ProjectsAPI";
-  import AiParams from "../../components/aiparams/AiParams";
-  import ColumnsChooser from "../../components/projects/new/ColumnsChooser";
-  import PageLoading from "../../components/loading/PageLoading";
+import DataNormalization from "../../components/projects/new/DataNormalization";
+import DataSeparation from "../../components/projects/new/DataSeparation";
+import ProjectsAPI from "../../services/api/ProjectsAPI";
+import PageLoading from "../../components/loading/PageLoading";
 
-  export default {
+export default {
   name: "ProjectEdit",
   props: {
     step: Number,
@@ -226,15 +224,18 @@
   },
   components: {
     PageLoading,
-    ColumnsChooser,
-    AiParams,
     DataNormalization,
     DataSeparation
   },
   data() {
     return {
       parsedData: { headers: [] },
-      normalizedData: {},
+      normalizedData: {
+        normalizationServiceData: {
+          method: null
+        },
+        columns: []
+      },
       settings: null,
       loading: false,
       dataIndexes: {},
@@ -249,20 +250,41 @@
       try {
         const res = await ProjectsAPI.getProjectData(this.projectId);
         this.parsedData = res.data;
+        console.log('[ProjectConfiguration].loadProjectData this.parsedData:', this.parsedData);
+        this.normalizedData = {
+          normalizationServiceData: {
+            method: null
+          },
+          columns: []
+        };
+        
+
+
+        this.parsedData.headers.forEach((value, index) => {
+          this.normalizedData.columns.push({
+            data: [],
+            // eslint-disable-next-line no-undef
+            columnName: value,
+            columnType:
+                index <= this.parsedData.headers.length - 2 ? "Input" : "Output",
+            minValue: 0,
+            maxValue: 0
+          });
+        })
       } catch (e) {
         console.error("[ProjectConfiguration.vue].loadProjectData error:", e);
       } finally {
         this.loading = false;
       }
-      if (!this.normalizedData.data && this.step !== 1) {
+      /*if (!this.normalizedData.data && this.step !== 1) {
         return this.$router.replace({
           name: "project-configure",
           params: { id: this.$route.params.id },
           query: { step: 1 }
         });
-      }
+      }*/
     },
-    async saveConfig (){
+    async saveConfig() {
       const config = {
         normalizedData: this.normalizedData,
         settings: this.settings,
@@ -270,17 +292,15 @@
         selectedColumns: this.selectedColumns,
         predictionParams: {
           windowSize: this.windowSize,
-          predictionPeriod: this.predictionPeriod,
-        },
-      }
-      try{
-        await ProjectsAPI.saveProjectConfiguration(this.projectId,config);
+          predictionPeriod: this.predictionPeriod
+        }
+      };
+      try {
+        await ProjectsAPI.saveProjectConfiguration(this.projectId, config);
         this.$router.push({ name: "projects" });
       } catch (e) {
-        console.error('[ProjectConfiguration].saveConfig e:', e);
+        console.error("[ProjectConfiguration].saveConfig e:", e);
       }
-
-
     },
     redirectToProjectsPage() {
       this.$router.push({ name: "projects" });
@@ -318,7 +338,7 @@
       return false;
     },
     goToStep2IsDisabled() {
-      return !this.normalizedData || !this.normalizedData.data;
+      return !this.normalizedData || (!this.normalizedData.columns && !this.normalizedData.columns.length === 0);
     }
   },
   watch: {
@@ -327,7 +347,7 @@
         this.loadProjectData();
       }
     },
-    step: function(newVal, oldVal) {
+   /* step: function(newVal, oldVal) {
       if (newVal === oldVal) {
         return;
       }
@@ -379,7 +399,7 @@
           });
         }
       }
-    }
+    }*/
   }
 };
 </script>

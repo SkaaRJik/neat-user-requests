@@ -1,19 +1,26 @@
 export default {
-  Linear_Method: (data, minRange, maxRange) =>
+  Linear_Method: (dataContainer, minRange, maxRange) =>
     new Promise((resolve, reject) => {
+      if (!dataContainer) reject("parsedData is null");
+      const data = dataContainer.data;
+
       if (!data) reject("Data is null");
       if (!data[0]) reject("Data is empty");
       let min = 0;
       let max = 0;
-      const mins = [];
-      const maxs = [];
-      const output = [];
+
+      const columns = [];
       const statistic = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
       for (let i = 0; i < data[0].length; i++) {
+        columns.push({
+          data: [],
+          columnName: dataContainer.headers[i],
+          columnType: i <= dataContainer.headers.length - 2? "Input" : "Output",
+          minValue: 0,
+          maxValue: 0
+        });
         for (let j = 0; j < data.length; j++) {
-          if (i == 0) {
-            output.push([]);
-          }
           if (j == 0) {
             if (data[j][i] != null) {
               min = data[j][i];
@@ -26,21 +33,23 @@ export default {
             max = Math.max(max, data[j][i]);
           }
         }
-        mins.push(min);
-        maxs.push(max);
+        columns[i].minValue = min;
+        columns[i].maxValue = max;
+
         for (let j = 0; j < data.length; j++) {
           if (data[j][i] == null) {
-            output[j].push(null);
+            columns[i].data.push(null);
             continue;
           }
           const newValue = (data[j][i] - min) / (max - min);
           if (minRange >= 0) {
             const rangedValue = newValue * (maxRange - minRange) + minRange;
-            output[j].push(rangedValue);
+            columns[i].data.push(rangedValue);
           } else {
             const rangedValue = newValue * (maxRange * 2) + minRange;
-            output[j].push(rangedValue);
+            columns[i].data.push(rangedValue);
           }
+
           if (newValue >= 0 && newValue < 0.1) {
             statistic[0]++;
           } else if (newValue >= 0.1 && newValue < 0.2) {
@@ -67,11 +76,12 @@ export default {
         }
       }
       resolve({
-        minRange,
-        maxRange,
-        data: output,
-        mins,
-        maxs,
+        normalizationServiceData: {
+          minRange,
+          maxRange,
+          method: "Linear_Method"
+        },
+        columns,
         statistic
       });
     })
