@@ -15,64 +15,39 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectConfigDto implements Serializable {
+
+    /*
+     normalizationServiceData: {
+          method: null
+        },
+        columns: [],
+        trainEndIndex: null,
+        testEndIndex: null,
+        totalRows: null,
+        inputs: 0,
+        outputs: 0,
+        }
+        settings
+        windowSize: 3,
+        predictionPeriod: 10
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class NormalizedDataDto implements Serializable {
         @NotNull
-        Double minRange;
-
-        @NotNull
-        Double maxRange;
+        private Map<String, Object> normalizationServiceData;
 
         @NotNull
         @NotEmpty
-        List<List<Double>> data;
+        private List<Map<String, Object>> columns;
 
         @NotNull
-        @NotEmpty
-        List<Double> mins;
+        private Integer trainEndIndex;
 
         @NotNull
-        @NotEmpty
-        List<Double> maxs;
-    }
+        private Integer testEndIndex;
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DataIndexesDto implements Serializable {
-        @NotNull
-        Integer trainEndIndex;
-
-        @NotNull
-        Integer testEndIndex;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class SelectedColumnsDto implements Serializable {
-        @NotNull
-        Integer inputs;
-
-        @NotNull
-        Integer outputs;
-
-        @NotNull
-        @NotEmpty
-        List<HashMap<String, String>> headers;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PredictionParamsDto implements Serializable {
-        @NotNull
-        Short windowSize;
-
-        @NotNull
-        Short predictionPeriod;
     }
 
     @NotNull
@@ -82,15 +57,9 @@ public class ProjectConfigDto implements Serializable {
     private List<Map<String, Object>> settings;
 
     @NotNull
-    private DataIndexesDto dataIndexes;
+    private Short windowSize;
 
     @NotNull
-    private SelectedColumnsDto selectedColumns;
-
-    @NotNull
-    private PredictionParamsDto predictionParams;
-
-
-
+    private Short predictionPeriod;
 
 }

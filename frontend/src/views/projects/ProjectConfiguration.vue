@@ -65,10 +65,7 @@
 
         <v-stepper-content step="2">
           <v-container>
-            <data-separation
-              v-model="dataIndexes"
-              :data="normalizedData"
-            />
+            <data-separation v-model="normalizedData" />
             <v-row>
               <v-col class="mr-auto" cols="auto" xs="12">
                 <v-btn @click="redirectToProjectsPage" class="ma-3" text
@@ -84,9 +81,9 @@
                   <v-btn
                     @click="goToStep(3)"
                     :disabled="
-                      !dataIndexes ||
-                        !dataIndexes.trainEndIndex ||
-                        !dataIndexes.testEndIndex
+                      !normalizedData ||
+                        !normalizedData.trainEndIndex ||
+                        !normalizedData.testEndIndex
                     "
                     class="ma-3"
                     color="primary"
@@ -100,111 +97,111 @@
           </v-container>
         </v-stepper-content>
 
-        <!-- <v-stepper-content step="3">
-           <v-container>
-             <columns-chooser
-               v-model="normalizedData"
-               :headers="parsedData.headers"
-             />
-             <v-row>
-               <v-col class="mr-auto" cols="auto" xs="12">
-                 <v-btn @click="redirectToProjectsPage" class="ma-3" text
-                   >{{ $t("Cancel") }}
-                 </v-btn>
-               </v-col>
-               <v-col cols="auto" xs="12">
-                 <v-card-actions>
-                   <v-btn @click="back" class="ma-3">
-                     <v-icon left> mdi-arrow-left</v-icon>
-                     {{ $t("Back") }}
-                   </v-btn>
-                   <v-btn
-                     @click="goToStep(4)"
-                     :disabled="nodesAreNotChosen"
-                     class="ma-3"
-                     color="primary"
-                   >
-                     {{ $t("Continue") }}
-                     <v-icon> mdi-arrow-right</v-icon>
-                   </v-btn>
-                 </v-card-actions>
-               </v-col>
-             </v-row>
-           </v-container>
-         </v-stepper-content>
+        <v-stepper-content step="3">
+          <v-container>
+            <columns-chooser v-model="normalizedData" />
+            <v-row>
+              <v-col class="mr-auto" cols="auto" xs="12">
+                <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                  >{{ $t("Cancel") }}
+                </v-btn>
+              </v-col>
+              <v-col cols="auto" xs="12">
+                <v-card-actions>
+                  <v-btn @click="back" class="ma-3">
+                    <v-icon left> mdi-arrow-left</v-icon>
+                    {{ $t("Back") }}
+                  </v-btn>
+                  <v-btn
+                    @click="goToStep(4)"
+                    :disabled="goToStep4IsDisabled"
+                    class="ma-3"
+                    color="primary"
+                  >
+                    {{ $t("Continue") }}
+                    <v-icon> mdi-arrow-right</v-icon>
+                  </v-btn>
+                </v-card-actions>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-stepper-content>
 
-         <v-stepper-content step="4">
-           <v-container>
-             <ai-params
-               v-model="settings"
-               :inputs="normalizedData.inputs"
-               :outputs="normalizedData.outputs"
-             />
-             <v-row>
-               <v-col class="mr-auto" cols="auto" xs="12">
-                 <v-btn @click="redirectToProjectsPage" class="ma-3" text
-                   >{{ $t("Cancel") }}
-                 </v-btn>
-               </v-col>
-               <v-col cols="auto" xs="12">
-                 <v-card-actions>
-                   <v-btn @click="back" class="ma-3">
-                     <v-icon left> mdi-arrow-left</v-icon>
-                     {{ $t("Back") }}
-                   </v-btn>
-                   <v-btn
-                     :disabled="!settings"
-                     class="ma-3"
-                     color="primary"
-                     @click="goToStep(5)"
-                   >
-                     {{ $t("Continue") }}
-                     <v-icon> mdi-arrow-right</v-icon>
-                   </v-btn>
-                 </v-card-actions>
-               </v-col>
-             </v-row>
-           </v-container>
-         </v-stepper-content>
+        <v-stepper-content step="4">
+          <v-container>
+            <ai-params v-model="settings" />
+            <v-row>
+              <v-col class="mr-auto" cols="auto" xs="12">
+                <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                  >{{ $t("Cancel") }}
+                </v-btn>
+              </v-col>
+              <v-col cols="auto" xs="12">
+                <v-card-actions>
+                  <v-btn @click="back" class="ma-3">
+                    <v-icon left> mdi-arrow-left</v-icon>
+                    {{ $t("Back") }}
+                  </v-btn>
+                  <v-btn
+                    :disabled="goToStep5IsDisabled"
+                    class="ma-3"
+                    color="primary"
+                    @click="goToStep(5)"
+                  >
+                    {{ $t("Continue") }}
+                    <v-icon> mdi-arrow-right</v-icon>
+                  </v-btn>
+                </v-card-actions>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-stepper-content>
 
-         <v-stepper-content step="5">
-           <v-container>
-             <v-row>
-               <v-col cols="12">
-                 <v-row align="center" justify="center">
+        <v-stepper-content step="5">
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-row align="center" justify="center">
+                  <v-text-field
+                    :label="$t('Window_Size')"
+                    class="ma-3"
+                    v-model="windowSize"
+                  ></v-text-field>
 
-                 <v-text-field :label="$t('Window_Size')" class="ma-3" v-model="windowSize"></v-text-field>
-
-                 <v-text-field :label="$t('Prediction_Period')" class="ma-3" v-model="predictionPeriod"></v-text-field>
-                 </v-row>
-               </v-col>
-             </v-row>
-             <v-row>
-               <v-col class="mr-auto" cols="auto" xs="12">
-                 <v-btn @click="redirectToProjectsPage" class="ma-3" text
-                   >{{ $t("Cancel") }}
-                 </v-btn>
-               </v-col>
-               <v-col cols="auto" xs="12">
-                 <v-card-actions>
-                   <v-btn @click="back" class="ma-3">
-                     <v-icon left> mdi-arrow-left</v-icon>
-                     {{ $t("Back") }}
-                   </v-btn>
-                   <v-btn
-                     :disabled="!settings"
-                     class="ma-3"
-                     color="primary"
-                     @click="saveConfig"
-                   >
-                     {{ $t("Continue") }}
-                     <v-icon> mdi-arrow-right</v-icon>
-                   </v-btn>
-                 </v-card-actions>
-               </v-col>
-             </v-row>
-           </v-container>
-         </v-stepper-content>-->
+                  <v-text-field
+                    :label="$t('Prediction_Period')"
+                    class="ma-3"
+                    v-model="predictionPeriod"
+                  ></v-text-field>
+                </v-row>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="mr-auto" cols="auto" xs="12">
+                <v-btn @click="redirectToProjectsPage" class="ma-3" text
+                  >{{ $t("Cancel") }}
+                </v-btn>
+              </v-col>
+              <v-col cols="auto" xs="12">
+                <v-card-actions>
+                  <v-btn @click="back" class="ma-3">
+                    <v-icon left> mdi-arrow-left</v-icon>
+                    {{ $t("Back") }}
+                  </v-btn>
+                  <v-btn
+                    :disabled="goToStep5IsDisabled"
+                    class="ma-3"
+                    color="primary"
+                    @click="saveConfig"
+                  >
+                    {{ $t("Continue") }}
+                    <v-icon> mdi-arrow-right</v-icon>
+                  </v-btn>
+                </v-card-actions>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-stepper-content>
       </v-stepper-items>
     </v-stepper>
   </v-container>
@@ -213,6 +210,9 @@
 <script>
 import DataNormalization from "../../components/projects/new/DataNormalization";
 import DataSeparation from "../../components/projects/new/DataSeparation";
+import ColumnsChooser from "../../components/projects/new/ColumnsChooser";
+import AiParams from "../../components/aiparams/AiParams";
+
 import ProjectsAPI from "../../services/api/ProjectsAPI";
 import PageLoading from "../../components/loading/PageLoading";
 
@@ -225,7 +225,9 @@ export default {
   components: {
     PageLoading,
     DataNormalization,
-    DataSeparation
+    DataSeparation,
+    ColumnsChooser,
+    AiParams
   },
   data() {
     return {
@@ -234,12 +236,16 @@ export default {
         normalizationServiceData: {
           method: null
         },
-        columns: []
+        columns: [],
+        trainEndIndex: null,
+        testEndIndex: null,
+        totalRows: null,
+        inputs: 0,
+        outputs: 0,
+        headers: []
       },
       settings: null,
       loading: false,
-      dataIndexes: {},
-      selectedColumns: {},
       windowSize: 3,
       predictionPeriod: 10
     };
@@ -250,50 +256,35 @@ export default {
       try {
         const res = await ProjectsAPI.getProjectData(this.projectId);
         this.parsedData = res.data;
-        console.log('[ProjectConfiguration].loadProjectData this.parsedData:', this.parsedData);
-        this.normalizedData = {
-          normalizationServiceData: {
-            method: null
-          },
-          columns: []
-        };
-        
-
-
         this.parsedData.headers.forEach((value, index) => {
           this.normalizedData.columns.push({
             data: [],
-            // eslint-disable-next-line no-undef
             columnName: value,
             columnType:
-                index <= this.parsedData.headers.length - 2 ? "Input" : "Output",
+              index <= this.parsedData.headers.length - 2 ? "Input" : "Output",
             minValue: 0,
             maxValue: 0
           });
-        })
+        });
       } catch (e) {
         console.error("[ProjectConfiguration.vue].loadProjectData error:", e);
       } finally {
         this.loading = false;
+        if (this.step !== 1) {
+          this.$router.replace({
+            name: "project-configure",
+            params: { id: this.$route.params.id },
+            query: { step: 1 }
+          });
+        }
       }
-      /*if (!this.normalizedData.data && this.step !== 1) {
-        return this.$router.replace({
-          name: "project-configure",
-          params: { id: this.$route.params.id },
-          query: { step: 1 }
-        });
-      }*/
     },
     async saveConfig() {
       const config = {
         normalizedData: this.normalizedData,
         settings: this.settings,
-        dataIndexes: this.dataIndexes,
-        selectedColumns: this.selectedColumns,
-        predictionParams: {
-          windowSize: this.windowSize,
-          predictionPeriod: this.predictionPeriod
-        }
+        windowSize: this.windowSize,
+        predictionPeriod: this.predictionPeriod
       };
       try {
         await ProjectsAPI.saveProjectConfiguration(this.projectId, config);
@@ -305,10 +296,28 @@ export default {
     redirectToProjectsPage() {
       this.$router.push({ name: "projects" });
     },
-    goToStep(step) {
+    goToStep(nextStep) {
+      if (nextStep === 4) {
+        this.normalizedData.columns.forEach((value, index) => {
+          value.columnType = this.normalizedData.headers[index].type;
+        });
+      }
+
+      if (nextStep === 5) {
+        const nodesConfig = this.settings[this.settings.length - 1].params;
+        nodesConfig.forEach(val => {
+          if (val.name === "INPUT.NODES") {
+            val.value = this.normalizedData.inputs;
+          }
+          if (val.name === "OUTPUT.NODES") {
+            val.value = this.normalizedData.outputs;
+          }
+        });
+      }
+
       this.$router.replace({
         name: "project-configure",
-        query: { step },
+        query: { step: nextStep },
         params: { id: this.projectId }
       });
       window.scrollTo(0, 0);
@@ -320,39 +329,9 @@ export default {
         params: { id: this.projectId }
       });
       window.scrollTo(0, 0);
-    }
-  },
-  mounted() {
-    this.loadProjectData();
-  },
-  computed: {
-    nodesAreNotChosen() {
-      if (!this.selectedColumns.inputs || !this.selectedColumns.outputs) {
-        return true;
-      } else if (
-        !!this.selectedColumns.outputs &&
-        this.selectedColumns.outputs > 1
-      ) {
-        return true;
-      }
-      return false;
     },
-    goToStep2IsDisabled() {
-      return !this.normalizedData || (!this.normalizedData.columns && !this.normalizedData.columns.length === 0);
-    }
-  },
-  watch: {
-    projectId: function(newVal) {
-      if (newVal) {
-        this.loadProjectData();
-      }
-    },
-   /* step: function(newVal, oldVal) {
-      if (newVal === oldVal) {
-        return;
-      }
-
-      if (!newVal) {
+    checkNavigation(step) {
+      if (!step) {
         return this.$router.replace({
           name: "project-configure",
           query: { step: 1 },
@@ -360,11 +339,8 @@ export default {
         });
       }
 
-      if (newVal === 2) {
-        if (
-          !this.normalizedData.data &&
-          this.normalizedData.data.length === 0
-        ) {
+      if (step === 2) {
+        if (this.goToStep2IsDisabled) {
           return this.$router.replace({
             name: "project-configure",
             params: { id: this.$route.params.id },
@@ -373,12 +349,8 @@ export default {
         }
       }
 
-      if (newVal === 3) {
-        if (
-          !this.dataIndexes &&
-          !this.dataIndexes.trainEndIndex &&
-          !this.dataIndexes.testEndIndex
-        ) {
+      if (step === 3) {
+        if (this.goToStep3IsDisabled) {
           return this.$router.replace({
             name: "project-configure",
             params: { id: this.$route.params.id },
@@ -387,11 +359,8 @@ export default {
         }
       }
 
-      if (newVal === 4) {
-        if (
-          (!this.selectedColumns.inputs && !this.selectedColumns.outputs) ||
-          (this.selectedColumns.outputs && this.selectedColumns.outputs > 1)
-        ) {
+      if (step === 4) {
+        if (this.goToStep4IsDisabled) {
           return this.$router.replace({
             name: "project-configure",
             params: { id: this.$route.params.id },
@@ -399,7 +368,57 @@ export default {
           });
         }
       }
-    }*/
+
+      if (step === 5) {
+        if (this.goToStep5IsDisabled) {
+          return this.$router.replace({
+            name: "project-configure",
+            params: { id: this.$route.params.id },
+            query: { step: 4 }
+          });
+        }
+      }
+    }
+  },
+  mounted() {
+    this.loadProjectData();
+  },
+  computed: {
+    goToStep2IsDisabled() {
+      return (
+        !this.normalizedData.columns ||
+        (!!this.normalizedData.columns.length &&
+          this.normalizedData.columns[0].data.length === 0)
+      );
+    },
+    goToStep3IsDisabled() {
+      return (
+        !this.normalizedData.trainEndIndex || !this.normalizedData.testEndIndex
+      );
+    },
+    goToStep4IsDisabled() {
+      return (
+        this.normalizedData.inputs === 0 ||
+        this.normalizedData.outputs !== 1 ||
+        this.normalizedData.headers.length === 0
+      );
+    },
+    goToStep5IsDisabled() {
+      return !this.settings;
+    }
+  },
+  watch: {
+    projectId: function(newVal) {
+      if (newVal) {
+        this.loadProjectData();
+      }
+    },
+    step: function(newVal, oldVal) {
+      if (newVal === oldVal) {
+        return;
+      }
+      this.checkNavigation(newVal);
+    }
   }
 };
 </script>

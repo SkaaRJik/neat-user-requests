@@ -47,22 +47,6 @@ public class NeatConfig {
     private List<Map<String, Object>> neatSettings;
 
     @Basic
-    @Column(name = "selected_columns", columnDefinition = "jsonb")
-    @Type(type = "jsonb")
-    @JsonView(NeatConfigView.Settings.class)
-    private ProjectConfigDto.SelectedColumnsDto selectedColumns;
-
-    @Basic
-    @Column(name = "train_index_end")
-    @JsonView(NeatConfigView.Settings.class)
-    private Integer trainIndexEnd;
-
-    @Basic
-    @Column(name = "test_index_end")
-    @JsonView(NeatConfigView.Settings.class)
-    private Integer testIndexEnd;
-
-    @Basic
     @Column(name = "prediction_window_size")
     @JsonView(NeatConfigView.Settings.class)
     private Short predictionWindowSize;
@@ -97,9 +81,6 @@ public class NeatConfig {
                 id,
                 normalizedData,
                 neatSettings,
-                selectedColumns,
-                trainIndexEnd,
-                testIndexEnd,
                 predictionWindowSize,
                 predictionPeriod
         );

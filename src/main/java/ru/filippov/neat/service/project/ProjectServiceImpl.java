@@ -158,11 +158,8 @@ public class ProjectServiceImpl {
                         null,
                         params.getNormalizedData(),
                         params.getSettings(),
-                        params.getSelectedColumns(),
-                        params.getDataIndexes().getTrainEndIndex(),
-                        params.getDataIndexes().getTestEndIndex(),
-                        params.getPredictionParams().getWindowSize(),
-                        params.getPredictionParams().getPredictionPeriod(),
+                        params.getWindowSize(),
+                        params.getPredictionPeriod(),
                         LocalDateTime.now(),
                         project,
                         null,
@@ -173,7 +170,7 @@ public class ProjectServiceImpl {
             }
         }
 
-        rabbitMQWriter.writeIntoExperimentServerQueue(neatConfig.toExperimentData());
+        //rabbitMQWriter.writeIntoExperimentServerQueue(neatConfig.toExperimentData());
 
 
 
@@ -184,11 +181,8 @@ public class ProjectServiceImpl {
         neatConfig.setCreationDate(LocalDateTime.now());
         neatConfig.setNormalizedData(params.getNormalizedData());
         neatConfig.setNeatSettings(params.getSettings());
-        neatConfig.setSelectedColumns(params.getSelectedColumns());
-        neatConfig.setTrainIndexEnd(params.getDataIndexes().getTrainEndIndex());
-        neatConfig.setTestIndexEnd(params.getDataIndexes().getTestEndIndex());
-        neatConfig.setPredictionWindowSize(params.getPredictionParams().getWindowSize());
-        neatConfig.setPredictionPeriod(params.getPredictionParams().getPredictionPeriod());
+        neatConfig.setPredictionWindowSize(params.getWindowSize());
+        neatConfig.setPredictionPeriod(params.getPredictionPeriod());
 
         return neatConfigRepository.save(neatConfig);
     }

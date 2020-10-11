@@ -101,11 +101,11 @@ export default {
         const data = await NormalizationMethodsContainer[
           this.normalizationMethod
         ](this.parsedData, this.minRange, this.maxRange);
-        console.log("[DataNormalization].normalize data:", data);
         const newValue = {
           ...this.value,
           normalizationServiceData: data.normalizationServiceData,
-          columns: data.columns
+          columns: data.columns,
+          totalRows: data.columns[0] ? data.columns[0].data.length : 0
         };
 
         this.$emit("input", newValue);
@@ -139,7 +139,6 @@ export default {
       }
     }
   },
-  computed: {},
   mounted() {
     this.normalizationMethods = Object.keys(NormalizationMethodsContainer);
     this.normalizationMethod = this.normalizationMethods[0];

@@ -37,11 +37,9 @@
         <v-col>
           <span>{{
             `${$t("Train_Elements", { elements: trainEndIndex })},
-            ${$t("Test_Elements", { elements: testEndIndex - trainEndIndex })},
+            ${$t("Test_Elements", { elements: testEndIndex })},
             ${$t("Total", {
-              elements: `${trainEndIndex + testEndIndex - trainEndIndex} / ${
-                data.length
-              }`
+              elements: `${testEndIndex + trainEndIndex} / ${totalRows}`
             })}`
           }}</span>
         </v-col>
@@ -54,23 +52,21 @@
 export default {
   name: "DataSeparation",
   props: {
-    value: Object,
-    data: Array
+    value: Object
   },
   data: () => {
     return {
       trainPercentage: 70,
       testPercentage: 30,
       trainEndIndex: null,
-      testEndIndex: null
+      testEndIndex: null,
+      totalRows: 0
     };
   },
   methods: {
     calculatePercentage() {
-
       this.trainPercentage = Number(this.trainPercentage);
       this.testPercentage = Number(this.testPercentage);
-
       if (this.trainPercentage + this.testPercentage > 100) {
         this.$toast.open({
           message: `${this.$t("ERROR_SUM_OF_PERCENTAGE_GREATER_100")}`,
@@ -78,6 +74,7 @@ export default {
           position: "bottom-right",
           duration: 5000
         });
+        return;
       }
       if (this.trainPercentage + this.testPercentage <= 0) {
         this.$toast.open({
@@ -86,19 +83,19 @@ export default {
           position: "bottom-right",
           duration: 5000
         });
+        return;
       }
-      console.log(
-        "[DataSeparation.vue].calculatePercentage this.value:",
-        this.value
-      );
+
       this.trainEndIndex = Math.round(
-        this.data.length * (this.trainPercentage / 100)
+        this.totalRows * (this.trainPercentage / 100)
       );
+
       this.testEndIndex = Math.floor(
-        this.data.length * (this.testPercentage / 100)
+        this.totalRows * (this.testPercentage / 100)
       );
 
       const newValue = {
+        ...this.value,
         trainEndIndex: this.trainEndIndex,
         testEndIndex: this.trainEndIndex + this.testEndIndex
       };
@@ -109,8 +106,20 @@ export default {
     value: function(newVal, oldVal) {
       if (newVal) {
         if (newVal !== oldVal) {
-          this.trainEndIndex = newVal.trainEndIndex;
-          this.testEndIndex = newVal.testEndIndex;
+          if (newVal.totalRows !== oldVal.totalRows) {
+            this.totalRows = newVal.totalRows ? newVal.totalRows : 0;
+            this.trainEndIndex = newVal.trainEndIndex;
+            this.testEndIndex = newVal.testEndIndex;
+            if (this.trainEndIndex) {
+              this.trainPercentage =
+                (this.trainEndIndex / this.totalRows) * 100;
+            }
+            if (this.testEndIndex) {
+              this.testPercentage =
+                ((this.testEndIndex - this.trainEndIndex) / this.totalRows) *
+                100;
+            }
+          }
         }
       }
     }
