@@ -193,4 +193,16 @@ public class ProjectServiceImpl {
         return neatConfigRepository.save(neatConfig);
     }
 
+    public void updateProjectStatus(Long projectId, ProjectStatus projectStatus) throws ProjectNotFoundException {
+        Project project = this.projectRepository
+                .findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(String.format("Project with [id] = %d not found!", projectId)));
+
+        project.setStatus(projectStatus);
+
+        this.projectRepository.save(project);
+
+
+    }
+
 }

@@ -67,7 +67,7 @@
           <v-container>
             <data-separation
               v-model="dataIndexes"
-              :data="normalizedData"
+              :data="normalizedData.columns[0].data"
             />
             <v-row>
               <v-col class="mr-auto" cols="auto" xs="12">
@@ -211,8 +211,8 @@
 </template>
 
 <script>
-import DataNormalization from "../../components/projects/new/DataNormalization";
-import DataSeparation from "../../components/projects/new/DataSeparation";
+import DataNormalization from "../../components/projects/configure/DataNormalization";
+import DataSeparation from "../../components/projects/configure/DataSeparation";
 import ProjectsAPI from "../../services/api/ProjectsAPI";
 import PageLoading from "../../components/loading/PageLoading";
 

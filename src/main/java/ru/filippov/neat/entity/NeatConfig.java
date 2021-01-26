@@ -95,6 +95,7 @@ public class NeatConfig {
     public ExperimentData toExperimentData() {
         return new ExperimentData(
                 id,
+                project.getId(),
                 normalizedData,
                 neatSettings,
                 selectedColumns,

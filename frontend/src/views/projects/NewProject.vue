@@ -146,8 +146,8 @@
   import parseExcel from "../../parser/ExcelParser";
   import Vue from "vue";
   import ProjectsAPI from "../../services/api/ProjectsAPI";
-  import UploadProjectData from "../../components/projects/new/UploadProjectData";
-  import ProjectDetails from "../../components/projects/new/ProjectDetails";
+  import UploadProjectData from "../../components/projects/configure/UploadProjectData";
+  import ProjectDetails from "../../components/projects/configure/ProjectDetails";
 
   export default {
   name: "NewProject",

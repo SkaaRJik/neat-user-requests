@@ -7,20 +7,18 @@ import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.MessagePropertiesBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.filippov.neat.config.RabbitConfig;
 import ru.filippov.neat.dto.ExperimentData;
 
 @Component
 @RequiredArgsConstructor
 public class RabbitMQWriter {
 
-    @Value("${rabbitmq.output.exchange:experiment-server}")
-    public String RABBITMQ_OUTPUT_EXPERIMENT_SERVER_EXCHANGE;
-    @Value("${rabbitmq.output.queue:experiment}")
-    public String RABBITMQ_OUTPUT_EXPERIMENT_SERVER_QUEUE;
-    @Value("${rabbitmq.output.routingkey:data}")
-    public String RABBITMQ_OUTPUT_EXPERIMENT_SERVER_ROUTING_KEY;
+    @Autowired
+    RabbitConfig rabbitConfig;
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -33,7 +31,7 @@ public class RabbitMQWriter {
                 .andProperties(props)
                 .build();*/
 
-        rabbitTemplate.convertAndSend(RABBITMQ_OUTPUT_EXPERIMENT_SERVER_EXCHANGE, RABBITMQ_OUTPUT_EXPERIMENT_SERVER_ROUTING_KEY, data);
+        rabbitTemplate.convertAndSend(rabbitConfig.RABBITMQ_OUTPUT_EXCHANGE, rabbitConfig.RABBITMQ_OUTPUT_DATA_ROUTING_KEY, data);
 
     }
 }

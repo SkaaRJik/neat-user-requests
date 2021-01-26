@@ -22,7 +22,7 @@ export const error = {
     removeError(state, { timerId }) {
       const newError = { ...state.errors };
       delete newError[timerId];
-      state.errors = { ...newError };
+      state.errors = newError;
     },
     clearErrors(state) {
       Object.keys(state.errors).forEach(key =>

@@ -55,10 +55,13 @@ path:
 
 rabbitmq:
   input:
-    exchange: database-server
-    queue: result-queue
-    routingkey: result
+    exchange: user-queries-service
+    queue: result
+    routingKeys:
+      status: status
+      result: result
   output:
     exchange: experiment-server
     queue: experiment
-    routingkey: data
+    routingKeys:
+      data: data

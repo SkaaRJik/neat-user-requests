@@ -1,11 +1,11 @@
 package ru.filippov.neat.dto;
 
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -19,22 +19,11 @@ public class ProjectConfigDto implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class NormalizedDataDto implements Serializable {
-        @NotNull
+  
         Double minRange;
-
-        @NotNull
         Double maxRange;
-
-        @NotNull
-        @NotEmpty
         List<List<Double>> data;
-
-        @NotNull
-        @NotEmpty
         List<Double> mins;
-
-        @NotNull
-        @NotEmpty
         List<Double> maxs;
     }
 

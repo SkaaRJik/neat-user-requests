@@ -21,7 +21,8 @@ import java.util.Map;
 @Builder(toBuilder = true)
 @Log4j2
 public class ExperimentData  {
-    private Long id;
+    private Long neatConfigId;
+    private Long projectId;
     private ProjectConfigDto.NormalizedDataDto normalizedData;
     private List<Map<String, Object>> neatSettings;
     private ProjectConfigDto.SelectedColumnsDto selectedColumns;

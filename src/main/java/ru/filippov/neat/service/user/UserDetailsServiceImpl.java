@@ -2,7 +2,6 @@ package ru.filippov.neat.service.user;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.util.StringUtil;
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
@@ -98,7 +97,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return isUserExists;
     }
 
-    public void registrate(SignUpDto signUpRequest) throws PSQLException {
+    public void registrate(SignUpDto signUpRequest) {
         String avatarName = null;
         try {
             avatarName = saveAvatar(signUpRequest.getUsername(), signUpRequest.getAvatar());

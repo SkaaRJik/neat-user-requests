@@ -2,9 +2,7 @@ package ru.filippov.neat.controller;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
-import org.postgresql.util.PSQLException;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +15,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.filippov.neat.config.jwt.TokenProvider;
-import ru.filippov.neat.entity.Auth;
-import ru.filippov.neat.entity.User;
-import ru.filippov.neat.dto.UserAuthDetailsResponse;
 import ru.filippov.neat.dto.SignInDto;
 import ru.filippov.neat.dto.SignUpDto;
 import ru.filippov.neat.dto.TokenDto;
+import ru.filippov.neat.dto.UserAuthDetailsResponse;
+import ru.filippov.neat.entity.Auth;
+import ru.filippov.neat.entity.User;
 import ru.filippov.neat.exception.AvatarUploadException;
 import ru.filippov.neat.exception.RefreshTokenNotExists;
 import ru.filippov.neat.exception.UserNotFoundException;
@@ -31,8 +29,6 @@ import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 import ru.filippov.neat.service.user.UserPrincipal;
 
 import javax.validation.Valid;
-import java.awt.*;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Date;
 
@@ -179,7 +175,7 @@ public class AuthRestAPI {
 
         try {
             userService.registrate(signUpRequest);
-        } catch (PSQLException e) {
+        } catch (Exception e) {
             log.error("AuthRestAPI.registerUser", e);
         }
 

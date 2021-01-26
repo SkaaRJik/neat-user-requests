@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     calculatePercentage() {
-
+      console.log('[DataSeparation].calculatePercentage :', this.data);
       this.trainPercentage = Number(this.trainPercentage);
       this.testPercentage = Number(this.testPercentage);
 
