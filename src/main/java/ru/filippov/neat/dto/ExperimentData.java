@@ -25,9 +25,6 @@ public class ExperimentData  {
     private Long projectId;
     private ProjectConfigDto.NormalizedDataDto normalizedData;
     private List<Map<String, Object>> neatSettings;
-    private ProjectConfigDto.SelectedColumnsDto selectedColumns;
-    private Integer trainIndexEnd;
-    private Integer testIndexEnd;
     private Short predictionWindowSize;
     private Short predictionPeriod;
 

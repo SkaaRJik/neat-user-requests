@@ -24,11 +24,21 @@
                         dense
                         outlined
                         :append-icon="
-                          item.type === 'Output' && outputs > 1
+                          (item.type === 'Output' && outputs > 1) ||
+                          outputs == 0 ||
+                          inputs == 0
                             ? 'mdi-alert'
                             : 'mdi-menu-down'
                         "
-                        :error="item.type === 'Output' && outputs > 1"
+                        :error="
+                          (item.type === 'Output' && outputs > 1) ||
+                            outputs == 0 ||
+                            inputs == 0
+                        "
+                        :error-messages="(item.type === 'Output' && outputs > 1)
+                        ? $t('ERROR_OUTPUTS_MUST_BE_ONLY_1') : outputs == 0
+                        ? $t('ERROR_OUTPUTS_NODE_CANT_BE_0') : inputs == 0
+                        ? $t('ERROR_INPUTS_NODE_CANT_BE_0') : ''"
                       >
                         <template v-slot:selection="{ item: headerType }">
                           <span>{{ $t(headerType) }}</span>
@@ -54,7 +64,6 @@ export default {
   name: "ColumnsChooser",
   props: {
     value: Object,
-    headers: Array
   },
   data: () => {
     return {
@@ -115,55 +124,40 @@ export default {
           outputs: this.outputs,
           headers: this.headerTypes
         };
-        console.log(
-          "[DataSeparation].handleDataType newValue:",
-          newNormalizedData
-        );
         this.$emit("input", newNormalizedData);
       }
     },
     initHeaders(headers){
+      this.inputs = 0;
+      this.outputs = 0;
       this.headerTypes = headers.map((val, index) => {
+        this.inputs += val.columnType === "Input" ? 1 : 0
+        this.outputs += val.columnType === "Output" ? 1 : 0
         return {
-          name: val,
+          name: val.columnName,
           type: headers.length - 1 === index ? "Output" : "Input"
         };
       });
-      this.inputs = headers.length - 1;
-      this.outputs = 1;
       const newNormalizedData = {
         ...this.value,
         inputs: this.inputs,
         outputs: this.outputs,
         headers: this.headerTypes
       };
-      console.log("[ColumnsChooser].watch headers:", newNormalizedData);
       this.$emit("input", newNormalizedData);
     }
   },
   mounted() {
-    this.initHeaders(this.headers)
+    this.initHeaders(this.value.columns)
   },
   watch: {
-    headers: function(newValue) {
-      console.log('[ColumnsChooser].headers watch newValue:', newValue);
+    value: function(newValue, oldValue) {
       if (newValue) {
-        this.initHeaders(newValue)
-      }
-    },
-    normalizedData: function(newVal) {
-      if (newVal) {
-        const newNormalizedData = {
-          ...newVal,
-          inputs: this.inputs,
-          outputs: this.outputs,
-          headers: this.headerTypes
-        };
-        console.log(
-          "[ColumnsChooser].watch normalizedData:",
-          newNormalizedData
-        );
-        this.$emit("input", newNormalizedData);
+        if(newValue !== oldValue) {
+          if(newValue.columns !== oldValue.columns){
+            this.initHeaders(newValue.columns);
+          }
+        }
       }
     }
   }

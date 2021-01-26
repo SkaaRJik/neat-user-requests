@@ -1,5 +1,24 @@
 <template>
   <v-container>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          @click="setAiConfigWithDeafultValues"
+          bottom
+          color="primary"
+          fab
+          fixed
+          right
+          small
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-icon>mdi-reload</v-icon>
+        </v-btn>
+      </template>
+      <span>{{ $t("Reset_to_default_configuration") }}</span>
+    </v-tooltip>
+
     <v-row>
       <v-col cols="12">
         <v-switch
@@ -46,13 +65,14 @@
                       v-if="
                         isFieldString(param.value) || isFieldNumber(param.value)
                       "
+                      style="width: 100%"
                       type="number"
                       :label="$t(param.name)"
                       v-model="param.value"
                       :max="param.maxValue ? param.maxValue : undefined"
                       :min="param.maxValue ? param.minValue : undefined"
                       :step="param.maxValue && param.maxValue > 1 ? 1 : 0.1"
-                      @blur="updateVModel"
+                      @blur="updateVModel(param)"
                       :append-icon="
                         param.name === 'GENERATOR.SEED'
                           ? 'mdi-refresh'
@@ -100,21 +120,20 @@
 </template>
 
 <script>
-  import AIAPI from "../../services/api/AIAPI";
-  import _ from "lodash";
+import AIAPI from "../../services/api/AIAPI";
+import _ from "lodash";
 
-  export default {
+export default {
   name: "AiParams",
   props: {
-    value: undefined,
-    inputs: Number,
-    outputs: Number
+    value: null,
   },
   data: function() {
     return {
       aiConfig: [],
       isAdvanced: false,
-      functions: []
+      functions: [],
+      defaultConfig: []
     };
   },
   methods: {
@@ -131,13 +150,18 @@
       this.loading = true;
       try {
         const res = await AIAPI.getDefaultConfig();
-        this.aiConfig = res.data;
-        this.updateVModel();
+        this.defaultConfig = res.data;
+        this.setAiConfigWithDeafultValues();
       } catch (e) {
         console.error("[AiParams.vue].loadDefaultConfig error:", e);
       } finally {
         this.loading = false;
       }
+    },
+
+    setAiConfigWithDeafultValues() {
+      this.aiConfig = this.defaultConfig;
+      this.updateVModel();
     },
 
     isFieldBoolean(value) {
@@ -182,7 +206,17 @@
       item.value = new Date().getTime();
     },
 
-    updateVModel() {
+    updateVModel(param) {
+      if (param) {
+        if (param.maxValue || param.minValue) {
+          if (param.value > param.maxValue) {
+            param.value = param.maxValue;
+          }
+          if (param.value < param.minValue) {
+            param.value = param.minValue;
+          }
+        }
+      }
       this.$emit("input", this.aiConfig);
     }
   },
@@ -190,26 +224,7 @@
     this.loadFunctions();
     this.loadDefaultConfig();
   },
-  watch: {
-    inputs: function(newVal) {
-      if (newVal) {
-        const nodesConfig = this.aiConfig[this.aiConfig.length - 1].params;
-        const inputsConfig = nodesConfig.filter(
-          val => val.name === "INPUT.NODES"
-        );
-        inputsConfig.value = newVal;
-      }
-    },
-    outputs: function(newVal) {
-      if (newVal) {
-        const nodesConfig = this.aiConfig[this.aiConfig.length - 1].params;
-        const outputsConfig = nodesConfig.filter(
-          val => val.name === "OUTPUT.NODES"
-        );
-        outputsConfig.value = newVal;
-      }
-    }
-  }
+
 };
 </script>
 

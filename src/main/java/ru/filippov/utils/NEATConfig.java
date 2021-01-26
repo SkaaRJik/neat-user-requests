@@ -465,7 +465,7 @@ public class NEATConfig implements AIConfig {
 				150,
 				true,
 				true,
-				true,
+				false,
 				300,
 				1
 		));
