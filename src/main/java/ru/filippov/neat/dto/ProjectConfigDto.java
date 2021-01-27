@@ -53,16 +53,7 @@ public class ProjectConfigDto implements Serializable {
         List<HashMap<String, String>> headers;
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PredictionParamsDto implements Serializable {
-        @NotNull
-        Short windowSize;
 
-        @NotNull
-        Short predictionPeriod;
-    }
 
     @NotNull
     private NormalizedDataDto normalizedData;
@@ -77,9 +68,8 @@ public class ProjectConfigDto implements Serializable {
     private SelectedColumnsDto selectedColumns;
 
     @NotNull
-    private PredictionParamsDto predictionParams;
+    private Short windowSize;
 
-
-
-
+    @NotNull
+    private Short predictionPeriod;
 }

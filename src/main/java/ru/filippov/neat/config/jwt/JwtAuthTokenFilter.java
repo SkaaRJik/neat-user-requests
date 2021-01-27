@@ -4,7 +4,10 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -27,6 +30,9 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
+    @Autowired
+    JwtAuthEntryPoint authenticationEntryPoint;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
     								HttpServletResponse response,
@@ -47,15 +53,20 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
             }
         } catch (IllegalArgumentException e) {
             logger.error("an error occured during getting username from token", e);
+            //response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } catch (TokenExpiredException e) {
+            response.setStatus(JwtStatus.EXPIRED_TOKEN.value);
             logger.warn("the token is expired and not valid anymore", e);
         } catch(SignatureVerificationException e){
-            logger.error("Someone change the token!");
+            response.setStatus(JwtStatus.CHANGED_TOKEN.value);
+            logger.error("Someone have changed the token!");
         } catch (Exception e) {
             log.error("Can NOT set user authentication -> Message: {}", e);
         }
 
         filterChain.doFilter(request, response);
+
+
     }
 
 

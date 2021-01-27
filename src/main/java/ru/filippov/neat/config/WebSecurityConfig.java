@@ -75,14 +75,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
                 .antMatchers("/login", "/signup", "/email-exist", "/username-exist", "/refresh-tokens", "/public/**").permitAll()
-                .antMatchers("/api/trainer/default-config").hasRole(Role.ROLE_USER.name().replace("ROLE_",""))
+                .antMatchers("/api/trainer/default-config").hasRole(Role.ROLE_ADMIN.name().replace("ROLE_",""))
                 .anyRequest().authenticated()
                 .and()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler);
+
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterAt(this.corsFilter(), CorsFilter.class);

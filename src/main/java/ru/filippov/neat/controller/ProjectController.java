@@ -60,7 +60,7 @@ public class ProjectController {
         }
     }
 
-    @PostMapping("/save")
+    @PostMapping("")
     public ResponseEntity<?> saveProject(@AuthenticationPrincipal UserPrincipal user, @RequestBody Map<String,Object> params){
         Project project = null;
         try{
@@ -73,14 +73,17 @@ public class ProjectController {
         return new ResponseEntity<Long>(project.getId(), HttpStatus.OK);
     }
 
-    @GetMapping("/my")
+    @GetMapping("")
     @JsonView(ProjectView.Info.class)
-    public Page<Project> getProjects(@AuthenticationPrincipal UserPrincipal user, @RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "itemsPerPage", defaultValue = "10") Integer itemsPerPage){
+    public Page<Project> getProjects(@AuthenticationPrincipal UserPrincipal user,
+                                     @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                     @RequestParam(name = "itemsPerPage", defaultValue = "10") Integer itemsPerPage,
+                                     @RequestParam(name = "projectBelongsTo", defaultValue = "me") String belongsTo){
         Page<Project> projectsByUser = projectService.getProjectsByUser(user.toUser(), page, itemsPerPage);
         return projectsByUser;
     }
 
-    @GetMapping("/find")
+    /*@GetMapping("")
     public ResponseEntity<?> findProject(@AuthenticationPrincipal UserPrincipal user, @RequestParam MultiValueMap<String, String> allParams) throws PermissionException {
 
 
@@ -98,7 +101,7 @@ public class ProjectController {
 
         return ResponseEntity.ok(projectsByNameAndUser);
     }
-
+*/
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getProjectInfo(@AuthenticationPrincipal UserPrincipal user, @PathVariable("id") Long id) throws PermissionException {
@@ -106,8 +109,10 @@ public class ProjectController {
             Project projectsByUser = projectService.getProjectById(id, user.toUser());
             return new ResponseEntity<Project>(projectsByUser, HttpStatus.OK);
         } catch (NoSuchElementException ex) {
+            log.error("ProjectController.getProjectData", ex);
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.NOT_FOUND);
         } catch (PermissionException ex) {
+            log.error("ProjectController.getProjectData", ex);
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception ex) {
             log.error("ProjectController.getProjectInfo", ex);
@@ -121,8 +126,10 @@ public class ProjectController {
             Map projectData = projectService.getProjectData(id, user.toUser());
             return new ResponseEntity<Map>(projectData, HttpStatus.OK);
         } catch (NoSuchElementException ex) {
+            log.error("ProjectController.getProjectData", ex);
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.NOT_FOUND);
         } catch (PermissionException ex) {
+            log.error("ProjectController.getProjectData", ex);
             return new ResponseEntity<String>(ex.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception ex) {
             log.error("ProjectController.getProjectData", ex);
@@ -136,8 +143,10 @@ public class ProjectController {
             final boolean b = projectService.saveNeatConfig(id, user.getId(), projectConfig, configId);
             return ResponseEntity.ok().build();
         } catch (ProjectNotFoundException e) {
+            log.error("ProjectController.getProjectData", e);
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (PermissionException e) {
+            log.error("ProjectController.getProjectData", e);
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             log.error("ProjectController.getProjectData", e);
