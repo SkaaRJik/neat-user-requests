@@ -48,7 +48,7 @@ public class ProjectServiceImpl {
         this.neatConfigRepository = neatConfigRepository;
     }
 
-    public Project saveProject(User user, Map<String, Object> projectParams) throws IOException {
+    public Project saveProject(User user, Map<String, Object> projectParams) throws NoSuchElementException {
 
         Project project = null;
 
@@ -78,7 +78,7 @@ public class ProjectServiceImpl {
     }
 
     public Page<Project> getProjectsByUser(User user, int curPage, int itemsPerPage) {
-        Pageable pageable = PageRequest.of(curPage, itemsPerPage);
+        Pageable pageable = PageRequest.of(curPage-1, itemsPerPage);
 
         Page<Project> projects = projectRepository.findAllByUserId(user.getId(), pageable);
 

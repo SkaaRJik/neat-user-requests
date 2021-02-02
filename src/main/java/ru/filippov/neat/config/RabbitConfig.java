@@ -3,6 +3,7 @@ package ru.filippov.neat.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.Data;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -97,6 +98,7 @@ public class RabbitConfig {
     public ObjectMapper objectMapper() {
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
         return objectMapper;
     }
