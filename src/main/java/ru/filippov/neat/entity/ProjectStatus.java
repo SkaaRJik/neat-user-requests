@@ -2,6 +2,13 @@ package ru.filippov.neat.entity;
 
 public enum ProjectStatus {
     NEW,
+    VERIFICATION,
+    VERIFIED,
+    VERIFICATION_SERVICE_ERROR,
+    VERIFICATION_ERROR,
+    NORMALIZATION,
+    NORMALIZED,
+    NORMALIZATION_SERVICE_ERROR,
     IN_QUEUE,
     TRAINING,
     PREDICT_FACTOR_SIGNS,

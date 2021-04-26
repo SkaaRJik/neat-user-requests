@@ -3,12 +3,12 @@ server:
 spring:
   datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/neat
-    username: postgres
-    password: root
+    url: ${POSTGRES_JDBC_URL:jdbc:postgresql://localhost:5432/neat}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:root}
     driverClassName: org.postgresql.Driver
   resources:
-    static-locations: /home/victor/IdeaProjects/neatvue/public
+    static-locations: ${STATIC_FILES_LOCATION:/home/victor/IdeaProjects/neatvue/public}
   jpa:
     generate-ddl: false
     open-in-view: true
@@ -24,23 +24,23 @@ spring:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: user
-    password: 1512
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:user}
+    password: ${RABBITMQ_PASSWORD:1512}
 # App Properties
 app:
   project:
     restrictions:
-      max_allowed_neat_config: 5
+      max_allowed_experiments: ${NEAT_MAX_ALLOWED_CONFIGS:5}
   jwt:
-    secret: SECRET
+    secret: ${JWT_SECRET:SECRET}
     access:
-      expiration: 864000
-      header: Authorization
-      prefix: Bearer_
+      expiration: ${JWT_ACCESS_EXPIRATION:864000}
+      header: ${JWT_HEADER:Authorization}
+      prefix: ${JWT_PREFIX:Bearer_}
     refresh:
-      expiration: 2592000000
+      expiration: ${JWT_REFRESH_EXPIRATION:2592000000}
 
 loger:
   level:
@@ -54,10 +54,17 @@ path:
 
 rabbitmq:
   input:
-    exchange: database-server
-    queue: result-queue
-    routingkey: result
+    exchange: ${RABBITMQ_MESSAGES_INPUT_EXCHANGE:user-queries-service}
+    queue: ${RABBITMQ_MESSAGES_INPUT_QUEUE:result-queue}
+    routingkey: ${RABBITMQ_MESSAGES_INPUT_ROUTING_KEY:result}
   output:
-    exchange: experiment-server
-    queue: experiment
-    routingkey: data
+    exchange: ${RABBITMQ_MESSAGES_INPUT_EXCHANGE:experiment-service}
+    queue: ${RABBITMQ_MESSAGES_INPUT_QUEUE:experiment}
+    routingkey: ${RABBITMQ_MESSAGES_INPUT_ROUTING_KEY:data}
+
+samba:
+  host: ${SAMBA_HOST:localhost}
+  username: ${SAMBA_USER:victor}
+  password: ${SAMBA_PASSWORD:1512}
+  shared_directory: ${SAMBA_SHARED_DIRECTORY:neat-store}
+

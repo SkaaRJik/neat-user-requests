@@ -1,0 +1,47 @@
+Для начала пробовать
+
+sudo apt install -y samba
+
+Если не получится, поставить в добавок
+
+sudo apt install -y samba-common python-glade2 system-config-samba
+
+Делаем бэкап конфига
+
+sudo cp /etc/samba/smb.conf{,.bak}
+
+Вставляем в sudo nano /etc/samba/smb.conf следующие строчки:
+
+[global]
+workgroup = WORKGROUP
+netbios name = NEAT
+server string = SambaServer
+dns proxy = no
+log file = /var/log/samba/log.%m
+max log size = 1000
+map to guest = bad user
+usershare allow guests = yes
+
+[NEAT]
+comment = NEAT Input data store
+path = /samba/neat-store
+valid users = victor
+read only = no
+browsable = yes
+writable = yes
+
+Создаем папку для шары:
+mkdir /samba
+mkdir /samba/neat-store
+
+Меняем права
+sudo chmod -R 777 /samba
+
+Меняем владельца
+sudo chown -R $USER@$USER /samba
+
+Добавляем текущего пользователя в Самбу
+sudo smbpasswd -a $USER
+
+Перезагружаем сервис Самбы
+systemctl restart smbd

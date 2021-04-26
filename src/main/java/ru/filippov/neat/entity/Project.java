@@ -2,6 +2,7 @@ package ru.filippov.neat.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,7 @@ public class Project {
     @SequenceGenerator(name = "PROJECT_ID_GEN", sequenceName = "project_id_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PROJECT_ID_GEN")
     @JsonView(ProjectView.Id.class)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(name = "name", nullable = false)
@@ -39,6 +41,7 @@ public class Project {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_user_id", referencedColumnName = "id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @Column(name = "status", nullable = false)
@@ -55,13 +58,40 @@ public class Project {
 
     @JsonView(ProjectView.FullInfo.class)
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<NeatConfig> neatConfigs;
+    private List<Experiment> experiments;
 
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "data", columnDefinition = "jsonb")
+    @JsonView(ProjectView.FullInfo.class)
+    @Column(name = "source_file")
+    private String sourceFile;
+
+    @JsonView(ProjectView.FullInfo.class)
+    @Column(name = "verified_file")
+    private String verifiedFile;
+
+    @JsonView(ProjectView.FullInfo.class)
+    @Column(name = "verification_errors", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    @JsonView(ProjectView.Data.class)
-    private Map<String, Object> data;
+    private Map<String, Object> verificationErrors;
+
+    @JsonView(ProjectView.FullInfo.class)
+    @Column(name = "verification_info", columnDefinition = "jsonb")
+    @Type(type = "jsonb")
+    private Map<String, Object> verificationInfo;
+
+
+    @JsonView(ProjectView.FullInfo.class)
+    @Column(name = "legend", columnDefinition = "jsonb")
+    @Type(type = "jsonb")
+    private Map<String, Object> legend;
+
+    @JsonView(ProjectView.FullInfo.class)
+    @Column(name = "log_is_allowed")
+    private Boolean logIsAllowed;
+
+    @JsonView(ProjectView.FullInfo.class)
+    @Column(name = "headers", columnDefinition = "jsonb")
+    @Type(type = "jsonb")
+    private List headers;
 
 
 

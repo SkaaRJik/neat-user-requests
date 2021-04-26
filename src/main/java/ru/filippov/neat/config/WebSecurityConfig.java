@@ -79,7 +79,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/login", "/signup", "/email-exist", "/username-exist", "/refresh-tokens", "/public/**").permitAll()
-                .antMatchers("/api/trainer/default-config").hasRole(Role.ROLE_ADMIN.name().replace("ROLE_",""))
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler);

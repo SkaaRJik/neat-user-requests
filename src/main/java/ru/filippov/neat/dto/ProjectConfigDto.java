@@ -1,13 +1,14 @@
 package ru.filippov.neat.dto;
 
-import com.sun.istack.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,43 +16,42 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectConfigDto implements Serializable {
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ColumnsDto  implements Serializable  {
+
+        private List<Number> data;
+
+        private String columnName;
+
+        private String columnType;
+
+        private Double minValue;
+
+        private Double maxValue;
+    }
+
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class NormalizedDataDto implements Serializable {
-  
-        Double minRange;
-        Double maxRange;
-        List<List<Double>> data;
-        List<Double> mins;
-        List<Double> maxs;
+        @NotNull
+        private Map<String, Object> normalizationServiceData;
+
+        @NotNull
+        private List<ColumnsDto> columns;
+
+        @NotNull
+        private Integer trainEndIndex;
+
+        @NotNull
+        private Integer testEndIndex;
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DataIndexesDto implements Serializable {
-        @NotNull
-        Integer trainEndIndex;
 
-        @NotNull
-        Integer testEndIndex;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class SelectedColumnsDto implements Serializable {
-        @NotNull
-        Integer inputs;
-
-        @NotNull
-        Integer outputs;
-
-        @NotNull
-        @NotEmpty
-        List<HashMap<String, String>> headers;
-    }
 
 
 
@@ -60,12 +60,6 @@ public class ProjectConfigDto implements Serializable {
 
     @NotNull
     private List<Map<String, Object>> settings;
-
-    @NotNull
-    private DataIndexesDto dataIndexes;
-
-    @NotNull
-    private SelectedColumnsDto selectedColumns;
 
     @NotNull
     private Short windowSize;

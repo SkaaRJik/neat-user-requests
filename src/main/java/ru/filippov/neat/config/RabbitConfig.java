@@ -23,78 +23,177 @@ import java.util.Map;
 @Data
 public class RabbitConfig {
 
-    @Value("${rabbitmq.input.exchange:experiment-service}")
-    public String RABBITMQ_OUTPUT_EXCHANGE;
-    @Value("${rabbitmq.input.queue.experiment.experiment:experiment}")
-    public String RABBITMQ_OUTPUT_QUEUE;
-    @Value("${rabbitmq.input.routingKeys.data:data}")
-    public String RABBITMQ_OUTPUT_DATA_ROUTING_KEY;
-
-    @Value("${rabbitmq.output.exchange:user-queries-service}")
-    public String RABBITMQ_INPUT_EXCHANGE;
-    @Value("${rabbitmq.output.queue.result:result}")
-    public String RABBITMQ_INPUT_RESULT_QUEUE;
-    @Value("${rabbitmq.output.queue.status:status}")
-    public String RABBITMQ_INPUT_STATUS_QUEUE;
-    @Value("${rabbitmq.output.routingKeys.result:result}")
-    public String RABBITMQ_INPUT_RESULT_ROUTING_KEY;
-    @Value("${rabbitmq.output.routingKeys.status:status}")
-    public String RABBITMQ_INPUT_STATUS_ROUTING_KEY;
-
+    @Value("${rabbitmq.input.predictionResult.exchange:user-queries-service}")
+    public String RABBITMQ_INPUT_PREDICTION_RESULT_EXCHANGE;
+    @Value("${rabbitmq.input.predictionResult.queue:prediction-result}")
+    public String RABBITMQ_INPUT_PREDICTION_RESULT_QUEUE;
+    @Value("${rabbitmq.input.predictionResult.routingKey:prediction-result}")
+    public String RABBITMQ_INPUT_PREDICTION_RESULT_ROUTING_KEY;
 
     @Bean
-    public TopicExchange rabbitmqOutputExchange() {
-        return ExchangeBuilder.topicExchange(RABBITMQ_OUTPUT_EXCHANGE).build();
+    public DirectExchange rabbitmqInputPredictionResultExchange() {
+        return ExchangeBuilder.directExchange(RABBITMQ_INPUT_PREDICTION_RESULT_EXCHANGE).build();
     }
 
     @Bean
-    public Queue rabbitmqOutputQueue() {
-        return QueueBuilder.durable(RABBITMQ_OUTPUT_QUEUE).build();
+    public Queue rabbitmqInputPredictionResultQueue() {
+        return QueueBuilder.durable(RABBITMQ_INPUT_PREDICTION_RESULT_QUEUE).build();
     }
 
     @Bean
-    public Binding rabbitMqOutputBinding(Queue rabbitmqOutputQueue, TopicExchange rabbitmqOutputExchange) {
-        return BindingBuilder.bind(rabbitmqOutputQueue).to(rabbitmqOutputExchange).with(RABBITMQ_OUTPUT_DATA_ROUTING_KEY);
+    public Binding rabbitmqInputPredictionResultBinding(Queue rabbitmqInputPredictionResultQueue, DirectExchange rabbitmqInputPredictionResultExchange) {
+        return BindingBuilder.bind(rabbitmqInputPredictionResultQueue).to(rabbitmqInputPredictionResultExchange).with(RABBITMQ_INPUT_PREDICTION_RESULT_ROUTING_KEY);
     }
 
 
+    @Value("${rabbitmq.input.predictionStatus.exchange:user-queries-service}")
+    public String RABBITMQ_INPUT_PREDICTION_STATUS_EXCHANGE;
+    @Value("${rabbitmq.input.predictionStatus.queue:prediction-status}")
+    public String RABBITMQ_INPUT_PREDICTION_STATUS_QUEUE;
+    @Value("${rabbitmq.input.predictionStatus.routingKey:prediction-status}")
+    public String RABBITMQ_INPUT_PREDICTION_STATUS_ROUTING_KEY;
 
     @Bean
-    public TopicExchange rabbitmqInputExchange() {
-        return ExchangeBuilder.topicExchange(RABBITMQ_INPUT_EXCHANGE).build();
+    public DirectExchange rabbitmqInputPredictionStatusExchange() {
+        return ExchangeBuilder.directExchange(RABBITMQ_INPUT_PREDICTION_STATUS_EXCHANGE).build();
     }
 
     @Bean
-    public Queue rabbitmqResultInputQueue() {
-        return QueueBuilder.durable(RABBITMQ_INPUT_RESULT_QUEUE).build();
+    public Queue rabbitmqInputPredictionStatusQueue() {
+        return QueueBuilder.durable(RABBITMQ_INPUT_PREDICTION_STATUS_QUEUE).build();
     }
 
     @Bean
-    public Binding rabbitMqResultInputBinding(Queue rabbitmqResultInputQueue, TopicExchange rabbitmqInputExchange) {
-        return BindingBuilder.bind(rabbitmqResultInputQueue).to(rabbitmqInputExchange).with(RABBITMQ_INPUT_RESULT_ROUTING_KEY);
+    public Binding rabbitmqInputPredictionStatusBinding(Queue rabbitmqInputPredictionStatusQueue, DirectExchange rabbitmqInputPredictionStatusExchange) {
+        return BindingBuilder.bind(rabbitmqInputPredictionStatusQueue).to(rabbitmqInputPredictionStatusExchange).with(RABBITMQ_INPUT_PREDICTION_STATUS_ROUTING_KEY);
     }
 
 
+    @Value("${rabbitmq.input.verificationResult.exchange:user-queries-service}")
+    public String RABBITMQ_INPUT_VERIFICATION_RESULT_EXCHANGE;
+    @Value("${rabbitmq.input.verificationResult.queue:verification-result}")
+    public String RABBITMQ_INPUT_VERIFICATION_RESULT_QUEUE;
+    @Value("${rabbitmq.input.verificationResult.routingKey:verification-result}")
+    public String RABBITMQ_INPUT_VERIFICATION_RESULT_ROUTING_KEY;
+
+
     @Bean
-    public Queue rabbitmqStatusInputQueue() {
-        return QueueBuilder.durable(RABBITMQ_INPUT_STATUS_QUEUE).build();
+    public DirectExchange rabbitmqInputVerificationResultExchange() {
+        return ExchangeBuilder.directExchange(RABBITMQ_INPUT_VERIFICATION_RESULT_EXCHANGE).build();
     }
 
     @Bean
-    public Binding rabbitMqStatusInputBinding(Queue rabbitmqStatusInputQueue, TopicExchange rabbitmqInputExchange) {
-        return BindingBuilder.bind(rabbitmqStatusInputQueue).to(rabbitmqInputExchange).with(RABBITMQ_INPUT_STATUS_ROUTING_KEY);
+    public Queue rabbitmqInputVerificationResultQueue() {
+        return QueueBuilder.durable(RABBITMQ_INPUT_VERIFICATION_RESULT_QUEUE).build();
     }
 
     @Bean
+    public Binding rabbitmqInputVerificationResultBinding(Queue rabbitmqInputVerificationResultQueue, DirectExchange rabbitmqInputVerificationResultExchange) {
+        return BindingBuilder.bind(rabbitmqInputVerificationResultQueue).to(rabbitmqInputVerificationResultExchange).with(RABBITMQ_INPUT_VERIFICATION_RESULT_ROUTING_KEY);
+    }
+
+    @Value("${rabbitmq.input.normalizationResult.exchange:user-queries-service}")
+    public String RABBITMQ_INPUT_NORMALIZATION_RESULT_EXCHANGE;
+    @Value("${rabbitmq.input.normalizationResult.queue:normalization-result}")
+    public String RABBITMQ_INPUT_NORMALIZATION_RESULT_QUEUE;
+    @Value("${rabbitmq.input.normalizationResult.routingKey:normalization-result}")
+    public String RABBITMQ_INPUT_NORMALIZATION_RESULT_ROUTING_KEY;
+
+
+    @Bean
+    public DirectExchange rabbitmqInputNormalizationResultExchange() {
+        return ExchangeBuilder.directExchange(RABBITMQ_INPUT_NORMALIZATION_RESULT_EXCHANGE).build();
+    }
+
+    @Bean
+    public Queue rabbitmqInputNormalizationResultQueue() {
+        return QueueBuilder.durable(RABBITMQ_INPUT_NORMALIZATION_RESULT_QUEUE).build();
+    }
+
+    @Bean
+    public Binding rabbitmqInputNormalizationResultBinding(Queue rabbitmqInputNormalizationResultQueue, DirectExchange rabbitmqInputNormalizationResultExchange) {
+        return BindingBuilder.bind(rabbitmqInputNormalizationResultQueue).to(rabbitmqInputNormalizationResultExchange).with(RABBITMQ_INPUT_NORMALIZATION_RESULT_ROUTING_KEY);
+    }
+
+    @Value("${rabbitmq.output.predictionService.exchange:prediction-service}")
+    public String RABBITMQ_OUTPUT_PREDICTION_SERVICE_EXCHANGE;
+    @Value("${rabbitmq.output.predictionService.queue:prediction-data}")
+    public String RABBITMQ_OUTPUT_PREDICTION_SERVICE_QUEUE;
+    @Value("${rabbitmq.output.predictionService.routingKey:prediction-data}")
+    public String RABBITMQ_OUTPUT_PREDICTION_SERVICE_ROUTING_KEY;
+
+
+    @Bean
+    public DirectExchange rabbitmqOutputPredictionServiceExchange() {
+        return ExchangeBuilder.directExchange(RABBITMQ_OUTPUT_PREDICTION_SERVICE_EXCHANGE).build();
+    }
+
+    @Bean
+    public Queue rabbitmqOutputPredictionServiceQueue() {
+        return QueueBuilder.durable(RABBITMQ_OUTPUT_PREDICTION_SERVICE_QUEUE).build();
+    }
+
+    @Bean
+    public Binding rabbitmqOutputPredictionServiceBinding(Queue rabbitmqOutputPredictionServiceQueue, DirectExchange rabbitmqOutputPredictionServiceExchange) {
+        return BindingBuilder.bind(rabbitmqOutputPredictionServiceQueue).to(rabbitmqOutputPredictionServiceExchange).with(RABBITMQ_OUTPUT_PREDICTION_SERVICE_ROUTING_KEY);
+    }
+
+    @Value("${rabbitmq.output.verificateDocument.exchange:data-preprocessing-service}")
+    public String RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_EXCHANGE;
+    @Value("${rabbitmq.output.verificateDocument.queue:verification-data}")
+    public String RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_QUEUE;
+    @Value("${rabbitmq.output.verificateDocument.routingKey:verification-data}")
+    public String RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_ROUTING_KEY;
+
+
+    @Bean
+    public DirectExchange rabbitmqOutputVerificateDocumentExchange() {
+        return ExchangeBuilder.directExchange(RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_EXCHANGE).build();
+    }
+
+    @Bean
+    public Queue rabbitmqOutputVerificateDocumentQueue() {
+        return QueueBuilder.durable(RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_QUEUE).build();
+    }
+
+    @Bean
+    public Binding rabbitmqOutputVerificateDocumentBinding(Queue rabbitmqOutputVerificateDocumentQueue, DirectExchange rabbitmqOutputVerificateDocumentExchange) {
+        return BindingBuilder.bind(rabbitmqOutputVerificateDocumentQueue).to(rabbitmqOutputVerificateDocumentExchange).with(RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_ROUTING_KEY);
+    }
+
+    @Value("${rabbitmq.output.normalizeData.exchange:data-preprocessing-service}")
+    public String RABBITMQ_OUTPUT_NORMALIZE_DATA_EXCHANGE;
+    @Value("${rabbitmq.output.normalizeData.queue:normalization-data}")
+    public String RABBITMQ_OUTPUT_NORMALIZE_DATA_QUEUE;
+    @Value("${rabbitmq.output.normalizeData.routingKey:normalization-data}")
+    public String RABBITMQ_OUTPUT_NORMALIZE_DATA_ROUTING_KEY;
+
+
+    @Bean
+    public DirectExchange rabbitmqOutputNormalizeDataExchange() {
+        return ExchangeBuilder.directExchange(RABBITMQ_OUTPUT_NORMALIZE_DATA_EXCHANGE).build();
+    }
+
+    @Bean
+    public Queue rabbitmqOutputNormalizeDataQueue() {
+        return QueueBuilder.durable(RABBITMQ_OUTPUT_NORMALIZE_DATA_QUEUE).build();
+    }
+
+    @Bean
+    public Binding rabbitmqOutputNormalizeDataBinding(Queue rabbitmqOutputNormalizeDataQueue, DirectExchange rabbitmqOutputNormalizeDataExchange) {
+        return BindingBuilder.bind(rabbitmqOutputNormalizeDataQueue).to(rabbitmqOutputNormalizeDataExchange).with(RABBITMQ_OUTPUT_NORMALIZE_DATA_ROUTING_KEY);
+    }
+    
+   /* @Bean
     public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory, final Jackson2JsonMessageConverter messageConverter){
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
         return rabbitTemplate;
-    }
+    }*/
 
 
 
-    @Bean
+    /*@Bean
     public ObjectMapper objectMapper() {
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -118,9 +217,10 @@ public class RabbitConfig {
         //classMapper.setTrustedPackages("ru.filippov.neat.dto", "ru.filippov.neat.dto.services");
         idClassMapping.put("ru.filippov.neatexecutor.entity.ExperimentStatusDto", ExperimentStatusDto.class);
         idClassMapping.put("ru.filippov.neatexecutor.entity.ServiceResult", PredictionServiceResult.class);
+        idClassMapping.put("ru.filippov.neat.dto", PredictionServiceResult.class);
         classMapper.setIdClassMapping(idClassMapping);
         return classMapper;
-    }
+    }*/
 
 
 }
