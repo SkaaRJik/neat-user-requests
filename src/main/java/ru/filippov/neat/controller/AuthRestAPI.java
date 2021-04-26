@@ -175,11 +175,13 @@ public class AuthRestAPI {
 
         try {
             userService.registrate(signUpRequest);
+            return ResponseEntity.ok().body("Ползователь зарегистрирован успешно. На ваш e-mail отправлено письмо с подтверждением регистрации.");
         } catch (Exception e) {
             log.error("AuthRestAPI.registerUser", e);
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return ResponseEntity.ok().body("Ползователь зарегистрирован успешно. На ваш e-mail отправлено письмо с подтверждением регистрации.");
+
     }
 
     @GetMapping("/refresh-tokens")

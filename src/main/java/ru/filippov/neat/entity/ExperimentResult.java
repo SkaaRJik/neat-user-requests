@@ -1,6 +1,7 @@
 package ru.filippov.neat.entity;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import ru.filippov.neat.entity.view.ExperimentView;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -20,8 +20,12 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@Table(name = "experiment_results", schema = "public", catalog = "neat")
+@Table(name = "experiment_results", schema = "public")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 public class ExperimentResult {
 
     @Id

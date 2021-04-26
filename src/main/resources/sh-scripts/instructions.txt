@@ -42,6 +42,9 @@ sudo chown -R $USER@$USER /samba
 
 Добавляем текущего пользователя в Самбу
 sudo smbpasswd -a $USER
+Активируем его
+sudo smbpasswd -e $USER
+
 
 Перезагружаем сервис Самбы
 systemctl restart smbd

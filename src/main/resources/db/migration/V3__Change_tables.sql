@@ -49,8 +49,8 @@ create table experiments
     PRIMARY KEY (id)
 );
 
-ALTER TABLE if EXISTS experiment add CONSTRAINT project_experiment_fk FOREIGN KEY (fk_project_id) references projects;
-ALTER TABLE if EXISTS experiment add CONSTRAINT experiment_reuslt_fk FOREIGN KEY (fk_experiment_result_id) references experiment_results;
+ALTER TABLE if EXISTS experiments add CONSTRAINT project_experiment_fk FOREIGN KEY (fk_project_id) references projects;
+ALTER TABLE if EXISTS experiments add CONSTRAINT experiment_reuslt_fk FOREIGN KEY (fk_experiment_result_id) references experiment_results;
 
 
 ALTER TABLE projects

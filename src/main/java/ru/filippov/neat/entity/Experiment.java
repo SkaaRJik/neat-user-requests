@@ -1,7 +1,9 @@
 package ru.filippov.neat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import ru.filippov.neat.dto.ExperimentData;
-import ru.filippov.neat.dto.ProjectConfigDto;
 import ru.filippov.neat.entity.view.ExperimentView;
 
 import javax.persistence.*;
@@ -23,8 +23,12 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@Table(name = "experiments", schema = "public", catalog = "neat")
+@Table(name = "experiments", schema = "public")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 public class Experiment {
 
     @Id
@@ -91,9 +95,5 @@ public class Experiment {
     @Column(name = "updated_date", nullable = false)
     @JsonView(ExperimentView.Info.class)
     private LocalDateTime updatedDate;
-
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fk_experiment_result_id", referencedColumnName = "id")
-    private ExperimentResult experimentResult;
 
 }
