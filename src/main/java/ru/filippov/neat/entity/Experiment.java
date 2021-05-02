@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import ru.filippov.neat.entity.view.ExperimentView;
@@ -29,6 +26,10 @@ import java.util.Map;
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id"
 )
+@NamedEntityGraph(name = "Experiment.project",
+        attributeNodes = @NamedAttributeNode("project")
+)
+@ToString
 public class Experiment {
 
     @Id
@@ -44,7 +45,7 @@ public class Experiment {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_project_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "fk_project_id", referencedColumnName = "id")
     @JsonIgnore
     private Project project;
 
@@ -62,19 +63,19 @@ public class Experiment {
     @Column(name = "normalization_statistic", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     @JsonView(ExperimentView.FullInfo.class)
-    private Map<String, Object> normalization_statistic;
+    private String normalizationStatistic;
 
     @Basic
     @Column(name = "neat_settings", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     @JsonView(ExperimentView.FullInfo.class)
-    private List<Map<String, Object>> neatSettings;
+    private String neatSettings;
 
     @Basic
     @Column(name = "columns", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     @JsonView(ExperimentView.FullInfo.class)
-    private List<Map<String, Object>> columns;
+    private String columns;
 
     @Basic
     @Column(name = "prediction_window_size")
@@ -87,13 +88,26 @@ public class Experiment {
     private Short predictionPeriod;
 
     @Basic
-    @Column(name = "creation_date", nullable = false)
+    @Column(name = "train_end_index")
+    @JsonView(ExperimentView.FullInfo.class)
+    private Integer trainEndIndex;
+
+    @Basic
+    @Column(name = "test_end_index")
+    @JsonView(ExperimentView.FullInfo.class)
+    private Integer testEndIndex;
+
+    @Basic
+    @Column(name = "creation_date")
     @JsonView(ExperimentView.Info.class)
     private LocalDateTime creationDate;
 
     @Basic
-    @Column(name = "updated_date", nullable = false)
+    @Column(name = "updated_date")
     @JsonView(ExperimentView.Info.class)
     private LocalDateTime updatedDate;
 
+    @OneToOne
+    @JoinColumn(name = "fk_experiment_result_id", referencedColumnName = "id")
+    private ExperimentResult experimentResult;
 }

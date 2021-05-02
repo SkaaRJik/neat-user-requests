@@ -14,7 +14,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class NormalizationResult {
-    private Long projectId;
+    private Long experimentId;
     private String normalizedDatasetFilename;
     private Map<String, Object> statistic;
     private ProjectStatus status;

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import ru.filippov.neat.entity.ProjectStatus;
 
 @Data
 @AllArgsConstructor
@@ -11,5 +12,5 @@ import lombok.ToString;
 @ToString
 public class ExperimentStatusDto {
     Long projectId;
-    String status;
+    ProjectStatus status;
 }

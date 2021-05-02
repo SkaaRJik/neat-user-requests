@@ -3,10 +3,7 @@ package ru.filippov.neat.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -26,6 +23,7 @@ import java.util.Map;
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id"
 )
+@ToString
 public class ExperimentResult {
 
     @Id
@@ -35,31 +33,44 @@ public class ExperimentResult {
     private Long id;
 
 
-    @Basic
     @Column(name = "model", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private Map model;
+    private String model;
 
 
     @Column(name = "train_errors", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private List<Map<String, Object>> trainErrors;
+    private String trainErrors;
 
 
     @Column(name = "test_errors", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private List<Map<String, Object>> testErrors;
+    private String testErrors;
 
     @Basic
     @Column(name = "prediction_error")
     private Double predictionError;
 
     @Basic
+    @Column(name = "prediction_result")
+    private String predictionResult;
+
+    @Basic
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
 
     @Basic
+    @Column(name = "prediction_result_file")
+    private String predictionResultFile;
+
+    @Basic
     @Column(name = "prediction_report_file")
     private String predictionReportFile;
+
+    @Column(name = "window_train_statistic", columnDefinition = "jsonb")
+    @Type(type = "jsonb")
+    private String windowTrainStatistic;
+
+
 
 }

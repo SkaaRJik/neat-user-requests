@@ -2,10 +2,7 @@ package ru.filippov.neat.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,16 +17,17 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Log4j2
-public class ExperimentData  {
-    private Long neatConfigId;
+@ToString
+public class ExperimentDataForPredictionServiceDto {
+    private Long experimentId;
     private Long projectId;
-    private ProjectConfigDto.NormalizedDataDto normalizedData;
-    private List<Map<String, Object>> neatSettings;
+    private String username;
+    private String projectName;
+    private String dataFilename;
+    private String columns;
+    private Integer trainEndIndex;
+    private Integer testEndIndex;
+    private String neatSettings;
     private Short predictionWindowSize;
     private Short predictionPeriod;
-
-
-    public String toJson() throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(this);
-    }
 }

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class NormalizationData {
     private Long experimentId;
+    private String projectName;
     private String  normalizationMethod;
     private boolean log;
     private String username;

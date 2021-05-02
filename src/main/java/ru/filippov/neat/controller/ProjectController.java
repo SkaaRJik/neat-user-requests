@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import ru.filippov.neat.dto.ExperimentDataForPredictionServiceDto;
 import ru.filippov.neat.dto.experiment.NewExperimentDto;
 import ru.filippov.neat.dto.experiment.UpdateExperimentDto;
 import ru.filippov.neat.dto.project.NewProjectDto;
@@ -24,9 +24,6 @@ import ru.filippov.neat.parser.excel.ExcelParser;
 import ru.filippov.neat.service.project.ProjectServiceImpl;
 import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 import ru.filippov.neat.service.user.UserPrincipal;
-
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @RestController
 @Slf4j
@@ -81,6 +78,10 @@ public class ProjectController {
             log.error(String.format("ProjectController.attachSourceFileToProject: projectId: %d ; user: %d-%s ", projectId, user.getId(), user.getUsername()), e);
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (ProjectException e) {
+            log.error(String.format("ProjectController.attachSourceFileToProject: projectId: %d ; user: %d-%s ", projectId, user.getId(), user.getUsername()), e);
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (Exception ex) {
             log.error(String.format("ProjectController.attachSourceFileToProject: projectId: %d ; user: %d-%s ", projectId, user.getId(), user.getUsername()), ex);
             throw new ResponseStatusException(
@@ -122,7 +123,7 @@ public class ProjectController {
     @GetMapping("/{id}")
     @JsonView(ProjectView.FullInfo.class)
     public Project getProjectInfo(@AuthenticationPrincipal UserPrincipal user,
-                                            @PathVariable("id") Long id) throws PermissionException {
+                                            @PathVariable("id") Long id) {
         try{
             Project projectsById = projectService.getProjectById(id, user.toUser());
             return projectsById;
@@ -144,23 +145,30 @@ public class ProjectController {
 
 
 
-    /*@RequestMapping(value = {"/{id}/config", "/{id}/config/{config_id}"},method = RequestMethod.PUT)
-    public ResponseEntity<?> saveProjectConfiguration(@AuthenticationPrincipal UserPrincipal user, @PathVariable("id") Long id, @PathVariable(name = "config_id", required = false) Long configId, @RequestBody ProjectConfigDto projectConfig){
+    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}/predict",method = RequestMethod.POST)
+    public String startPrediction(@AuthenticationPrincipal UserPrincipal user,
+                                                      @PathVariable("project_id") Long projectId,
+                                                      @PathVariable(name = "experiment_id", required = false) Long experimentId,
+                                                      @RequestBody ExperimentDataForPredictionServiceDto experimentDataForPredictionServiceDto){
         try {
-            final boolean b = projectService.saveNeatConfig(id, user.getId(), projectConfig, configId);
-            return ResponseEntity.ok().build();
-        } catch (ProjectException e) {
-            log.error("ProjectController.getProjectData", e);
-            responseEntity = new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+            projectService.startPrediction(user.toUser(), projectId, experimentId, experimentDataForPredictionServiceDto);
+            return "INFO_PREDICTION_STARTED";
+        } catch (ResourceNotFoundException e) {
+            log.error(String.format("ProjectController.startPrediction: projectId: %d ; user: %d-%s ; experimentId: %d; experimentData = %s", projectId, user.getId(), user.getUsername(), experimentId, experimentDataForPredictionServiceDto.toString()), e);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (PermissionException e) {
-            log.error("ProjectController.getProjectData", e);
-            responseEntity = new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
+            log.error(String.format("ProjectController.startPrediction: projectId: %d ; user: %d-%s ; experimentId: %d; experimentData = %s", projectId, user.getId(), user.getUsername(), experimentId, experimentDataForPredictionServiceDto.toString()), e);
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, e.getMessage(), e);
         } catch (Exception e) {
-            log.error("ProjectController.getProjectData", e);
-            responseEntity = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(String.format("ProjectController.startPrediction: projectId: %d ; user: %d-%s ; experimentId: %d; experimentData = %s", projectId, user.getId(), user.getUsername(), experimentId, experimentDataForPredictionServiceDto.toString()), e);
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
         }
-    }*/
+    }
 
+    @JsonView(ProjectView.Info.class)
     @RequestMapping(value = "/{project_id}/experiment",method = RequestMethod.POST)
     public Experiment createExperiment(@AuthenticationPrincipal UserPrincipal user,
                                               @PathVariable("project_id") Long projectId,
@@ -208,7 +216,7 @@ public class ProjectController {
         
     }
 
-    @RequestMapping(value = "/{id}/experiment/{experiment_id}",method = RequestMethod.POST)
+    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}/normalize",method = RequestMethod.POST)
     public String normalizeDataForExperiment(@AuthenticationPrincipal UserPrincipal user,
                                               @PathVariable("project_id") Long projectId,
                                               @PathVariable(name = "experiment_id", required = false) Long experimentId,
