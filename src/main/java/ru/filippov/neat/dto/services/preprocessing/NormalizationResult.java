@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.filippov.neat.entity.ProjectStatus;
 
-import java.util.List;
-import java.util.Map;
+import java.util.HashMap;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +15,6 @@ import java.util.Map;
 public class NormalizationResult {
     private Long experimentId;
     private String normalizedDatasetFilename;
-    private Map<String, Object> statistic;
+    private HashMap<String, Object> statistic;
     private ProjectStatus status;
 }

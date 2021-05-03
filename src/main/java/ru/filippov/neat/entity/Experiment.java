@@ -12,8 +12,8 @@ import ru.filippov.neat.entity.view.ExperimentView;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Entity
@@ -55,6 +55,10 @@ public class Experiment {
     private String normalizedDataFile;
 
     @Basic
+    @Column(name = "enable_log_transform")
+    private Boolean enableLogTransform;
+
+    @Basic
     @Column(name = "normalization_method")
     @JsonView(ExperimentView.FullInfo.class)
     private String normalizationMethod;
@@ -63,19 +67,19 @@ public class Experiment {
     @Column(name = "normalization_statistic", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     @JsonView(ExperimentView.FullInfo.class)
-    private String normalizationStatistic;
+    private HashMap<String, Object> normalizationStatistic;
 
     @Basic
     @Column(name = "neat_settings", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     @JsonView(ExperimentView.FullInfo.class)
-    private String neatSettings;
+    private List<HashMap<String, Object>> neatSettings;
 
     @Basic
     @Column(name = "columns", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     @JsonView(ExperimentView.FullInfo.class)
-    private String columns;
+    private List<HashMap<String, Object>> columns;
 
     @Basic
     @Column(name = "prediction_window_size")

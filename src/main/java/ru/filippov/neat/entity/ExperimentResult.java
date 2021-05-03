@@ -9,8 +9,8 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Entity
@@ -27,33 +27,32 @@ import java.util.Map;
 public class ExperimentResult {
 
     @Id
-    @SequenceGenerator(name = "EXPERIMENT_RESULT_ID_GEN", sequenceName = "experiment_result_id_sequence", allocationSize = 1, schema = "public")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EXPERIMENT_RESULT_ID_GEN")
     @Column(name = "id")
     private Long id;
 
 
     @Column(name = "model", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private String model;
+    private HashMap<String, Object> model;
 
 
     @Column(name = "train_errors", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private String trainErrors;
+    private List<Double> trainErrors;
 
 
     @Column(name = "test_errors", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private String testErrors;
+    private List<Double> testErrors;
 
     @Basic
     @Column(name = "prediction_error")
     private Double predictionError;
 
     @Basic
-    @Column(name = "prediction_result")
-    private String predictionResult;
+    @Column(name = "prediction_result", columnDefinition = "jsonb")
+    @Type(type = "jsonb")
+    private List<HashMap<String, Object>> predictionResult;
 
     @Basic
     @Column(name = "creation_date", nullable = false)
@@ -69,7 +68,7 @@ public class ExperimentResult {
 
     @Column(name = "window_train_statistic", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private String windowTrainStatistic;
+    private HashMap<String, Object> windowTrainStatistic;
 
 
 

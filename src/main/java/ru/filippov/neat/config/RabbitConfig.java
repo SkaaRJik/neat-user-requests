@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class RabbitConfig {
 
+
     @Value("${rabbitmq.input.predictionResult.exchange:user-queries-service}")
     public String RABBITMQ_INPUT_PREDICTION_RESULT_EXCHANGE;
     @Value("${rabbitmq.input.predictionResult.queue:prediction-result}")
@@ -102,6 +103,29 @@ public class RabbitConfig {
         return BindingBuilder.bind(rabbitmqInputNormalizationResultQueue).to(rabbitmqInputNormalizationResultExchange).with(RABBITMQ_INPUT_NORMALIZATION_RESULT_ROUTING_KEY);
     }
 
+    @Value("${rabbitmq.input.reportResult.exchange:data-preprocessing-service}")
+    public String RABBITMQ_INPUT_REPORT_RESULTS_EXCHANGE;
+    @Value("${rabbitmq.input.reportResult.queue:report-result}")
+    public String RABBITMQ_INPUT_REPORT_RESULTS_QUEUE;
+    @Value("${rabbitmq.input.reportResult.routingKey:report-result}")
+    public String RABBITMQ_INPUT_REPORT_RESULTS_ROUTING_KEY;
+
+    @Bean
+    public DirectExchange rabbitmqInputReportResultExchange() {
+        return ExchangeBuilder.directExchange(RABBITMQ_INPUT_REPORT_RESULTS_EXCHANGE).build();
+    }
+
+    @Bean
+    public Queue rabbitmqInputReportResultQueue() {
+        return QueueBuilder.durable(RABBITMQ_INPUT_REPORT_RESULTS_QUEUE).build();
+    }
+
+    @Bean
+    public Binding rabbitmqInputReportResultBinding(Queue rabbitmqInputReportResultQueue, DirectExchange rabbitmqInputReportResultExchange) {
+        return BindingBuilder.bind(rabbitmqInputReportResultQueue).to(rabbitmqInputReportResultExchange).with(RABBITMQ_INPUT_REPORT_RESULTS_ROUTING_KEY);
+    }
+
+
     @Value("${rabbitmq.output.predictionService.exchange:prediction-service}")
     public String RABBITMQ_OUTPUT_PREDICTION_SERVICE_EXCHANGE;
     @Value("${rabbitmq.output.predictionService.queue:prediction-data}")
@@ -169,6 +193,29 @@ public class RabbitConfig {
     @Bean
     public Binding rabbitmqOutputNormalizeDataBinding(Queue rabbitmqOutputNormalizeDataQueue, DirectExchange rabbitmqOutputNormalizeDataExchange) {
         return BindingBuilder.bind(rabbitmqOutputNormalizeDataQueue).to(rabbitmqOutputNormalizeDataExchange).with(RABBITMQ_OUTPUT_NORMALIZE_DATA_ROUTING_KEY);
+    }
+
+
+    @Value("${rabbitmq.output.report.exchange:data-preprocessing-service}")
+    public String RABBITMQ_OUTPUT_REPORT_EXCHANGE;
+    @Value("${rabbitmq.output.report.queue:report}")
+    public String RABBITMQ_OUTPUT_REPORT_QUEUE;
+    @Value("${rabbitmq.output.report.routingKey:report}")
+    public String RABBITMQ_OUTPUT_REPORT_ROUTING_KEY;
+
+    @Bean
+    public DirectExchange rabbitmqOutputReportExchange() {
+        return ExchangeBuilder.directExchange(RABBITMQ_OUTPUT_REPORT_EXCHANGE).build();
+    }
+
+    @Bean
+    public Queue rabbitmqOutputReportQueue() {
+        return QueueBuilder.durable(RABBITMQ_OUTPUT_REPORT_QUEUE).build();
+    }
+
+    @Bean
+    public Binding rabbitmqOutputReportBinding(Queue rabbitmqOutputReportQueue, DirectExchange rabbitmqOutputReportExchange) {
+        return BindingBuilder.bind(rabbitmqOutputReportQueue).to(rabbitmqOutputReportExchange).with(RABBITMQ_OUTPUT_REPORT_ROUTING_KEY);
     }
     
    /* @Bean

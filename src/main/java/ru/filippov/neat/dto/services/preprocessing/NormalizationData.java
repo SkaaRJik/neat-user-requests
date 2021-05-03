@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class NormalizationData {
     private Long experimentId;
-    private String projectName;
-    private String  normalizationMethod;
+    private String normalizationMethod;
     private boolean log;
     private String username;
-    private String fileName;
+    private String filePath;
+    private String projectFolder;
 }

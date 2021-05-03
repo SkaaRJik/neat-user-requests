@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import ru.filippov.neat.entity.ProjectStatus;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -15,11 +15,11 @@ import java.util.Map;
 @ToString
 public class PredictionResult {
     private Long experimentId;
-    private String trainErrors;
-    private String testErrors;
+    private List<Double> trainErrors;
+    private List<Double> testErrors;
     private Double predictionError;
     private String predictionResultFile;
-    private String windowTrainStatistic;
-    private String model;
+    private HashMap<String, Object> windowTrainStatistic;
+    private HashMap<String, Object> model;
     private ProjectStatus status;
 }

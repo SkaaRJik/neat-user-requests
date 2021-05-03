@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class VerificationData {
     private Long projectId;
-    private String projectName;
     private String username;
-    private String fileName;
+    private String filePath;
+    private String projectFolder;
 }

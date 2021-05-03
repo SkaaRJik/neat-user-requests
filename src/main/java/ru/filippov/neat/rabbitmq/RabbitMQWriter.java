@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.filippov.neat.config.RabbitConfig;
+import ru.filippov.neat.dto.DataForReportServiceDto;
 import ru.filippov.neat.dto.ExperimentDataForPredictionServiceDto;
 import ru.filippov.neat.dto.services.preprocessing.NormalizationData;
 import ru.filippov.neat.dto.services.preprocessing.VerificationData;
@@ -36,5 +37,10 @@ public class RabbitMQWriter {
     public void sendDataToVerify(VerificationData verificationData) throws JsonProcessingException {
         String json = this.objectMapper.writeValueAsString(verificationData);
         rabbitTemplate.convertAndSend(rabbitConfig.RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_EXCHANGE, rabbitConfig.RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_ROUTING_KEY, json);
+    }
+
+    public void sendDataToReportService(DataForReportServiceDto dataForReportServiceDto) throws JsonProcessingException {
+        String json = this.objectMapper.writeValueAsString(dataForReportServiceDto);
+        rabbitTemplate.convertAndSend(rabbitConfig.RABBITMQ_OUTPUT_REPORT_EXCHANGE, rabbitConfig.RABBITMQ_OUTPUT_REPORT_ROUTING_KEY, json);
     }
 }

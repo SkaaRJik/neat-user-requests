@@ -61,6 +61,10 @@ public class Project {
     private List<Experiment> experiments;
 
     @JsonView(ProjectView.FullInfo.class)
+    @Column(name = "project_folder")
+    private String projectFolder;
+
+    @JsonView(ProjectView.FullInfo.class)
     @Column(name = "source_file")
     private String sourceFile;
 
@@ -91,7 +95,7 @@ public class Project {
     @JsonView(ProjectView.FullInfo.class)
     @Column(name = "headers", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private List headers;
+    private List<String> headers;
 
 
 

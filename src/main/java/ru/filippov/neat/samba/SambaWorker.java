@@ -193,10 +193,9 @@ public class SambaWorker {
         return filePath;
     }
 
-    public String writeSourceFile(MultipartFile file, String projectName, String username) throws IOException {
-        String directory = String.format("./%s/%s", username, projectName);
+    public String writeSourceFile(MultipartFile file, String projectFolder) throws IOException {
         String filename = "source.xlsx";
-        return writeFileToNetworkFolder(file, directory, filename);
+        return writeFileToNetworkFolder(file, projectFolder, filename);
     }
 
 
