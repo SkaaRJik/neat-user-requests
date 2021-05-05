@@ -7,16 +7,16 @@ CREATE sequence neat_config_id_sequence
 
 create table neat_config
 (
-    id int8 not null,
+    id bigint not null,
     normalized_data jsonb not null,
     neat_settings jsonb not null,
-    prediction_window_size int2 not null,
-    prediction_period int2 not null,
-    fk_project_id int8 not null,
+    prediction_window_size int not null,
+    prediction_period int not null,
+    fk_project_id bigint not null,
     creation_date timestamp not null,
-    prediction_error float8,
-    training_error float8,
-    test_error float8,
+    prediction_error double precision,
+    training_error double precision,
+    test_error double precision,
     PRIMARY KEY (id)
 );
 

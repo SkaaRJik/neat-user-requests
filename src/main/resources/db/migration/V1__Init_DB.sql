@@ -6,7 +6,7 @@ CREATE sequence user_id_sequence
     CACHE 1;
 
 CREATE TABLE usr (
-    id int8 NOT NULL,
+    id bigint NOT NULL,
     active boolean NOT NULL,
     avatar varchar(255),
     creation_date timestamp NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE usr (
 );
 
 CREATE TABLE user_role (
-    user_id int8 NOT NULL,
+    user_id bigint NOT NULL,
     roles varchar(255)
 );
 
@@ -35,13 +35,13 @@ CREATE sequence project_id_sequence
     CACHE 1;
 
 CREATE TABLE projects (
-    id int8 NOT NULL,
+    id bigint NOT NULL,
     created_date timestamp NOT NULL,
     name varchar(255) NOT NULL,
-    status int2 NOT NULL,
+    status int NOT NULL,
     updated_date timestamp NOT NULL,
     data jsonb not null,
-    fk_user_id int8 NOT NULL,
+    fk_user_id bigint NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -55,11 +55,11 @@ CREATE sequence auth_id_sequence
     CACHE 1;
 
 CREATE TABLE auth (
-    id int8 NOT NULL,
+    id bigint NOT NULL,
     expiration_date timestamp NOT NULL,
     previous_refresh_token varchar(255),
     refresh_token varchar(255) NOT NULL,
-    fk_user_id int8 NOT NULL,
+    fk_user_id bigint NOT NULL,
     PRIMARY KEY (id)
 );
 

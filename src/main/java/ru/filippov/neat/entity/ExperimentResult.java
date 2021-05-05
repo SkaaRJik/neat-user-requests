@@ -52,7 +52,7 @@ public class ExperimentResult {
     @Basic
     @Column(name = "prediction_result", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private List<HashMap<String, Object>> predictionResult;
+    private HashMap<String, Object> predictionResult;
 
     @Basic
     @Column(name = "creation_date", nullable = false)

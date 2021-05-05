@@ -8,13 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.filippov.neat.dto.DataForReportServiceDto;
-import ru.filippov.neat.dto.ExperimentDataForPredictionServiceDto;
+import ru.filippov.neat.dto.services.prediction.ExperimentData;
+import ru.filippov.neat.dto.services.prediction.ExperimentNewStatusDto;
 import ru.filippov.neat.dto.services.prediction.PredictionResult;
-import ru.filippov.neat.dto.services.preprocessing.NormalizationData;
-import ru.filippov.neat.dto.services.preprocessing.NormalizationResult;
-import ru.filippov.neat.dto.services.preprocessing.VerificationData;
-import ru.filippov.neat.dto.services.preprocessing.VerificationResult;
+import ru.filippov.neat.dto.services.preprocessing.*;
 import ru.filippov.neat.entity.*;
 import ru.filippov.neat.exception.PermissionException;
 import ru.filippov.neat.exception.ResourceNotFoundException;
@@ -80,6 +77,7 @@ public class ProjectServiceImpl {
                 projectName,
                 user,
                 ProjectStatus.NEW,
+                null,
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 null,
@@ -106,11 +104,11 @@ public class ProjectServiceImpl {
             throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
         }
 
-        if (!(project.getStatus() == ProjectStatus.VERIFICATION ||
-                project.getStatus() == ProjectStatus.VERIFICATION_ERROR ||
-                project.getStatus() == ProjectStatus.VERIFICATION_SERVICE_ERROR ||
-                project.getStatus() == ProjectStatus.NEW
-        )) {
+        if(project.getStatus() == ProjectStatus.VERIFICATION){
+            throw new ProjectException("VERIFICATION_IN_PROGRESS");
+        }
+
+        if ( project.getStatus() == ProjectStatus.VERIFIED ) {
             throw new ProjectException("SOURCE_FILE_ALREADY_VERIFIED");
         }
 
@@ -156,17 +154,27 @@ public class ProjectServiceImpl {
             throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
         }
 
-        if (project.getStatus() == ProjectStatus.NORMALIZATION) {
-            throw new ProjectException("NORMALIZATION_PROCESS_ALREADY_RAN");
-        }
-
         if (project.getVerifiedFile() == null) {
             throw new ProjectException("ERROR_VERIFIED_FILE_NOT_EXIST");
         }
 
-
         Experiment experiment = experimentRepository.findById(experimentId).orElseThrow(() -> new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS"));
 
+        if (experiment.getStatus() == ExperimentStatus.NORMALIZATION) {
+            throw new ProjectException("NORMALIZATION_PROCESS_ALREADY_RAN");
+        }
+
+        if (experiment.getStatus() == ExperimentStatus.CREATING_REPORT) {
+            throw new ProjectException("REPORT_PROCESS_ALREADY_RAN");
+        }
+
+        if (experiment.getStatus() == ExperimentStatus.IN_QUEUE) {
+            throw new ProjectException("PREDICTION_PROCESS_ALREADY_RAN");
+        }
+
+        if (experiment.getStatus() == ExperimentStatus.PREDICTION) {
+            throw new ProjectException("PREDICTION_PROCESS_ALREADY_RAN");
+        }
 
         /*Experiment experiment = null;
 
@@ -181,23 +189,32 @@ public class ProjectServiceImpl {
         }*/
 
 
-        project.setStatus(ProjectStatus.NORMALIZATION);
+
         project.setUpdatedDate(LocalDateTime.now());
+        project.setLastActiveExperiment(experiment);
+        experiment.setStatus(ExperimentStatus.NORMALIZATION);
         experiment.setNormalizationMethod(method);
         experiment.setEnableLogTransform(enableLogTransform);
         projectRepository.save(project);
         experimentRepository.save(experiment);
+        try {
+            rabbitMQWriter.sendDataToNormalize(new NormalizationData(
+                            experimentId,
+                            method,
+                            enableLogTransform,
+                            user.getUsername(),
+                            project.getVerifiedFile(),
+                            project.getProjectFolder()
+                    )
+            );
+        } catch (Exception exception) {
+            experiment.setStatus(ExperimentStatus.SENDING_TO_NORMALIZATION_SERVICE_ERROR);
+            experimentRepository.save(experiment);
+            throw exception;
+        }
 
-        rabbitMQWriter.sendDataToNormalize(new NormalizationData(
-                        experimentId,
-                        method,
-                        enableLogTransform,
-                        user.getUsername(),
-                        project.getVerifiedFile(),
-                        project.getProjectFolder()
-                )
-        );
     }
+
 
     public Experiment createExperiment(User user, Long projectId, String experimentName) throws PermissionException, ResourceNotFoundException, ProjectException {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
@@ -225,10 +242,12 @@ public class ProjectServiceImpl {
                         null,
                         LocalDateTime.now(),
                         LocalDateTime.now(),
-                        null
+                        null,
+                        ExperimentStatus.NEW_EXPERIMENT
                 );
-                experiments.add(experiment);
                 experiment = experimentRepository.save(experiment);
+                experiments.add(experiment);
+                project.setLastActiveExperiment(experiment);
                 projectRepository.save(project);
             } else {
                 throw new ProjectException("ERROR_MAX_EXPERIMENTS_REACHED");
@@ -251,11 +270,13 @@ public class ProjectServiceImpl {
                     null,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
-                    null
+                    null,
+                    ExperimentStatus.NEW_EXPERIMENT
             );
-            experiments.add(experiment);
-            project.setExperiments(experiments);
             experiment = experimentRepository.save(experiment);
+            experiments.add(experiment);
+            project.setLastActiveExperiment(experiment);
+            project.setExperiments(experiments);
             projectRepository.save(project);
         }
         return experiment;
@@ -270,22 +291,22 @@ public class ProjectServiceImpl {
         }
 
         Experiment experiment = experimentRepository.findById(experimentId).orElseThrow(() -> new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS"));
-
+        project.setUpdatedDate(LocalDateTime.now());
         experiment.setUpdatedDate(LocalDateTime.now());
         experiment.setName(experimentName);
 
         experiment = experimentRepository.save(experiment);
-
+        projectRepository.save(project);
         return experiment;
     }
 
-    public Project updateProjectStatus(Long projectId, ProjectStatus status) throws ResourceNotFoundException {
-        Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
+    public Experiment updateExperimentStatus(ExperimentNewStatusDto newStatusDto) throws ResourceNotFoundException {
+        Experiment experiment = experimentRepository.findById(newStatusDto.getExperimentId()).orElseThrow(() -> new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS"));
 
-        project.setStatus(status);
-        project.setUpdatedDate(LocalDateTime.now());
+        experiment.setStatus(newStatusDto.getStatus());
+        experiment.setUpdatedDate(LocalDateTime.now());
 
-        return projectRepository.save(project);
+        return experimentRepository.save(experiment);
     }
 
     public Experiment getExperimentById(User user, Long projectId, Long experimentId) throws ResourceNotFoundException, PermissionException {
@@ -320,21 +341,19 @@ public class ProjectServiceImpl {
 
         //Project project = projectRepository.findById(experiment.getProject().getId()).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
         Project project = experiment.getProject();
-        project.setStatus(normalizationResult.getStatus());
+        project.setLastActiveExperiment(experiment);
         project.setUpdatedDate(LocalDateTime.now());
 
-
+        experiment.setStatus(normalizationResult.getStatus());
         experiment.setUpdatedDate(LocalDateTime.now());
         experiment.setNormalizationStatistic(normalizationResult.getStatistic());
         experiment.setNormalizedDataFile(normalizationResult.getNormalizedDatasetFilename());
 
         this.projectRepository.save(project);
         this.experimentRepository.save(experiment);
-
-
     }
 
-    public void startPrediction(User user, Long projectId, Long experimentId, ExperimentDataForPredictionServiceDto experimentDataForPredictionServiceDto) throws PermissionException, ResourceNotFoundException, JsonProcessingException, ProjectException {
+    public void startPrediction(User user, Long projectId, Long experimentId, ExperimentData experimentData) throws PermissionException, ResourceNotFoundException, JsonProcessingException, ProjectException {
 
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
 
@@ -344,34 +363,49 @@ public class ProjectServiceImpl {
 
         Experiment experiment = experimentRepository.findById(experimentId).orElseThrow(() -> new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS"));
 
-        if (
-                project.getStatus() == ProjectStatus.IN_QUEUE ||
-                        project.getStatus() == ProjectStatus.PREDICTION
-        ) {
+        if(experiment.getNormalizedDataFile() == null) {
+            throw new ProjectException("ERROR_NORMALIZATION_FILE_NOT_FOUND");
+        }
+
+        if (experiment.getStatus() == ExperimentStatus.NORMALIZATION) {
+            throw new ProjectException("NORMALIZATION_PROCESS_ALREADY_RAN");
+        }
+
+        if (experiment.getStatus() == ExperimentStatus.CREATING_REPORT) {
+            throw new ProjectException("REPORT_PROCESS_ALREADY_RAN");
+        }
+
+        if (experiment.getStatus() == ExperimentStatus.IN_QUEUE) {
             throw new ProjectException("PREDICTION_PROCESS_ALREADY_RAN");
         }
 
-        project.setStatus(ProjectStatus.IN_QUEUE);
+        if (experiment.getStatus() == ExperimentStatus.PREDICTION) {
+            throw new ProjectException("PREDICTION_PROCESS_ALREADY_RAN");
+        }
+
+        project.setLastActiveExperiment(experiment);
         project.setUpdatedDate(LocalDateTime.now());
 
         experiment.setUpdatedDate(LocalDateTime.now());
-        experiment.setColumns(experimentDataForPredictionServiceDto.getColumns());
-        experiment.setTrainEndIndex(experimentDataForPredictionServiceDto.getTrainEndIndex());
-        experiment.setTestEndIndex(experimentDataForPredictionServiceDto.getTestEndIndex());
-        experiment.setNeatSettings(experimentDataForPredictionServiceDto.getNeatSettings());
-        experiment.setPredictionPeriod(experimentDataForPredictionServiceDto.getPredictionPeriod());
-        experiment.setPredictionWindowSize(experimentDataForPredictionServiceDto.getPredictionWindowSize());
+        experiment.setStatus(ExperimentStatus.IN_QUEUE);
+        experiment.setColumns(experimentData.getColumns());
+        experiment.setTrainEndIndex(experimentData.getTrainEndIndex());
+        experiment.setTestEndIndex(experimentData.getTestEndIndex());
+        experiment.setNeatSettings(experimentData.getNeatSettings());
+        experiment.setPredictionPeriod(experimentData.getPredictionPeriod());
+        experiment.setPredictionWindowSize(experimentData.getPredictionWindowSize());
+        experiment.setExperimentResult(null);
 
-        ExperimentDataForPredictionServiceDto sendingExperimentConfig = new ExperimentDataForPredictionServiceDto(
+        ExperimentData sendingExperimentConfig = new ExperimentData(
                 experimentId,
                 projectId,
                 user.getUsername(),
                 project.getProjectFolder(),
                 experiment.getNormalizedDataFile(),
-                experimentDataForPredictionServiceDto.getColumns(),
+                experimentData.getColumns(),
                 experiment.getTrainEndIndex(),
                 experiment.getTestEndIndex(),
-                experimentDataForPredictionServiceDto.getNeatSettings(),
+                experimentData.getNeatSettings(),
                 experiment.getPredictionWindowSize(),
                 experiment.getPredictionPeriod()
         );
@@ -381,8 +415,8 @@ public class ProjectServiceImpl {
         try {
             rabbitMQWriter.sendDataToPredict(sendingExperimentConfig);
         } catch (Exception ex) {
-            project.setStatus(ProjectStatus.SENDING_TO_PREDICTION_SERVICE_ERROR);
-            projectRepository.save(project);
+            experiment.setStatus(ExperimentStatus.SENDING_TO_PREDICTION_SERVICE_ERROR);
+            experimentRepository.save(experiment);
             throw ex;
         }
 
@@ -395,7 +429,6 @@ public class ProjectServiceImpl {
 
 
         Project project = experiment.getProject();
-        project.setStatus(predictionResult.getStatus());
         project.setUpdatedDate(LocalDateTime.now());
 
 
@@ -410,22 +443,50 @@ public class ProjectServiceImpl {
                 predictionResult.getPredictionResultFile(),
                 null,
                 predictionResult.getWindowTrainStatistic()
-
         );
 
         experiment.setUpdatedDate(LocalDateTime.now());
+        experiment.setStatus(ExperimentStatus.PREDICTED);
         experiment.setExperimentResult(experimentResult);
-
 
         this.experimentResultsRepository.save(experimentResult);
         this.experimentRepository.save(experiment);
         this.projectRepository.save(project);
 
-        if (project.getStatus() == ProjectStatus.PREDICTED) {
-            this.rabbitMQWriter.sendDataToReportService(
-                    new DataForReportServiceDto(project, experiment, experimentResult)
-            );
+        if (experiment.getStatus() == ExperimentStatus.PREDICTED) {
+            try {
+                this.rabbitMQWriter.sendDataToReportService(
+                        new ReportData(project, experiment, experimentResult)
+                );
+            } catch (Exception ex) {
+                experiment.setStatus(ExperimentStatus.SENDING_TO_REPORT_SERVICE_ERROR);
+                experimentRepository.save(experiment);
+                throw ex;
+            }
         }
+
+    }
+
+    public void setReportResult(ReportResult reportResult) throws ResourceNotFoundException {
+
+        Experiment experiment = experimentRepository
+                .findById(reportResult.getExperimentId())
+                .orElseThrow(() -> new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS"));
+
+        Project project = experiment.getProject();
+        project.setLastActiveExperiment(experiment);
+        project.setUpdatedDate(LocalDateTime.now());
+
+        ExperimentResult experimentResult = experiment.getExperimentResult();
+        experimentResult.setPredictionReportFile(reportResult.getPredictionReportFile());
+        experimentResult.setPredictionResult(reportResult.getPredictionResult());
+
+        experiment.setUpdatedDate(LocalDateTime.now());
+
+        this.experimentResultsRepository.save(experimentResult);
+        this.experimentRepository.save(experiment);
+        this.projectRepository.save(project);
+
 
     }
 

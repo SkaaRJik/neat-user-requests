@@ -1,20 +1,21 @@
 package ru.filippov.neat.dto.services.preprocessing;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.filippov.neat.entity.ExperimentStatus;
 
 import java.util.HashMap;
 
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder(toBuilder = true)
-public class NormalizationResult {
+public class ReportResult {
+    private Long projectId;
     private Long experimentId;
-    private String normalizedDatasetFilename;
-    private HashMap<String, Object> statistic;
+    private Long experimentResultId;
+    private HashMap<String, Object> predictionResult;
+    private String predictionReportFile;
     private ExperimentStatus status;
 }

@@ -1,4 +1,4 @@
-package ru.filippov.neat.dto;
+package ru.filippov.neat.dto.services.preprocessing;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +15,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DataForReportServiceDto {
+public class ReportData {
     private Long experimentResultId;
     private HashMap<String, Object> model;
     private List<Double> trainErrors;
@@ -36,9 +36,10 @@ public class DataForReportServiceDto {
     private Short predictionWindowSize;
     private Integer trainEndIndex;
     private Integer testEndIndex;
+    private Map<String, Object> normalizationStatistic;
 
 
-    public DataForReportServiceDto(Project project, Experiment experiment, ExperimentResult experimentResult) {
+    public ReportData(Project project, Experiment experiment, ExperimentResult experimentResult) {
         this.experimentResultId = experimentResult.getId();
         this.model = experimentResult.getModel();
         this.trainErrors = experimentResult.getTrainErrors();
@@ -60,5 +61,6 @@ public class DataForReportServiceDto {
         this.predictionWindowSize = experiment.getPredictionWindowSize();
         this.trainEndIndex = experiment.getTrainEndIndex();
         this.testEndIndex = experiment.getTestEndIndex();
+        this.normalizationStatistic = experiment.getNormalizationStatistic();
     }
 }

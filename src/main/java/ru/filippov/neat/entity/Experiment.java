@@ -27,7 +27,10 @@ import java.util.List;
         property = "id"
 )
 @NamedEntityGraph(name = "Experiment.project",
-        attributeNodes = @NamedAttributeNode("project")
+        attributeNodes = {
+            @NamedAttributeNode("project"),
+            @NamedAttributeNode("experimentResult")
+        }
 )
 @ToString
 public class Experiment {
@@ -56,6 +59,7 @@ public class Experiment {
 
     @Basic
     @Column(name = "enable_log_transform")
+    @JsonView(ExperimentView.FullInfo.class)
     private Boolean enableLogTransform;
 
     @Basic
@@ -114,4 +118,9 @@ public class Experiment {
     @OneToOne
     @JoinColumn(name = "fk_experiment_result_id", referencedColumnName = "id")
     private ExperimentResult experimentResult;
+
+    @Basic
+    @Column(name = "status")
+    @JsonView(ExperimentView.Status.class)
+    private ExperimentStatus status;
 }

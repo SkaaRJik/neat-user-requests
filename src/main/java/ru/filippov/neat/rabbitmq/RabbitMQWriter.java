@@ -7,9 +7,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.filippov.neat.config.RabbitConfig;
-import ru.filippov.neat.dto.DataForReportServiceDto;
-import ru.filippov.neat.dto.ExperimentDataForPredictionServiceDto;
+import ru.filippov.neat.dto.services.prediction.ExperimentData;
 import ru.filippov.neat.dto.services.preprocessing.NormalizationData;
+import ru.filippov.neat.dto.services.preprocessing.ReportData;
 import ru.filippov.neat.dto.services.preprocessing.VerificationData;
 
 @Component
@@ -24,7 +24,7 @@ public class RabbitMQWriter {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public void sendDataToPredict(ExperimentDataForPredictionServiceDto data) throws JsonProcessingException {
+    public void sendDataToPredict(ExperimentData data) throws JsonProcessingException {
         String json = this.objectMapper.writeValueAsString(data);
         rabbitTemplate.convertAndSend(rabbitConfig.RABBITMQ_OUTPUT_PREDICTION_SERVICE_EXCHANGE, rabbitConfig.RABBITMQ_OUTPUT_PREDICTION_SERVICE_ROUTING_KEY, json);
     }
@@ -39,8 +39,8 @@ public class RabbitMQWriter {
         rabbitTemplate.convertAndSend(rabbitConfig.RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_EXCHANGE, rabbitConfig.RABBITMQ_OUTPUT_VERIFICATE_DOCUMENT_ROUTING_KEY, json);
     }
 
-    public void sendDataToReportService(DataForReportServiceDto dataForReportServiceDto) throws JsonProcessingException {
-        String json = this.objectMapper.writeValueAsString(dataForReportServiceDto);
+    public void sendDataToReportService(ReportData reportData) throws JsonProcessingException {
+        String json = this.objectMapper.writeValueAsString(reportData);
         rabbitTemplate.convertAndSend(rabbitConfig.RABBITMQ_OUTPUT_REPORT_EXCHANGE, rabbitConfig.RABBITMQ_OUTPUT_REPORT_ROUTING_KEY, json);
     }
 }

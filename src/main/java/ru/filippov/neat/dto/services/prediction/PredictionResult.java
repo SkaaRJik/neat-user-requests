@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import ru.filippov.neat.entity.ProjectStatus;
+import ru.filippov.neat.entity.ExperimentStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,5 +21,5 @@ public class PredictionResult {
     private String predictionResultFile;
     private HashMap<String, Object> windowTrainStatistic;
     private HashMap<String, Object> model;
-    private ProjectStatus status;
+    private ExperimentStatus status;
 }

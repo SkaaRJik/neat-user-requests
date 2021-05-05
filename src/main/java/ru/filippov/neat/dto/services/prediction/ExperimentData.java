@@ -1,4 +1,4 @@
-package ru.filippov.neat.dto;
+package ru.filippov.neat.dto.services.prediction;
 
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
@@ -12,7 +12,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Log4j2
 @ToString
-public class ExperimentDataForPredictionServiceDto {
+public class ExperimentData {
     private Long experimentId;
     private Long projectId;
     private String username;

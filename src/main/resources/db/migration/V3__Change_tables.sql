@@ -11,11 +11,11 @@ CREATE sequence experiment_result_id_sequence
 
 create table experiment_results
 (
-    id int8 not null,
+    id bigint not null,
     model jsonb,
     train_errors jsonb,
     test_errors jsonb,
-    prediction_error float8,
+    prediction_error double precision,
     prediction_result jsonb,
     prediction_report_file text,
     creation_date timestamp NOT NULL,
@@ -31,7 +31,7 @@ CREATE SEQUENCE experiment_id_sequence
 
 create table experiments
 (
-    id int8 not null,
+    id bigint not null,
     name text not null,
     normalized_file text,
     normalization_method varchar(255),
@@ -40,12 +40,12 @@ create table experiments
     columns jsonb,
     prediction_window_size int4,
     prediction_period int4,
-    fk_project_id int8 not null,
+    fk_project_id bigint not null,
     creation_date timestamp not null,
     updated_date timestamp not null,
     train_end_index int4,
     test_end_index int4,
-    fk_experiment_result_id int8,
+    fk_experiment_result_id bigint,
     PRIMARY KEY (id)
 );
 

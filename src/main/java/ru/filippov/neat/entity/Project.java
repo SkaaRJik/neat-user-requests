@@ -48,6 +48,11 @@ public class Project {
     @JsonView(ProjectView.Info.class)
     private ProjectStatus status;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_last_active_experiment_id", referencedColumnName = "id")
+
+    private Experiment lastActiveExperiment;
+
     @Column(name = "created_date", updatable = false, nullable = false)
     @JsonView(ProjectView.Info.class)
     private LocalDateTime creationDate;
