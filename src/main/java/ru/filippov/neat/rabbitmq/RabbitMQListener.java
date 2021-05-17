@@ -29,33 +29,65 @@ public class RabbitMQListener {
 
     @RabbitListener(queues = "${rabbitmq.input.predictionStatus.queue:prediction-status}")
     public void consumeStatusFromPredictionService(Message message) throws IOException, ResourceNotFoundException {
-        ExperimentNewStatusDto statusDto = objectMapper.readValue(message.getBody(), ExperimentNewStatusDto.class);
-        projectService.updateExperimentStatus(statusDto);
-
+        try {
+            ExperimentNewStatusDto statusDto = objectMapper.readValue(message.getBody(), ExperimentNewStatusDto.class);
+            projectService.updateExperimentStatus(statusDto);
+        } catch (Exception ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeStatusFromPredictionService Message.body: ").append(message.getBody()).toString(), ex);
+        }
     }
 
     @RabbitListener(queues = "${rabbitmq.input.predictionResult.queue:prediction-result}")
     public void consumeResultFromPredictionService(Message message) throws IOException, ResourceNotFoundException {
-        PredictionResult predictionResult = objectMapper.readValue(message.getBody(), PredictionResult.class);
-        projectService.setPredictionResult(predictionResult);
+        try {
+            PredictionResult predictionResult = objectMapper.readValue(message.getBody(), PredictionResult.class);
+            projectService.setPredictionResult(predictionResult);
+        } catch (Exception ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromPredictionService Message.body: ").append(message.getBody()).toString(), ex);
+        }
+
     }
 
     @RabbitListener(queues = "${rabbitmq.input.verificationResult.queue:verification-result}")
     public void consumeResultFromVerificationService(Message message) throws IOException, ResourceNotFoundException {
-        VerificationResult verificationResult = objectMapper.readValue(message.getBody(), VerificationResult.class);
-        projectService.setVerificationResult(verificationResult);
+        try {
+            VerificationResult verificationResult = objectMapper.readValue(message.getBody(), VerificationResult.class);
+            projectService.setVerificationResult(verificationResult);
+        } catch (IOException ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromVerificationService Message.body: ").append(message.getBody()).toString(), ex);
+        } catch (ResourceNotFoundException ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromVerificationService Message.body: ").append(message.getBody()).toString(), ex);
+        } catch (Exception ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromVerificationService Message.body: ").append(message.getBody()).toString(), ex);
+        }
     }
 
     @RabbitListener(queues = "${rabbitmq.input.normalizationResult.queue:normalization-result}")
     public void consumeResultFromNormalizationService(Message message) throws IOException, ResourceNotFoundException {
-        NormalizationResult normalizationResult = objectMapper.readValue(message.getBody(), NormalizationResult.class);
-        projectService.setNormalizationResult(normalizationResult);
+        try {
+            NormalizationResult normalizationResult = objectMapper.readValue(message.getBody(), NormalizationResult.class);
+            projectService.setNormalizationResult(normalizationResult);
+        } catch (IOException ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromNormalizationService Message.body: ").append(message.getBody()).toString(), ex);
+        } catch (ResourceNotFoundException ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromNormalizationService Message.body: ").append(message.getBody()).toString(), ex);
+        } catch (Exception ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromNormalizationService Message.body: ").append(message.getBody()).toString(), ex);
+        }
     }
 
     @RabbitListener(queues = "${rabbitmq.input.reportResult.queue:report-result}")
     public void consumeResultFromReportService(Message message) throws IOException, ResourceNotFoundException {
-        ReportResult reportResult = objectMapper.readValue(message.getBody(), ReportResult.class);
-        projectService.setReportResult(reportResult);
+        try {
+            ReportResult reportResult = objectMapper.readValue(message.getBody(), ReportResult.class);
+            projectService.setReportResult(reportResult);
+        } catch (IOException ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromReportService Message.body: ").append(message.getBody()).toString(), ex);
+        } catch (ResourceNotFoundException ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromReportService Message.body: ").append(message.getBody()).toString(), ex);
+        } catch (Exception ex) {
+            log.error(new StringBuilder("RabbitMQListener.consumeResultFromReportService Message.body: ").append(message.getBody()).toString(), ex);
+        }
     }
 
 
