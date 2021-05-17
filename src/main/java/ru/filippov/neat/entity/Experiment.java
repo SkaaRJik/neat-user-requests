@@ -9,6 +9,7 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import ru.filippov.neat.entity.view.ExperimentView;
+import ru.filippov.neat.entity.view.ProjectView;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -39,12 +40,12 @@ public class Experiment {
     @SequenceGenerator(name = "EXPERIMENT_ID_GEN", sequenceName = "experiment_id_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EXPERIMENT_ID_GEN")
     @Column(name = "id")
-    @JsonView(ExperimentView.Id.class)
+    @JsonView({ ProjectView.Info.class, ExperimentView.Id.class})
     private Long id;
 
     @Basic
     @Column(name = "name")
-    @JsonView(ExperimentView.Info.class)
+    @JsonView({ProjectView.Info.class, ProjectView.FullInfo.class, ExperimentView.Info.class})
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,7 +60,7 @@ public class Experiment {
 
     @Basic
     @Column(name = "enable_log_transform")
-    @JsonView(ExperimentView.FullInfo.class)
+    @JsonView({ExperimentView.FullInfo.class})
     private Boolean enableLogTransform;
 
     @Basic
@@ -107,12 +108,12 @@ public class Experiment {
 
     @Basic
     @Column(name = "creation_date")
-    @JsonView(ExperimentView.Info.class)
+    @JsonView({ ProjectView.Info.class, ExperimentView.Info.class})
     private LocalDateTime creationDate;
 
     @Basic
     @Column(name = "updated_date")
-    @JsonView(ExperimentView.Info.class)
+    @JsonView({ProjectView.Info.class,ExperimentView.Info.class})
     private LocalDateTime updatedDate;
 
     @OneToOne
@@ -121,6 +122,6 @@ public class Experiment {
 
     @Basic
     @Column(name = "status")
-    @JsonView(ExperimentView.Status.class)
+    @JsonView({ ProjectView.Info.class, ExperimentView.Info.class})
     private ExperimentStatus status;
 }

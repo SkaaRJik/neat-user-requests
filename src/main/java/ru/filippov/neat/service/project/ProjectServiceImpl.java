@@ -59,7 +59,7 @@ public class ProjectServiceImpl {
     }
 
 
-    public Project createProject(User user, String projectName) throws IOException, ResourceNotFoundException, ProjectException {
+    public Project createProject(User user, String projectName, MultipartFile sourceFile) throws IOException, ResourceNotFoundException, ProjectException {
 
         if (projectRepository.findAllByUserId(user.getId(), PageRequest.of(1, 1, Sort.unsorted())).getTotalElements() >= MAX_ALLOWED_PROJECTS) {
             throw new ResourceNotFoundException("ERROR_CREATED_MAX_PROJECTS");
@@ -72,7 +72,7 @@ public class ProjectServiceImpl {
 
         String transliteratedProjectName = Translitirator.cyr2lat(projectName).replaceAll("[^\\d\\w А-Яа-я]", "").replaceAll(" ", "_");
 
-        project = projectRepository.save(new Project(
+        project = new Project(
                 null,
                 projectName,
                 user,
@@ -89,8 +89,22 @@ public class ProjectServiceImpl {
                 null,
                 null,
                 null
-        ));
+        );
 
+        String sourceFilePath = this.sambaWorker.writeSourceFile(sourceFile, project.getProjectFolder());
+
+        project.setSourceFile(sourceFilePath);
+        project.setStatus(ProjectStatus.VERIFICATION);
+        projectRepository.save(project);
+
+        rabbitMQWriter.sendDataToVerify(
+                new VerificationData(
+                        project.getId(),
+                        user.getUsername(),
+                        project.getSourceFile(),
+                        project.getProjectFolder()
+                )
+        );
 
         return project;
     }
@@ -108,9 +122,6 @@ public class ProjectServiceImpl {
             throw new ProjectException("VERIFICATION_IN_PROGRESS");
         }
 
-        if ( project.getStatus() == ProjectStatus.VERIFIED ) {
-            throw new ProjectException("SOURCE_FILE_ALREADY_VERIFIED");
-        }
 
         String sourceFile = this.sambaWorker.writeSourceFile(multipartFile, project.getProjectFolder());
 
@@ -146,6 +157,7 @@ public class ProjectServiceImpl {
 
         return project;
     }
+
 
     public void normalizeData(User user, Long projectId, Long experimentId, String method, boolean enableLogTransform) throws PermissionException, ResourceNotFoundException, IOException, ProjectException {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
@@ -216,9 +228,9 @@ public class ProjectServiceImpl {
     }
 
 
-    public Experiment createExperiment(User user, Long projectId, String experimentName) throws PermissionException, ResourceNotFoundException, ProjectException {
+    public Experiment createExperiment(User user, Long projectId) throws PermissionException, ResourceNotFoundException, ProjectException {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
-
+        String experimentName = String.format("Experiment_%d", System.nanoTime());
         if (project.getUser().getId() != user.getId()) {
             throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
         }

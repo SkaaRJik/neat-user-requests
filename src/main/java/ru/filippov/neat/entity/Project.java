@@ -48,9 +48,9 @@ public class Project {
     @JsonView(ProjectView.Info.class)
     private ProjectStatus status;
 
+    @JsonView(ProjectView.Info.class)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_last_active_experiment_id", referencedColumnName = "id")
-
     private Experiment lastActiveExperiment;
 
     @Column(name = "created_date", updatable = false, nullable = false)
@@ -65,15 +65,15 @@ public class Project {
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<Experiment> experiments;
 
-    @JsonView(ProjectView.FullInfo.class)
+    @JsonIgnore
     @Column(name = "project_folder")
     private String projectFolder;
 
-    @JsonView(ProjectView.FullInfo.class)
+    @JsonIgnore
     @Column(name = "source_file")
     private String sourceFile;
 
-    @JsonView(ProjectView.FullInfo.class)
+    @JsonIgnore
     @Column(name = "verified_file")
     private String verifiedFile;
 

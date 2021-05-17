@@ -10,9 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import ru.filippov.neat.dto.experiment.NewExperimentDto;
 import ru.filippov.neat.dto.experiment.UpdateExperimentDto;
-import ru.filippov.neat.dto.project.NewProjectDto;
 import ru.filippov.neat.dto.services.prediction.ExperimentData;
 import ru.filippov.neat.entity.Experiment;
 import ru.filippov.neat.entity.Project;
@@ -47,16 +45,18 @@ public class ProjectController {
     @PostMapping("")
     @JsonView(ProjectView.Info.class)
     public Project saveProject(@AuthenticationPrincipal UserPrincipal user,
-                                         @RequestBody NewProjectDto newProjectDto){
+                               @RequestParam("file") MultipartFile sourceFile,
+                               @RequestParam("projectName") String projectName
+                               ){
         try{
-            Project project = projectService.createProject(user.toUser(), newProjectDto.getProjectName());
+            Project project = projectService.createProject(user.toUser(), projectName, sourceFile);
             return project;
         } catch (ProjectException e) {
-            log.error(String.format("ProjectController.saveProject: user: %d-%s ; projectDto: %s ", user.getId(), user.getUsername(), newProjectDto.toString()), e);
+            log.error(String.format("ProjectController.saveProject: user: %d-%s ; projectDto: %s ", user.getId(), user.getUsername(), projectName), e);
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (Exception e) {
-            log.error(String.format("ProjectController.saveProject: user: %d-%s ; projectDto: %s ", user.getId(), user.getUsername(), newProjectDto.toString()), e);
+            log.error(String.format("ProjectController.saveProject: user: %d-%s ; projectDto: %s ", user.getId(), user.getUsername(), projectName), e);
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
         }
@@ -65,7 +65,7 @@ public class ProjectController {
     @PostMapping("/{id}/attach")
     @JsonView(ProjectView.Id.class)
     public String attachSourceFileToProject(@AuthenticationPrincipal UserPrincipal user,
-                                                       @RequestBody MultipartFile file,
+                                                        @RequestParam("file") MultipartFile file,
                                                        @PathVariable("id") Long projectId){
         
         try{
@@ -92,7 +92,6 @@ public class ProjectController {
     }
 
     @GetMapping("")
-    @JsonView(ProjectView.Info.class)
     public Page<Project> getProjects(@AuthenticationPrincipal UserPrincipal user,
                                      @RequestParam(name = "page", defaultValue = "1") Integer page,
                                      @RequestParam(name = "itemsPerPage", defaultValue = "10") Integer itemsPerPage,
@@ -149,7 +148,7 @@ public class ProjectController {
     @RequestMapping(value = "/{project_id}/experiment/{experiment_id}/predict",method = RequestMethod.POST)
     public String startPrediction(@AuthenticationPrincipal UserPrincipal user,
                                                       @PathVariable("project_id") Long projectId,
-                                                      @PathVariable(name = "experiment_id", required = false) Long experimentId,
+                                                      @PathVariable(name = "experiment_id") Long experimentId,
                                                       @RequestBody ExperimentData experimentData){
         try {
             projectService.startPrediction(user.toUser(), projectId, experimentId, experimentData);
@@ -170,31 +169,52 @@ public class ProjectController {
     }
 
     @JsonView(ExperimentView.FullInfo.class)
-    @RequestMapping(value = "/{project_id}/experiment",method = RequestMethod.POST)
-    public Experiment createExperiment(@AuthenticationPrincipal UserPrincipal user,
-                                              @PathVariable("project_id") Long projectId,
-                                              @RequestBody NewExperimentDto newExperimentDto){
+    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}",method = RequestMethod.GET)
+    public Experiment getExperiment(@AuthenticationPrincipal UserPrincipal user,
+                                  @PathVariable("project_id") Long projectId,
+                                  @PathVariable(name = "experiment_id") Long experimentId){
         try {
-            Experiment experiment = projectService.createExperiment(user.toUser(), projectId, newExperimentDto.getName());
-            return experiment;
+            Experiment experimentById = projectService.getExperimentById(user.toUser(), projectId, experimentId);
+            return experimentById;
         } catch (ResourceNotFoundException e) {
-            log.error(String.format("ProjectController.createExperiment: projectId: %d ; user: %d-%s ; newExperimentDto = %s", projectId, user.getId(), user.getUsername(), newExperimentDto.toString()), e);
+            log.error(String.format("ProjectController.getExperiment: projectId: %d ; user: %d-%s ; experimentId: %d; ", projectId, user.getId(), user.getUsername(), experimentId), e);
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (PermissionException e) {
-            log.error(String.format("ProjectController.createExperiment: projectId: %d ; user: %d-%s ; newExperimentDto = %s", projectId, user.getId(), user.getUsername(), newExperimentDto.toString()), e);
+            log.error(String.format("ProjectController.getExperiment: projectId: %d ; user: %d-%s ; experimentId: %d; ", projectId, user.getId(), user.getUsername(), experimentId), e);
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, e.getMessage(), e);
         } catch (Exception e) {
-            log.error(String.format("ProjectController.createExperiment: projectId: %d ; user: %d-%s ; newExperimentDto = %s", projectId, user.getId(), user.getUsername(), newExperimentDto.toString()), e);
+            log.error(String.format("ProjectController.getExperiment: projectId: %d ; user: %d-%s ; experimentId: %d; ", projectId, user.getId(), user.getUsername(), experimentId), e);
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
         }
-        
     }
 
     @JsonView(ExperimentView.FullInfo.class)
-    @RequestMapping(value = "/{id}/experiment/{experiment_id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{project_id}/experiment",method = RequestMethod.POST)
+    public Experiment createExperiment(@AuthenticationPrincipal UserPrincipal user,
+                                              @PathVariable("project_id") Long projectId){
+        try {
+            Experiment experiment = projectService.createExperiment(user.toUser(), projectId);
+            return experiment;
+        } catch (ResourceNotFoundException e) {
+            log.error(String.format("ProjectController.createExperiment: projectId: %d ; user: %d-%s ;", projectId, user.getId(), user.getUsername()), e);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (PermissionException e) {
+            log.error(String.format("ProjectController.createExperiment: projectId: %d ; user: %d-%s ;", projectId, user.getId(), user.getUsername()), e);
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, e.getMessage(), e);
+        } catch (Exception e) {
+            log.error(String.format("ProjectController.createExperiment: projectId: %d ; user: %d-%s ;", projectId, user.getId(), user.getUsername()), e);
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        }
+    }
+
+    @JsonView(ExperimentView.FullInfo.class)
+    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}",method = RequestMethod.PUT)
     public Experiment updateExperiment(@AuthenticationPrincipal UserPrincipal user,
                                               @PathVariable("project_id") Long projectId,
                                               @PathVariable(name = "experiment_id", required = false) Long experimentId,

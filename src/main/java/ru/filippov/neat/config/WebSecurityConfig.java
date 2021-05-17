@@ -18,7 +18,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import ru.filippov.neat.config.jwt.JwtAuthEntryPoint;
 import ru.filippov.neat.config.jwt.JwtAuthTokenFilter;
-import ru.filippov.neat.entity.Role;
 import ru.filippov.neat.service.user.UserDetailsServiceImpl;
 
 import java.util.Arrays;
@@ -51,6 +50,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:8080");
         config.addAllowedOrigin("http://192.168.0.3:8080");
+        config.addAllowedOrigin("http://192.168.0.2:8080");
+        config.addAllowedOrigin("http://192.168.0.1:8080");
+        config.addAllowedOrigin("http://192.168.0.4:8080");
+        config.addAllowedOrigin("http://192.168.0.5:8080");
+        config.addAllowedOrigin("http://192.168.0.6:8080");
         config.addAllowedOrigin("http://192.168.0.7:8080");
         config.setAllowedMethods(Arrays.asList("POST", "OPTIONS", "GET", "DELETE", "PUT"));
         config.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
@@ -74,6 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .cors().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
