@@ -20,6 +20,7 @@ public class VerificationResult {
     private String verifiedFile;
     private Map<String, Object> legend;
     private boolean logIsAllowed;
+    private Integer rows;
     private List headers;
     private ProjectStatus status;
 }

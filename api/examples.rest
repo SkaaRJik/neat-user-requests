@@ -1,0 +1,5 @@
+GET http://localhost:9000/sse/mvc/stream-sse-mvc
+
+###
+
+POST http://localhost:9000/5/experiment/11/download_report

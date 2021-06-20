@@ -355,9 +355,9 @@ public class NEATConfig implements AIConfig {
 		params.add(new GUIAIConfig(
         "RECURRENCY.ALLOWED",
 				false,
-				true,
-				true,
 				false,
+				false,
+				true,
 				null,
 				null
 		));

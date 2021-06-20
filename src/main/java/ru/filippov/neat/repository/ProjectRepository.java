@@ -14,7 +14,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Page<Project> findAllByUserId(Long userId, Pageable pageable);
 
-    @Query("SELECT pr FROM Project pr WHERE pr.name = ?1 AND pr.user.id = ?2")
+    @Query("SELECT pr FROM Project pr WHERE upper(pr.name) = upper(?1) AND pr.user.id = ?2")
     Optional<Project> findOneByNameAndUserId(String name, Long userId);
 
 }

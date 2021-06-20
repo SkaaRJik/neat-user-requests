@@ -3,6 +3,7 @@ package ru.filippov.neat.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@Order(1)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -82,11 +84,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                .antMatchers("/login", "/signup", "/email-exist", "/username-exist", "/refresh-tokens", "/public/**").permitAll()
-                .anyRequest().authenticated()
+                .headers()
+                    .frameOptions()
+                        .sameOrigin()
                 .and()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler);
+                .authorizeRequests()
+                .antMatchers("/login", "/signup", "/email-exist", "/username-exist", "/refresh-tokens", "/public/**", "/sse/mvc/stream-sse-mvc")
+                    .permitAll()
+                .anyRequest()
+                    .authenticated()
+                .and()
+                .exceptionHandling()
+                    .authenticationEntryPoint(unauthorizedHandler);
 
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

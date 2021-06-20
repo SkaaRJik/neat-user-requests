@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.filippov.neat.controller.ServerSentEventController;
 import ru.filippov.neat.dto.services.prediction.ExperimentData;
 import ru.filippov.neat.dto.services.prediction.ExperimentNewStatusDto;
 import ru.filippov.neat.dto.services.prediction.PredictionResult;
@@ -44,18 +45,21 @@ public class ProjectServiceImpl {
     @Value("${app.project.restrictions.max_allowed_projects:50}")
     private int MAX_ALLOWED_PROJECTS;
 
+    private final ServerSentEventController serverSentEventController;
+
     private final RabbitMQWriter rabbitMQWriter;
 
     private final ExperimentRepository experimentRepository;
 
     private final SambaWorker sambaWorker;
 
-    public ProjectServiceImpl(ExperimentResultsRepository experimentResultsRepository, ProjectRepository projectRepository, ExperimentRepository experimentRepository, RabbitMQWriter rabbitMQWriter, SambaWorker sambaWorker) {
+    public ProjectServiceImpl(ExperimentResultsRepository experimentResultsRepository, ProjectRepository projectRepository, ExperimentRepository experimentRepository, RabbitMQWriter rabbitMQWriter, SambaWorker sambaWorker, ServerSentEventController serverSentEventController) {
         this.experimentResultsRepository = experimentResultsRepository;
         this.projectRepository = projectRepository;
         this.experimentRepository = experimentRepository;
         this.rabbitMQWriter = rabbitMQWriter;
         this.sambaWorker = sambaWorker;
+        this.serverSentEventController = serverSentEventController;
     }
 
 
@@ -66,6 +70,7 @@ public class ProjectServiceImpl {
         }
 
         Project project = projectRepository.findOneByNameAndUserId(projectName, user.getId()).orElse(null);
+
         if (project != null) {
             throw new ProjectException("ERROR_PROJECT_ALREADY_EXISTS");
         }
@@ -82,6 +87,7 @@ public class ProjectServiceImpl {
                 LocalDateTime.now(),
                 null,
                 String.format("%s/%s", user.getUsername(), transliteratedProjectName),
+                null,
                 null,
                 null,
                 null,
@@ -109,7 +115,7 @@ public class ProjectServiceImpl {
         return project;
     }
 
-    public void attachSourceFileToProject(User user, Long projectId, MultipartFile multipartFile) throws ResourceNotFoundException, PermissionException, IOException, ProjectException {
+    public Project attachSourceFileToProject(User user, Long projectId, MultipartFile multipartFile) throws ResourceNotFoundException, PermissionException, IOException, ProjectException {
         Project project = projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
@@ -118,7 +124,7 @@ public class ProjectServiceImpl {
             throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
         }
 
-        if(project.getStatus() == ProjectStatus.VERIFICATION){
+        if (project.getStatus() == ProjectStatus.VERIFICATION) {
             throw new ProjectException("VERIFICATION_IN_PROGRESS");
         }
 
@@ -129,14 +135,23 @@ public class ProjectServiceImpl {
         project.setStatus(ProjectStatus.VERIFICATION);
         projectRepository.save(project);
 
-        rabbitMQWriter.sendDataToVerify(
-                new VerificationData(
-                        project.getId(),
-                        user.getUsername(),
-                        project.getSourceFile(),
-                        project.getProjectFolder()
-                )
-        );
+        try {
+            rabbitMQWriter.sendDataToVerify(
+                    new VerificationData(
+                            project.getId(),
+                            user.getUsername(),
+                            project.getSourceFile(),
+                            project.getProjectFolder()
+                    )
+            );
+        } catch (Exception exception) {
+            project.setStatus(ProjectStatus.SENDING_TO_VERIFICATION_SERVICE_ERROR);
+            projectRepository.save(project);
+            throw exception;
+        }
+
+
+        return project;
     }
 
     public Page<Project> getProjectsByUser(User user, int curPage, int itemsPerPage) {
@@ -159,7 +174,7 @@ public class ProjectServiceImpl {
     }
 
 
-    public void normalizeData(User user, Long projectId, Long experimentId, String method, boolean enableLogTransform) throws PermissionException, ResourceNotFoundException, IOException, ProjectException {
+    public Experiment normalizeData(User user, Long projectId, Long experimentId, String method, boolean enableLogTransform) throws PermissionException, ResourceNotFoundException, IOException, ProjectException {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
 
         if (project.getUser().getId() != user.getId()) {
@@ -188,19 +203,6 @@ public class ProjectServiceImpl {
             throw new ProjectException("PREDICTION_PROCESS_ALREADY_RAN");
         }
 
-        /*Experiment experiment = null;
-
-        try {
-            experiment = project.getExperiments().stream().filter(exp -> exp.getId() == experimentId).collect(Collectors.toList()).get(0);
-        } catch (IndexOutOfBoundsException ex) {
-            throw new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS");
-        }
-
-        if(experiment == null){
-            throw new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS");
-        }*/
-
-
 
         project.setUpdatedDate(LocalDateTime.now());
         project.setLastActiveExperiment(experiment);
@@ -224,6 +226,8 @@ public class ProjectServiceImpl {
             experimentRepository.save(experiment);
             throw exception;
         }
+
+        return experiment;
 
     }
 
@@ -342,6 +346,7 @@ public class ProjectServiceImpl {
         project.setLegend(verificationResult.getLegend());
         project.setVerifiedFile(verificationResult.getVerifiedFile());
         project.setLogIsAllowed(verificationResult.isLogIsAllowed());
+        project.setRows(verificationResult.getRows());
         this.projectRepository.save(project);
     }
 
@@ -363,9 +368,11 @@ public class ProjectServiceImpl {
 
         this.projectRepository.save(project);
         this.experimentRepository.save(experiment);
+
+        this.serverSentEventController.updateExperiment(project.getUser().getId(), experiment);
     }
 
-    public void startPrediction(User user, Long projectId, Long experimentId, ExperimentData experimentData) throws PermissionException, ResourceNotFoundException, JsonProcessingException, ProjectException {
+    public Experiment startPrediction(User user, Long projectId, Long experimentId, ExperimentData experimentData) throws PermissionException, ResourceNotFoundException, JsonProcessingException, ProjectException {
 
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
 
@@ -375,7 +382,7 @@ public class ProjectServiceImpl {
 
         Experiment experiment = experimentRepository.findById(experimentId).orElseThrow(() -> new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS"));
 
-        if(experiment.getNormalizedDataFile() == null) {
+        if (experiment.getNormalizedDataFile() == null) {
             throw new ProjectException("ERROR_NORMALIZATION_FILE_NOT_FOUND");
         }
 
@@ -431,7 +438,7 @@ public class ProjectServiceImpl {
             experimentRepository.save(experiment);
             throw ex;
         }
-
+        return experiment;
     }
 
     public void setPredictionResult(PredictionResult predictionResult) throws ResourceNotFoundException, JsonProcessingException {
@@ -496,8 +503,57 @@ public class ProjectServiceImpl {
         experiment.setUpdatedDate(LocalDateTime.now());
 
         this.experimentResultsRepository.save(experimentResult);
-        this.experimentRepository.save(experiment);
+        experiment = this.experimentRepository.save(experiment);
         this.projectRepository.save(project);
+
+        this.serverSentEventController.updateExperiment(project.getUser().getId(), experiment);
+
+    }
+
+    public Experiment copyExperiment(User user, Long projectId, Long experimentId, Long rewriteExperimentId) throws PermissionException, ResourceNotFoundException, ProjectException {
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
+        if (project.getUser().getId() != user.getId()) {
+            throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
+        }
+
+        List<Experiment> experiments = project.getExperiments();
+
+        Experiment sourceExperiment = experimentRepository.findById(experimentId)
+                .orElseThrow(() -> new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS"));
+        Experiment newExperiment = null;
+
+
+        if (experiments.size() < MAX_ALLOWED_EXPERIMENTS || rewriteExperimentId != null) {
+            newExperiment = sourceExperiment.copy(rewriteExperimentId);
+            newExperiment = experimentRepository.save(newExperiment);
+            experiments.add(newExperiment);
+            project.setLastActiveExperiment(newExperiment);
+            projectRepository.save(project);
+        } else {
+            throw new ProjectException("ERROR_MAX_EXPERIMENTS_REACHED");
+        }
+        return newExperiment;
+    }
+
+    public byte[] getExperimentReport(User user, Long projectId, Long experimentId) throws PermissionException, ProjectException, ResourceNotFoundException, IOException {
+
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("ERROR_PROJECT_DOES_NOT_EXISTS"));
+
+        if (project.getUser().getId() != user.getId()) {
+            throw new PermissionException("ERROR_PROJECT_DOES_NOT_BELONG_TO_YOU");
+        }
+
+        Experiment experiment = experimentRepository.findById(experimentId).orElseThrow(() -> new ResourceNotFoundException("ERROR_EXPERIMENT_DOES_NOT_EXISTS"));
+
+        if (experiment.getExperimentResult() == null) {
+            throw new ProjectException("ERROR_EXPERIMENT_RESULT_DOES_NOT_EXIST");
+        }
+
+        if(experiment.getExperimentResult().getPredictionReportFile() == null) {
+            throw new ProjectException("ERROR_REPORT_FILE_DOES_NOT_EXIST");
+        }
+
+        return this.sambaWorker.readFile(experiment.getExperimentResult().getPredictionReportFile());
 
 
     }

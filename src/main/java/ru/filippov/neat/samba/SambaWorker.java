@@ -95,13 +95,17 @@ public class SambaWorker {
 
 
     // Читаем
-    private byte[] readFile(String filename) throws IOException {
+    public byte[] readFile(String filename) throws IOException {
 
         final File file = getFile(filename, AccessMask.GENERIC_READ, SMB2CreateDisposition.FILE_OPEN);
         InputStream is = file.getInputStream();
         byte[] fileBytes = null;
         BufferedInputStream in = new BufferedInputStream(is);
         fileBytes = in.readAllBytes();
+        is.close();
+        in.close();
+        file.close();
+
         return fileBytes;
 
     }

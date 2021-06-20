@@ -64,6 +64,7 @@ public class User {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime lastPasswordUpdate;
 
+
    /* @OneToMany(
             mappedBy = "user_projects",
             cascade = CascadeType.PERSIST,

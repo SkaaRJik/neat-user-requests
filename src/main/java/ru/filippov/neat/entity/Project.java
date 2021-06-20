@@ -102,6 +102,11 @@ public class Project {
     @Type(type = "jsonb")
     private List<String> headers;
 
+    @JsonView(ProjectView.FullInfo.class)
+    @Column(name = "rows")
+    private Integer rows;
+
+
 
 
 }

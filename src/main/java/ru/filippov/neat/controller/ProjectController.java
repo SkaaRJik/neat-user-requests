@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +33,7 @@ import ru.filippov.neat.service.user.UserPrincipal;
 public class ProjectController {
 
     @Bean
-    public ExcelParser getExcelParser(){
+    public ExcelParser getExcelParser() {
         return new ExcelParser();
     }
 
@@ -43,12 +46,12 @@ public class ProjectController {
 
 
     @PostMapping("")
-    @JsonView(ProjectView.Info.class)
+    @JsonView(ProjectView.FullInfo.class)
     public Project saveProject(@AuthenticationPrincipal UserPrincipal user,
                                @RequestParam("file") MultipartFile sourceFile,
                                @RequestParam("projectName") String projectName
-                               ){
-        try{
+    ) {
+        try {
             Project project = projectService.createProject(user.toUser(), projectName, sourceFile);
             return project;
         } catch (ProjectException e) {
@@ -63,14 +66,13 @@ public class ProjectController {
     }
 
     @PostMapping("/{id}/attach")
-    @JsonView(ProjectView.Id.class)
-    public String attachSourceFileToProject(@AuthenticationPrincipal UserPrincipal user,
-                                                        @RequestParam("file") MultipartFile file,
-                                                       @PathVariable("id") Long projectId){
-        
-        try{
-            projectService.attachSourceFileToProject(user.toUser(), projectId, file);
-            return "INFO_VERIFICATION_STARTED";
+    @JsonView(ProjectView.FullInfo.class)
+    public Project attachSourceFileToProject(@AuthenticationPrincipal UserPrincipal user,
+                                             @RequestParam("file") MultipartFile file,
+                                             @PathVariable("id") Long projectId) {
+
+        try {
+            return projectService.attachSourceFileToProject(user.toUser(), projectId, file);
         } catch (PermissionException e) {
             log.error(String.format("ProjectController.attachSourceFileToProject: projectId: %d ; user: %d-%s ", projectId, user.getId(), user.getUsername()), e);
             throw new ResponseStatusException(
@@ -82,20 +84,20 @@ public class ProjectController {
         } catch (ProjectException e) {
             log.error(String.format("ProjectController.attachSourceFileToProject: projectId: %d ; user: %d-%s ", projectId, user.getId(), user.getUsername()), e);
             throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, e.getMessage(), e);
+                    HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (Exception ex) {
             log.error(String.format("ProjectController.attachSourceFileToProject: projectId: %d ; user: %d-%s ", projectId, user.getId(), user.getUsername()), ex);
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
         }
-        
+
     }
 
     @GetMapping("")
     public Page<Project> getProjects(@AuthenticationPrincipal UserPrincipal user,
                                      @RequestParam(name = "page", defaultValue = "1") Integer page,
                                      @RequestParam(name = "itemsPerPage", defaultValue = "10") Integer itemsPerPage,
-                                     @RequestParam(name = "projectBelongsTo", defaultValue = "me") String belongsTo){
+                                     @RequestParam(name = "projectBelongsTo", defaultValue = "me") String belongsTo) {
         Page<Project> projectsByUser = projectService.getProjectsByUser(user.toUser(), page, itemsPerPage);
         return projectsByUser;
     }
@@ -123,8 +125,8 @@ public class ProjectController {
     @GetMapping("/{id}")
     @JsonView(ProjectView.FullInfo.class)
     public Project getProjectInfo(@AuthenticationPrincipal UserPrincipal user,
-                                            @PathVariable("id") Long id) {
-        try{
+                                  @PathVariable("id") Long id) {
+        try {
             Project projectsById = projectService.getProjectById(id, user.toUser());
             return projectsById;
         } catch (ResourceNotFoundException ex) {
@@ -140,19 +142,18 @@ public class ProjectController {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
         }
-        
+
     }
 
 
-
-    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}/predict",method = RequestMethod.POST)
-    public String startPrediction(@AuthenticationPrincipal UserPrincipal user,
-                                                      @PathVariable("project_id") Long projectId,
-                                                      @PathVariable(name = "experiment_id") Long experimentId,
-                                                      @RequestBody ExperimentData experimentData){
+    @JsonView(ExperimentView.FullInfo.class)
+    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}/predict", method = RequestMethod.POST)
+    public Experiment startPrediction(@AuthenticationPrincipal UserPrincipal user,
+                                      @PathVariable("project_id") Long projectId,
+                                      @PathVariable(name = "experiment_id") Long experimentId,
+                                      @RequestBody ExperimentData experimentData) {
         try {
-            projectService.startPrediction(user.toUser(), projectId, experimentId, experimentData);
-            return "INFO_PREDICTION_STARTED";
+            return projectService.startPrediction(user.toUser(), projectId, experimentId, experimentData);
         } catch (ResourceNotFoundException e) {
             log.error(String.format("ProjectController.startPrediction: projectId: %d ; user: %d-%s ; experimentId: %d; experimentData = %s", projectId, user.getId(), user.getUsername(), experimentId, experimentData.toString()), e);
             throw new ResponseStatusException(
@@ -168,11 +169,11 @@ public class ProjectController {
         }
     }
 
-    @JsonView(ExperimentView.FullInfo.class)
-    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}",method = RequestMethod.GET)
+
+    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}", method = RequestMethod.GET)
     public Experiment getExperiment(@AuthenticationPrincipal UserPrincipal user,
-                                  @PathVariable("project_id") Long projectId,
-                                  @PathVariable(name = "experiment_id") Long experimentId){
+                                    @PathVariable("project_id") Long projectId,
+                                    @PathVariable(name = "experiment_id") Long experimentId) {
         try {
             Experiment experimentById = projectService.getExperimentById(user.toUser(), projectId, experimentId);
             return experimentById;
@@ -192,9 +193,9 @@ public class ProjectController {
     }
 
     @JsonView(ExperimentView.FullInfo.class)
-    @RequestMapping(value = "/{project_id}/experiment",method = RequestMethod.POST)
+    @RequestMapping(value = "/{project_id}/experiment", method = RequestMethod.POST)
     public Experiment createExperiment(@AuthenticationPrincipal UserPrincipal user,
-                                              @PathVariable("project_id") Long projectId){
+                                       @PathVariable("project_id") Long projectId) {
         try {
             Experiment experiment = projectService.createExperiment(user.toUser(), projectId);
             return experiment;
@@ -213,12 +214,40 @@ public class ProjectController {
         }
     }
 
+    @JsonView(ExperimentView.Id.class)
+    @RequestMapping(value = {"/{project_id}/experiment/{experiment_id}/copy",
+            "/{project_id}/experiment/{experiment_id}/copy/{rewrite_experiment_id}"},
+            method = RequestMethod.POST)
+    public Experiment copyExperiment(@AuthenticationPrincipal UserPrincipal user,
+                                     @PathVariable("project_id") Long projectId,
+                                     @PathVariable(name = "experiment_id") Long experimentId,
+                                     @PathVariable(name = "rewrite_experiment_id", required = false) Long rewriteExperimentId
+    ) {
+        try {
+            final Experiment experiment = projectService.copyExperiment(user.toUser(), projectId, experimentId, rewriteExperimentId);
+            return experiment;
+        } catch (ResourceNotFoundException e) {
+            log.error(String.format("ProjectController.copyExperiment: projectId: %d ; user: %d-%s ; experimentId: %d; rewriteExperimentId = %d", projectId, user.getId(), user.getUsername(), experimentId, rewriteExperimentId), e);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (PermissionException e) {
+            log.error(String.format("ProjectController.copyExperiment: projectId: %d ; user: %d-%s ; experimentId: %d; rewriteExperimentId = %d", projectId, user.getId(), user.getUsername(), experimentId, rewriteExperimentId), e);
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, e.getMessage(), e);
+        } catch (Exception e) {
+            log.error(String.format("ProjectController.copyExperiment: projectId: %d ; user: %d-%s ; experimentId: %d; rewriteExperimentId = %d", projectId, user.getId(), user.getUsername(), experimentId, rewriteExperimentId), e);
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        }
+
+    }
+
     @JsonView(ExperimentView.FullInfo.class)
-    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}", method = RequestMethod.PUT)
     public Experiment updateExperiment(@AuthenticationPrincipal UserPrincipal user,
-                                              @PathVariable("project_id") Long projectId,
-                                              @PathVariable(name = "experiment_id", required = false) Long experimentId,
-                                              @RequestBody UpdateExperimentDto updateExperimentDto){
+                                       @PathVariable("project_id") Long projectId,
+                                       @PathVariable(name = "experiment_id") Long experimentId,
+                                       @RequestBody UpdateExperimentDto updateExperimentDto) {
         try {
             final Experiment experiment = projectService.updateExperiment(user.toUser(), projectId, experimentId, updateExperimentDto.getName());
             return experiment;
@@ -235,17 +264,17 @@ public class ProjectController {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
         }
-        
+
     }
 
-    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}/normalize",method = RequestMethod.POST)
-    public String normalizeDataForExperiment(@AuthenticationPrincipal UserPrincipal user,
-                                              @PathVariable("project_id") Long projectId,
-                                              @PathVariable(name = "experiment_id", required = false) Long experimentId,
-                                              @RequestBody UpdateExperimentDto updateExperimentDto){
+    @JsonView(ExperimentView.FullInfo.class)
+    @RequestMapping(value = "/{project_id}/experiment/{experiment_id}/normalize", method = RequestMethod.POST)
+    public Experiment normalizeDataForExperiment(@AuthenticationPrincipal UserPrincipal user,
+                                                 @PathVariable("project_id") Long projectId,
+                                                 @PathVariable(name = "experiment_id", required = false) Long experimentId,
+                                                 @RequestBody UpdateExperimentDto updateExperimentDto) {
         try {
-            projectService.normalizeData(user.toUser(), projectId, experimentId, updateExperimentDto.getNormalizationMethod(), updateExperimentDto.getEnableLogTransform());
-            return "INFO_NORMALIZATION_STARTED";
+            return projectService.normalizeData(user.toUser(), projectId, experimentId, updateExperimentDto.getNormalizationMethod(), updateExperimentDto.getEnableLogTransform());
         } catch (ResourceNotFoundException e) {
             log.error(String.format("ProjectController.updateExperiment: projectId: %d ; user: %d-%s ; experimentId: %d; updateExperimentDto = %s", projectId, user.getId(), user.getUsername(), experimentId, updateExperimentDto.toString()), e);
             throw new ResponseStatusException(
@@ -259,9 +288,35 @@ public class ProjectController {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
         }
-        
     }
 
+    @PostMapping(value = "/{project_id}/experiment/{experiment_id}/download_report")
+    public ResponseEntity downloadReport(@AuthenticationPrincipal UserPrincipal user,
+                                                            @PathVariable("project_id") Long projectId,
+                                                            @PathVariable(name = "experiment_id") Long experimentId) {
+        try {
+            byte[] experimentReport = projectService.getExperimentReport(user.toUser(), projectId, experimentId);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=customers.xlsx");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" );
+            return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .body(new ByteArrayResource(experimentReport));
+        } catch (ResourceNotFoundException e) {
+            log.error(String.format("ProjectController.downloadReport: projectId: %d ; user: %d-%s ; experimentId: %d", projectId, user.getId(), user.getUsername(), experimentId), e);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (PermissionException e) {
+            log.error(String.format("ProjectController.downloadReport: projectId: %d ; user: %d-%s ; experimentId: %d", projectId, user.getId(), user.getUsername(), experimentId), e);
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, e.getMessage(), e);
+        } catch (Exception e) {
+            log.error(String.format("ProjectController.downloadReport: projectId: %d ; user: %d-%s ; experimentId: %d", projectId, user.getId(), user.getUsername(), experimentId), e);
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        }
+    }
 
 
 }

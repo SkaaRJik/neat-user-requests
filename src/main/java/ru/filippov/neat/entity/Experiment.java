@@ -118,10 +118,39 @@ public class Experiment {
 
     @OneToOne
     @JoinColumn(name = "fk_experiment_result_id", referencedColumnName = "id")
+    @JsonView({ExperimentView.FullInfo.class})
     private ExperimentResult experimentResult;
 
     @Basic
     @Column(name = "status")
     @JsonView({ ProjectView.Info.class, ExperimentView.Info.class})
     private ExperimentStatus status;
+
+    public Experiment copy(Long id){
+
+        StringBuilder stringBuilder = new StringBuilder("Copy ");
+        stringBuilder.append(this.name);
+
+        String experimentName = stringBuilder.toString();
+
+        return new Experiment(
+                id,
+                experimentName,
+                this.project,
+                this.normalizedDataFile,
+                this.enableLogTransform,
+                this.normalizationMethod,
+                this.normalizationStatistic,
+                this.neatSettings,
+                this.columns,
+                this.predictionWindowSize,
+                this.predictionPeriod,
+                this.trainEndIndex,
+                this.testEndIndex,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                ExperimentStatus.NORMALIZED
+        );
+    }
 }
