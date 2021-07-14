@@ -10,7 +10,7 @@ The project is presented in a microservice architecture and includes the followi
 3. [Prediction service](https://github.com/SkaaRJik/neat-executor)
 4. [Graphical user interface](https://github.com/SkaaRJik/neatvue)
 5. PostgresSQL 11
-6. SMB protocol (Linux: Samba)
+6. [SMB protocol (Linux: Samba)](#samba-configuration)
 7. RabbitMQ 
 
 ## Service description
