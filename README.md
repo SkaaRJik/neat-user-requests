@@ -53,4 +53,4 @@ This service is designed to process user requests using the HTTP protocol. Inclu
 
 ## Samba configuration
 
-See [samba instruction](file://./src/main/resources/sh-scripts/samba-instructions.md)
+See [samba instruction](https://github.com/SkaaRJik/neat-user-requests/blob/separate-frontend/src/main/resources/sh-scripts/samba-instructions.md)
